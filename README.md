@@ -6,15 +6,33 @@ Although initially an ARM solution, it is quite portable and can be used on othe
 
 ### C++ API
 
-All functions have C equivalents:
+The following functions are available:
 
-TBD
+```c++
+namespace os
+{
+  namespace semihosting
+  {
+    int
+    call_host (int reason, void* arg);
+
+    void
+    report_exception (int reason);
+  } 
+} 
+```
 
  ### C API
 
-The following functions are available:
+All C++ functions have C equivalents:
 
-TBD
+```c
+  static int
+  os_semihosting_call_host (int reason, void* arg);
+
+  static void
+  os_semihosting_report_exception (int reason);
+```
 
 ## Developer info
 
@@ -36,7 +54,7 @@ $ git clone https://github.com/micro-os-plus/semihosting-xpack.git semihosting-x
 
 ### Implementation
 
-The architecture should provide a header file with the implementation for the following basic function.
+The architecture should provide a definition of the following function:
 
 ```c
   static inline int
@@ -54,7 +72,7 @@ $ sudo npm install xpm --global
 
 On Windows, global packages are installed in the user home folder, and do not require `sudo`.
 
-Compiling the source code require a modern C++ compiler, preferably GCC 5 or higher, but was also compiled with GCC 4.8. 
+Compiling the source code requires a modern C++ compiler, preferably GCC 5 or higher, but was also compiled with GCC 4.8. 
 
 ### How to publish
 
