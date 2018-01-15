@@ -22,7 +22,7 @@ namespace os
 } 
 ```
 
- ### C API
+### C API
 
 All C++ functions have C equivalents:
 
