@@ -33,19 +33,19 @@ extern "C"
 {
 #endif /* defined(__cplusplus) */
 
-  // Semihosting operations.
-  // They should be the same on all architectures.
-  enum os_semihosting_operation_number
+  enum semihosting_operation_numbers
   {
-    // Names preserve the original case from the ARM manual.
+    /*
+     * ARM semihosting operations, in lexicographic order.
+     */
+    SEMIHOSTING_ENTER_SVC = 0x17, /* DEPRECATED */
 
-    // Regular operations.
-    SEMIHOSTING_EnterSVC = 0x17,
-    SEMIHOSTING_ReportException = 0x18,
     SEMIHOSTING_SYS_CLOSE = 0x02,
     SEMIHOSTING_SYS_CLOCK = 0x10,
     SEMIHOSTING_SYS_ELAPSED = 0x30,
     SEMIHOSTING_SYS_ERRNO = 0x13,
+    SEMIHOSTING_SYS_EXIT = 0x18,
+    SEMIHOSTING_SYS_EXIT_EXTENDED = 0x20,
     SEMIHOSTING_SYS_FLEN = 0x0C,
     SEMIHOSTING_SYS_GET_CMDLINE = 0x15,
     SEMIHOSTING_SYS_HEAPINFO = 0x16,
@@ -64,21 +64,25 @@ extern "C"
     SEMIHOSTING_SYS_WRITE = 0x05,
     SEMIHOSTING_SYS_WRITEC = 0x03,
     SEMIHOSTING_SYS_WRITE0 = 0x04,
+  };
 
-    // Codes returned by SEMIHOSTING_ReportException.
-    ADP_Stopped_ApplicationExit = ((2 << 16) + 38),
-    ADP_Stopped_RunTimeError = ((2 << 16) + 35),
-
+  /*
+   * Codes used by SEMIHOSTING_SYS_EXIT (formerly
+   * SEMIHOSTING_REPORT_EXCEPTION).
+   * On 64-bits, the exit code is passed explicitly.
+   */
+  enum semihosting_reported_exceptions
+  {
+    /* On 32 bits, use it for exit(0) */
+    ADP_STOPPED_APPLICATION_EXIT = ((2 << 16) + 38),
+    /* On 32 bits, use it for exit(1) */
+    ADP_STOPPED_RUN_TIME_ERROR = ((2 << 16) + 35),
   };
 
 // ----------------------------------------------------------------------------
 
   static int
   os_semihosting_call_host (int reason, void* arg);
-
-  // Function used in _exit() to return the status code as Angel exception.
-  static void
-  os_semihosting_report_exception (int reason);
 
 #if defined(__cplusplus)
 }
@@ -97,9 +101,6 @@ namespace os
 
     int
     call_host (int reason, void* arg);
-
-    void
-    report_exception (int reason);
 
   // --------------------------------------------------------------------------
   } /* namespace semihosting */

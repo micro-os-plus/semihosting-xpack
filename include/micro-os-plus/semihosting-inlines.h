@@ -28,31 +28,6 @@
 #ifndef MICRO_OS_PLUS_SEMIHOSTING_INLINES_H_
 #define MICRO_OS_PLUS_SEMIHOSTING_INLINES_H_
 
-#if defined(__cplusplus)
-extern "C"
-{
-#endif /* defined(__cplusplus) */
-
-// ----------------------------------------------------------------------------
-
-  // Function used in _exit() to return the status code as Angel exception.
-  static inline void
-  __attribute__ ((always_inline,noreturn))
-  os_semihosting_report_exception (int reason)
-  {
-    os_semihosting_call_host (SEMIHOSTING_ReportException, (void*) reason);
-
-    while (true)
-      {
-        os::arch::wfi ();
-      }
-    /* NOTREACHED */
-  }
-
-#if defined(__cplusplus)
-}
-#endif /* defined(__cplusplus) */
-
 // ----------------------------------------------------------------------------
 
 #if defined(__cplusplus)
@@ -69,13 +44,6 @@ namespace os
     call_host (int reason, void* arg)
     {
       return os_semihosting_call_host (reason, arg);
-    }
-
-    inline void
-    __attribute__ ((always_inline,noreturn))
-    report_exception (int reason)
-    {
-      os_semihosting_report_exception (reason);
     }
 
   // --------------------------------------------------------------------------
