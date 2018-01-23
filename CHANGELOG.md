@@ -2,6 +2,11 @@
 
 Changes in reverse chronological order.
 
+### 2018-01-23
+
+* Use the posix:: namespace
+* add debug breaks for unimplemented calls
+
 ### 2018-01-21
 
 * [#1] Update semihosting after OpenOCD new definitions
