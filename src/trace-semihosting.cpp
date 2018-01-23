@@ -146,7 +146,7 @@ namespace os
 
       static int handle; // STATIC!
 
-      void* block[3];
+      void* fields[3];
       int ret;
 
       if (handle == 0)
@@ -154,12 +154,12 @@ namespace os
           // On the very first call get the file handle from the host.
 
           // Special filename for stdin/out/err.
-          block[0] = (void*) ":tt";
-          block[1] = (void*) 4;// mode "w"
+          fields[0] = (void*) ":tt";
+          fields[1] = (void*) 4;// mode "w"
           // Length of ":tt", except null terminator.
-          block[2] = (void*) (sizeof(":tt") - 1);
+          fields[2] = (void*) (sizeof(":tt") - 1);
 
-          ret = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*) block);
+          ret = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*) fields);
           if (ret == -1)
             {
               return -1;
@@ -168,11 +168,11 @@ namespace os
           handle = ret;
         }
 
-      block[0] = (void*) handle;
-      block[1] = (void*) buf;
-      block[2] = (void*) nbyte;
+      fields[0] = (void*) handle;
+      fields[1] = (void*) buf;
+      fields[2] = (void*) nbyte;
       // Send character array to host file/device.
-      ret = os::semihosting::call_host (SEMIHOSTING_SYS_WRITE, (void*) block);
+      ret = os::semihosting::call_host (SEMIHOSTING_SYS_WRITE, (void*) fields);
       // This call returns the number of bytes NOT written (0 if all ok).
 
       // -1 is not a legal value, but SEGGER seems to return it
