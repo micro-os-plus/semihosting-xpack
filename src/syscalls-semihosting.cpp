@@ -712,6 +712,10 @@ mkdir (const char* path, mode_t mode)
 int
 rmdir (const char* path)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -719,6 +723,10 @@ rmdir (const char* path)
 void
 sync (void)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
 }
 
@@ -728,6 +736,10 @@ sync (void)
 DIR*
 opendir (const char* dirpath)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return nullptr;
 }
@@ -735,6 +747,10 @@ opendir (const char* dirpath)
 struct dirent*
 readdir (DIR* dirp)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return nullptr;
 }
@@ -742,6 +758,10 @@ readdir (DIR* dirp)
 int
 readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return ((ssize_t) -1);
 }
@@ -749,12 +769,20 @@ readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
 void
 rewinddir (DIR* dirp)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
 }
 
 int
 closedir (DIR* dirp)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -776,6 +804,10 @@ closedir (DIR* dirp)
 int
 socket (int domain, int type, int protocol)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -783,6 +815,10 @@ socket (int domain, int type, int protocol)
 int
 socketpair (int domain, int type, int protocol, int socket_vector[2])
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -790,6 +826,10 @@ socketpair (int domain, int type, int protocol, int socket_vector[2])
 int
 accept (int socket, struct sockaddr* address, socklen_t* address_len)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -797,6 +837,10 @@ accept (int socket, struct sockaddr* address, socklen_t* address_len)
 int
 bind (int socket, const struct sockaddr* address, socklen_t address_len)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -804,6 +848,10 @@ bind (int socket, const struct sockaddr* address, socklen_t address_len)
 int
 connect (int socket, const struct sockaddr* address, socklen_t address_len)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -811,6 +859,10 @@ connect (int socket, const struct sockaddr* address, socklen_t address_len)
 int
 getpeername (int socket, struct sockaddr* address, socklen_t* address_len)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -818,6 +870,10 @@ getpeername (int socket, struct sockaddr* address, socklen_t* address_len)
 int
 getsockname (int socket, struct sockaddr* address, socklen_t* address_len)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -826,6 +882,10 @@ int
 getsockopt (int socket, int level, int option_name, void* option_value,
             socklen_t* option_len)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -833,6 +893,10 @@ getsockopt (int socket, int level, int option_name, void* option_value,
 int
 listen (int socket, int backlog)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -840,6 +904,10 @@ listen (int socket, int backlog)
 ssize_t
 recv (int socket, void* buffer, size_t length, int flags)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -848,6 +916,10 @@ ssize_t
 recvfrom (int socket, void* buffer, size_t length, int flags,
           struct sockaddr* address, socklen_t* address_len)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -855,6 +927,10 @@ recvfrom (int socket, void* buffer, size_t length, int flags,
 ssize_t
 recvmsg (int socket, struct msghdr* message, int flags)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -862,6 +938,10 @@ recvmsg (int socket, struct msghdr* message, int flags)
 ssize_t
 send (int socket, const void* buffer, size_t length, int flags)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -869,6 +949,10 @@ send (int socket, const void* buffer, size_t length, int flags)
 ssize_t
 sendmsg (int socket, const struct msghdr* message, int flags)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -877,6 +961,10 @@ ssize_t
 sendto (int socket, const void* message, size_t length, int flags,
         const struct sockaddr* dest_addr, socklen_t dest_len)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -885,6 +973,10 @@ int
 setsockopt (int socket, int level, int option_name, const void* option_value,
             socklen_t option_len)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -892,6 +984,10 @@ setsockopt (int socket, int level, int option_name, const void* option_value,
 int
 shutdown (int socket, int how)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -899,6 +995,10 @@ shutdown (int socket, int how)
 int
 sockatmark (int socket)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -926,6 +1026,10 @@ int
 select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
         struct timeval* timeout)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -933,6 +1037,10 @@ select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
 int
 chdir (const char* path)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -943,6 +1051,10 @@ chdir (const char* path)
 ssize_t
 writev (int fildes, const struct iovec* iov, int iovcnt)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -950,6 +1062,10 @@ writev (int fildes, const struct iovec* iov, int iovcnt)
 int
 ioctl (int fildes, int request, ...)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -957,6 +1073,10 @@ ioctl (int fildes, int request, ...)
 int
 fcntl (int fildes, int cmd, ...)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -964,6 +1084,10 @@ fcntl (int fildes, int cmd, ...)
 int
 ftruncate (int fildes, off_t length)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -971,6 +1095,10 @@ ftruncate (int fildes, off_t length)
 int
 fsync (int fildes)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -978,6 +1106,10 @@ fsync (int fildes)
 int
 chmod (const char* path, mode_t mode)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -985,6 +1117,10 @@ chmod (const char* path, mode_t mode)
 int
 truncate (const char* path, off_t length)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -992,6 +1128,10 @@ truncate (const char* path, off_t length)
 int
 utime (const char* path, const struct utimbuf* times)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -1002,6 +1142,10 @@ utime (const char* path, const struct utimbuf* times)
 int
 execve (const char* path, char* const argv[], char* const envp[])
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -1009,6 +1153,10 @@ execve (const char* path, char* const argv[], char* const envp[])
 pid_t
 fork (void)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return ((pid_t) -1);
 }
@@ -1022,6 +1170,10 @@ getpid (void)
 int
 kill (pid_t pid, int sig)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -1029,6 +1181,10 @@ kill (pid_t pid, int sig)
 int
 raise (int sig)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -1036,6 +1192,10 @@ raise (int sig)
 pid_t
 wait (int* stat_loc)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return ((pid_t) -1);
 }
@@ -1043,6 +1203,10 @@ wait (int* stat_loc)
 int
 chown (const char* path, uid_t owner, gid_t group)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -1050,6 +1214,10 @@ chown (const char* path, uid_t owner, gid_t group)
 int
 link (const char* existing, const char* _new)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -1057,6 +1225,10 @@ link (const char* existing, const char* _new)
 int
 symlink (const char* existing, const char* _new)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return -1;
 }
@@ -1064,6 +1236,10 @@ symlink (const char* existing, const char* _new)
 ssize_t
 readlink (const char* path, char* buf, size_t bufsize)
 {
+#if defined(DEBUG)
+  os::arch::brk ();
+#endif
+
   errno = ENOSYS; // Not implemented
   return ((ssize_t) -1);
 }
@@ -1314,6 +1490,10 @@ os_terminate (int code)
   fields[0] = ADP_Stopped_ApplicationExit;
   fields[1] = code;
   os::semihosting::call_host (SEMIHOSTING_SYS_EXIT, fields);
+#endif
+
+#if defined(DEBUG)
+  os::arch::brk ();
 #endif
 
   while (true)
