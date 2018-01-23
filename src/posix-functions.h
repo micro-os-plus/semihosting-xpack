@@ -41,7 +41,6 @@
 #ifdef __cplusplus
 extern "C"
 {
-#endif /* __cplusplus */
 
   struct dirent;
 
@@ -60,6 +59,10 @@ extern "C"
 
   struct sockaddr;
 
+}
+
+namespace posix
+{
   // -------------------------------------------------------------------------
 
   // The standard POSIX IO functions. Prototypes are from:
@@ -259,8 +262,8 @@ extern "C"
   ssize_t __attribute__((weak))
   writev (int fildes, const struct iovec* iov, int iovcnt);
 
-#ifdef __cplusplus
-}
+} /* namespace posix */
+
 #endif /* __cplusplus */
 
 // ----------------------------------------------------------------------------

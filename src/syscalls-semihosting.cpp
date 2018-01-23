@@ -314,6 +314,8 @@ namespace
 // ----------------------------------------------------------------------------
 // ---- Standard POSIX IO functions ----------------------------------------------------
 
+namespace posix
+{
 /**
  * @details
  *
@@ -340,7 +342,7 @@ open (const char* path, int oflag, ...)
     {
       struct stat st;
       int res;
-      res = stat (path, &st);
+      res = posix::stat (path, &st);
       if (res != -1)
         {
           errno = EEXIST;
@@ -1067,6 +1069,220 @@ readlink (const char* path, char* buf, size_t bufsize)
 }
 
 #pragma GCC diagnostic pop
+
+} /* namespace posix */
+
+// ----------------------------------------------------------------------------
+
+#if (__STDC_HOSTED__ != 0)
+
+extern "C"
+{
+
+/**
+ * In hosted environments only, alias all functions to C;
+ * in freestanding environments these are intentionally omitted.
+ *
+ * The main trick here is that some of the functions are prefixed
+ * with `_`; these are newlib specific functions.
+ *
+ * The aliases must be in the same compilation unit as the names
+ * they alias.
+ */
+int __attribute__((weak, alias ("_ZN5posix6acceptEiP8sockaddrPm")))
+accept (int socket, struct sockaddr* address, socklen_t* address_len);
+
+int __attribute__((weak, alias ("_ZN5posix4bindEiPK8sockaddrm")))
+bind (int socket, const struct sockaddr* address, socklen_t address_len);
+
+int __attribute__((weak, alias ("_ZN5posix5chdirEPKc")))
+chdir (const char* path);
+
+int __attribute__((weak, alias ("_ZN5posix5chmodEPKcm")))
+chmod (const char* path, mode_t mode);
+
+int __attribute__((weak, alias ("_ZN5posix5chownEPKctt")))
+_chown (const char* path, uid_t owner, gid_t group);
+
+clock_t __attribute__((weak, alias ("_ZN5posix5clockEv")))
+_clock (void);
+
+int __attribute__((weak, alias ("_ZN5posix5closeEi")))
+_close (int fildes);
+
+int __attribute__((weak, alias ("_ZN5posix8closedirEP3DIR")))
+closedir (DIR* dirp);
+
+int __attribute__((weak, alias ("_ZN5posix7connectEiPK8sockaddrm")))
+connect (int socket, const struct sockaddr* address, socklen_t address_len);
+
+int __attribute__((weak, alias ("_ZN5posix6execveEPKcPKPcS4_")))
+_execve (const char* path, char* const argv[], char* const envp[]);
+
+int __attribute__((weak, alias ("_ZN5posix5fcntlEiiz")))
+fcntl (int fildes, int cmd, ...);
+
+pid_t __attribute__((weak, alias ("_ZN5posix4forkEv")))
+_fork (void);
+
+int __attribute__((weak, alias ("_ZN5posix5fstatEiP4stat")))
+_fstat (int fildes, struct stat* buf);
+
+int __attribute__((weak, alias ("_ZN5posix9ftruncateEil")))
+ftruncate (int fildes, off_t length);
+
+int __attribute__((weak, alias ("_ZN5posix5fsyncEi")))
+fsync (int fildes);
+
+char*
+__attribute__((weak, alias ("_ZN5posix6getcwdEPcj")))
+getcwd (char* buf, size_t size);
+
+int __attribute__((weak, alias ("_ZN5posix11getpeernameEiP8sockaddrPm")))
+getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
+
+pid_t __attribute__((weak, alias ("_ZN5posix6getpidEv")))
+_getpid (void);
+
+int __attribute__((weak, alias ("_ZN5posix11getsocknameEiP8sockaddrPm")))
+getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
+
+int __attribute__((weak, alias ("_ZN5posix10getsockoptEiiiPvPm")))
+getsockopt (int socket, int level, int option_name, void* option_value,
+    socklen_t* option_len);
+
+int __attribute__((weak, alias ("_ZN5posix12gettimeofdayEP7timevalPv")))
+_gettimeofday (struct timeval* ptimeval, void* ptimezone);
+
+int __attribute__((weak, alias ("_ZN5posix5ioctlEiiz")))
+ioctl (int fildes, int request, ...);
+
+int __attribute__((weak, alias ("_ZN5posix6isattyEi")))
+_isatty (int fildes);
+
+int __attribute__((weak, alias ("_ZN5posix4killEii")))
+_kill (pid_t pid, int sig);
+
+int __attribute__((weak, alias ("_ZN5posix4linkEPKcS1_")))
+_link (const char* existing, const char* _new);
+
+int __attribute__((weak, alias ("_ZN5posix6listenEii")))
+listen (int socket, int backlog);
+
+off_t __attribute__((weak, alias ("_ZN5posix5lseekEili")))
+_lseek (int fildes, off_t offset, int whence);
+
+int __attribute__((weak, alias ("_ZN5posix5mkdirEPKcm")))
+mkdir (const char* path, mode_t mode);
+
+int __attribute__((weak, alias ("_ZN5posix4openEPKciz")))
+_open (const char* path, int oflag, ...);
+
+DIR*
+__attribute__((weak, alias ("_ZN5posix7opendirEPKc")))
+opendir (const char* dirname);
+
+int __attribute__((weak, alias ("_ZN5posix5raiseEi")))
+raise (int sig);
+
+ssize_t __attribute__((weak, alias ("_ZN5posix4readEiPvj")))
+_read (int fildes, void* buf, size_t nbyte);
+
+struct dirent*
+__attribute__((weak, alias ("_ZN5posix7readdirEP3DIR")))
+readdir (DIR* dirp);
+
+int __attribute__((weak, alias ("_ZN5posix9readdir_rEP3DIRP6direntPS3_")))
+readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
+
+ssize_t __attribute__((weak, alias ("_ZN5posix8readlinkEPKcPcj")))
+_readlink (const char* path, char* buf, size_t bufsize);
+
+ssize_t __attribute__((weak, alias ("_ZN5posix4recvEiPvji")))
+recv (int socket, void* buffer, size_t length, int flags);
+
+ssize_t __attribute__((weak, alias ("_ZN5posix8recvfromEiPvjiP8sockaddrPm")))
+recvfrom (int socket, void* buffer, size_t length, int flags,
+    struct sockaddr* address, socklen_t* address_len);
+
+ssize_t __attribute__((weak, alias ("_ZN5posix7recvmsgEiPNS_6msghdrEi")))
+recvmsg (int socket, struct msghdr* message, int flags);
+
+int __attribute__((weak, alias ("_ZN5posix6renameEPKcS1_")))
+rename (const char* oldfn, const char* newfn);
+
+void __attribute__((weak, alias ("_ZN5posix9rewinddirEP3DIR")))
+rewinddir (DIR* dirp);
+
+int __attribute__((weak, alias ("_ZN5posix5rmdirEPKc")))
+rmdir (const char* path);
+
+int __attribute__((weak, alias ("_ZN5posix6selectEiP13_types_fd_setS1_S1_P7timeval")))
+select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
+    struct timeval* timeout);
+
+ssize_t __attribute__((weak, alias ("_ZN5posix4sendEiPKvji")))
+send (int socket, const void* buffer, size_t length, int flags);
+
+ssize_t __attribute__((weak, alias ("_ZN5posix7sendmsgEiPKNS_6msghdrEi")))
+sendmsg (int socket, const struct msghdr* message, int flags);
+
+ssize_t __attribute__((weak, alias ("_ZN5posix6sendtoEiPKvjiPK8sockaddrm")))
+sendto (int socket, const void* message, size_t length, int flags,
+    const struct sockaddr* dest_addr, socklen_t dest_len);
+
+int __attribute__((weak, alias ("_ZN5posix10setsockoptEiiiPKvm")))
+setsockopt (int socket, int level, int option_name, const void* option_value,
+    socklen_t option_len);
+
+int __attribute__((weak, alias ("_ZN5posix8shutdownEii")))
+shutdown (int socket, int how);
+
+int __attribute__((weak, alias ("_ZN5posix10sockatmarkEi")))
+sockatmark (int socket);
+
+int __attribute__((weak, alias ("_ZN5posix6socketEiii")))
+socket (int domain, int type, int protocol);
+
+int __attribute__((weak, alias ("_ZN5posix10socketpairEiiiPi")))
+socketpair (int domain, int type, int protocol, int socket_vector[2]);
+
+int __attribute__((weak, alias ("_ZN5posix4statEPKcP4stat")))
+_stat (const char* path, struct stat* buf);
+
+void __attribute__((weak, alias ("_ZN5posix4syncEv")))
+sync (void);
+
+int __attribute__((weak, alias ("_ZN5posix7symlinkEPKcS1_")))
+_symlink (const char* existing, const char* _new);
+
+int __attribute__((weak, alias ("_ZN5posix6systemEPKc")))
+system (const char *command);
+
+clock_t __attribute__((weak, alias ("_ZN5posix5timesEP3tms")))
+_times (struct tms* buf);
+
+int __attribute__((weak, alias ("_ZN5posix8truncateEPKcl")))
+truncate (const char* path, off_t length);
+
+int __attribute__((weak, alias ("_ZN5posix6unlinkEPKc")))
+_unlink (const char* name);
+
+int __attribute__((weak, alias ("_ZN5posix5utimeEPKcPKNS_7utimbufE")))
+utime (const char* path, const struct utimbuf* times);
+
+pid_t __attribute__((weak, alias ("_ZN5posix4waitEPi")))
+_wait (int* stat_loc);
+
+ssize_t __attribute__((weak, alias ("_ZN5posix5writeEiPKvj")))
+_write (int fildes, const void* buf, size_t nbyte);
+
+ssize_t __attribute__((weak, alias ("_ZN5posix6writevEiPKNS_5iovecEi")))
+writev (int fildes, const struct iovec* iov, int iovcnt);
+
+} /* extern "C" */
+
+#endif /* (__STDC_HOSTED__ != 0) */
 
 // ----------------------------------------------------------------------------
 
