@@ -15,9 +15,6 @@ namespace os
   {
     int
     call_host (int reason, void* arg);
-
-    void
-    report_exception (int reason);
   } 
 } 
 ```
@@ -30,8 +27,6 @@ All C++ functions have C equivalents:
   static int
   os_semihosting_call_host (int reason, void* arg);
 
-  static void
-  os_semihosting_report_exception (int reason);
 ```
 
 ## Developer info
