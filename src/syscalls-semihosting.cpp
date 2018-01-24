@@ -29,6 +29,7 @@
 #if defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
 #include <micro-os-plus/semihosting.h>
+#include <micro-os-plus/architecture.h>
 #include <micro-os-plus/diag/trace.h>
 
 #include "posix-functions.h"
@@ -62,32 +63,40 @@
  * The standard headers define errno as '*(__errno())';
  * In a multi-threaded environment, __errno() must return a
  * thread specific pointer.
+ *
+ * ENOSYS
+ * Not implemented functions print a trace message and return ENOSYS.
+ * To help identify the caller, optionally they can break to the
+ * debugger.
  */
 
 // ----------------------------------------------------------------------------
-#if !defined(OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
-#define OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES (20)
-#endif
-
-// ----------------------------------------------------------------------------
-// Local support functions.
-
+// Local support functions in the anonymous namespace.
 namespace
 {
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
 
   // Struct used to keep track of the file position, just so we
   // can implement fseek(fh,x,SEEK_CUR).
   struct file
   {
     int handle;
-    int pos;
+    off_t pos;
   };
+
+#pragma GCC diagnostic pop
 
   // The type of a field, for the array passed to the host.
 #if ( __SIZEOF_POINTER__ == 4 )
   typedef uint32_t field_t;
 #elif ( __SIZEOF_POINTER__ == 8 )
   typedef uint64_t field_t;
+#endif
+
+#if !defined(OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
+#define OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES (20)
 #endif
 
   /*
@@ -123,8 +132,8 @@ namespace
   int
   check_error (int result);
 
-  int
-  lseek_impl (int fd, int ptr, int dir);
+  off_t
+  lseek_impl (int fd, off_t offset, int whence);
 
   int
   stat_impl (int fd, struct stat* st);
@@ -138,19 +147,19 @@ namespace
   struct file*
   find_slot (int fd)
   {
-    // User file descriptor is out of range.
-    if ((unsigned int) fd >= OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
+    if ((size_t) fd >= OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
       {
+        // File descriptor is out of range.
         return nullptr;
       }
 
-    // User file descriptor is open?
     if (opened_files[fd].handle == -1)
       {
+        // File descriptor not in use.
         return nullptr;
       }
 
-    // Valid.
+    // Valid, return host file descriptor.
     return &opened_files[fd];
   }
 
@@ -161,7 +170,7 @@ namespace
   int
   new_slot (void)
   {
-    int i;
+    size_t i;
     for (i = 0; i < OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES; i++)
       {
         if (opened_files[i].handle == -1)
@@ -175,7 +184,7 @@ namespace
         return -1;
       }
 
-    return i;
+    return (int)i;
   }
 
   int
@@ -211,8 +220,8 @@ namespace
   /*
    *  fd, is a user file descriptor.
    */
-  int
-  lseek_impl (int fd, int ptr, int dir)
+  off_t
+  lseek_impl (int fd, off_t offset, int whence)
   {
     struct file* pfd;
 
@@ -225,33 +234,33 @@ namespace
       }
 
     // Valid whence?
-    if ((dir != SEEK_CUR) && (dir != SEEK_SET) && (dir != SEEK_END))
+    if ((whence != SEEK_CUR) && (whence != SEEK_SET) && (whence != SEEK_END))
       {
         errno = EINVAL;
         return -1;
       }
 
     // Convert SEEK_CUR to SEEK_SET.
-    if (dir == SEEK_CUR)
+    if (whence == SEEK_CUR)
       {
-        ptr = pfd->pos + ptr;
+        offset += pfd->pos;
         // The resulting file offset would be negative.
-        if (ptr < 0)
+        if (offset < 0)
           {
             errno = EINVAL;
-            if ((pfd->pos > 0) && (ptr > 0))
+            if ((pfd->pos > 0) && (offset > 0))
               {
                 errno = EOVERFLOW;
               }
             return -1;
           }
-        dir = SEEK_SET;
+        whence = SEEK_SET;
       }
 
     field_t fields[2];
     int res;
 
-    if (dir == SEEK_END)
+    if (whence == SEEK_END)
       {
         fields[0] = pfd->handle;
         res = check_error (
@@ -260,20 +269,20 @@ namespace
           {
             return -1;
           }
-        ptr += res;
+        offset += res;
       }
 
     // This code only does absolute seeks.
     fields[0] = pfd->handle;
-    fields[1] = ptr;
+    fields[1] = offset;
     res = check_error (
         os::semihosting::call_host (SEMIHOSTING_SYS_SEEK, fields));
 
     // At this point ptr is the current file position.
     if (res >= 0)
       {
-        pfd->pos = ptr;
-        return ptr;
+        pfd->pos = offset;
+        return offset;
       }
     else
       {
@@ -312,127 +321,133 @@ namespace
 }
 
 // ----------------------------------------------------------------------------
-// ---- Standard POSIX IO functions ----------------------------------------------------
+// ---- Standard POSIX IO functions -------------------------------------------
 
 namespace posix
 {
-/**
- * @details
- *
- * The `open()` function shall establish the connection between a file and a
- * file descriptor. It shall create an open file description that refers
- * to a file and a file descriptor that refers to that open file
- * description. The file descriptor is used by other I/O functions to
- * refer to that file. The _path_ argument points to a pathname naming
- * the file.
- */
-int
-open (const char* path, int oflag, ...)
-{
+  /**
+   * @details
+   *
+   * The `open()` function shall establish the connection between a file and a
+   * file descriptor. It shall create an open file description that refers
+   * to a file and a file descriptor that refers to that open file
+   * description. The file descriptor is used by other I/O functions to
+   * refer to that file. The _path_ argument points to a pathname naming
+   * the file.
+   */
+  int
+  open (const char* path, int oflag, ...)
+  {
 
-  int fd = new_slot ();
-  if (fd == -1)
-    {
-      errno = EMFILE;
-      return -1;
-    }
+    int fd = new_slot ();
+    if (fd == -1)
+      {
+        os::trace::printf ("%s() EMFILE\n", __FUNCTION__);
 
-  // It is an error to open a file that already exists.
-  if ((oflag & O_CREAT) && (oflag & O_EXCL))
-    {
-      struct stat st;
-      int res;
-      res = posix::stat (path, &st);
-      if (res != -1)
-        {
-          errno = EEXIST;
-          return -1;
-        }
-    }
+        errno = EMFILE;
+        return -1;
+      }
 
-  int aflags = 0;
-  // The flags are Unix-style, so we need to convert them.
+    // It is an error to open a file that already exists.
+    if ((oflag & O_CREAT) && (oflag & O_EXCL))
+      {
+        struct stat st;
+        int res;
+        res = posix::stat (path, &st);
+        if (res != -1)
+          {
+            os::trace::printf ("%s() EEXIST\n", __FUNCTION__);
+
+            errno = EEXIST;
+            return -1;
+          }
+      }
+
+    int aflags = 0;
+    // The flags are Unix-style, so we need to convert them.
 #ifdef O_BINARY
-  if (oflag & O_BINARY)
-    {
-      aflags |= 1;
-    }
+    if (oflag & O_BINARY)
+      {
+        aflags |= 1;
+      }
 #endif
 
-  // In O_RDONLY we expect aflags == 0.
+    // In O_RDONLY we expect aflags == 0.
 
-  if (oflag & O_RDWR)
-    {
-      aflags |= 2;
-    }
+    if (oflag & O_RDWR)
+      {
+        aflags |= 2;
+      }
 
-  if ((oflag & O_CREAT) || (oflag & O_TRUNC) || (oflag & O_WRONLY))
-    {
-      aflags |= 4;
-    }
+    if ((oflag & O_CREAT) || (oflag & O_TRUNC) || (oflag & O_WRONLY))
+      {
+        aflags |= 4;
+      }
 
-  if (oflag & O_APPEND)
-    {
-      // Can't ask for w AND a; means just 'a'.
-      aflags &= ~4;
-      aflags |= 8;
-    }
+    if (oflag & O_APPEND)
+      {
+        // Can't ask for w AND a; means just 'a'.
+        aflags &= ~4;
+        aflags |= 8;
+      }
 
-  field_t fields[3];
-  fields[0] = (uint32_t) path;
-  fields[2] = std::strlen (path);
-  fields[1] = (uint32_t) aflags;
+    field_t fields[3];
+    fields[0] = (field_t) path;
+    fields[1] = (field_t) aflags;
+    fields[2] = std::strlen (path);
 
-  int fh = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, fields);
+    int fh = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, fields);
 
-  // Return a user file descriptor or an error.
-  if (fh >= 0)
-    {
-      opened_files[fd].handle = fh;
-      opened_files[fd].pos = 0;
-      return fd;
-    }
-  else
-    {
-      return with_set_errno (fh);
-    }
-}
+    // Return a user file descriptor or an error.
+    if (fh >= 0)
+      {
+        opened_files[fd].handle = fh;
+        opened_files[fd].pos = 0;
+        return fd;
+      }
+    else
+      {
+        return with_set_errno (fh);
+      }
+  }
 
-int
-close (int fildes)
-{
-  struct file* pfd;
-  pfd = find_slot (fildes);
-  if (pfd == nullptr)
-    {
-      errno = EBADF;
-      return -1;
-    }
+  int
+  close (int fildes)
+  {
+    struct file* pfd;
+    pfd = find_slot (fildes);
+    if (pfd == nullptr)
+      {
+        os::trace::printf ("%s() EBADF\n", __FUNCTION__);
 
-  // Handle stderr == stdout.
-  if ((fildes == 1 || fildes == 2)
-      && (opened_files[1].handle == opened_files[2].handle))
-    {
-      pfd->handle = -1;
-      return 0;
-    }
+        errno = EBADF;
+        return -1;
+      }
 
-  field_t fields[1];
-  fields[0] = pfd->handle;
+    // Handle stderr == stdout.
+    if ((fildes == 1 || fildes == 2)
+        && (opened_files[1].handle == opened_files[2].handle))
+      {
+        pfd->handle = -1;
+        return 0;
+      }
 
-  // Attempt to close the handle.
-  int res;
-  res = check_error (
-      os::semihosting::call_host (SEMIHOSTING_SYS_CLOSE, fields));
+    field_t fields[1];
+    fields[0] = pfd->handle;
 
-  // Reclaim handle?
-  if (res == 0)
-    {
-      pfd->handle = -1;
-    }
+    // Attempt to close the handle.
+    int res;
+    res = check_error (
+        os::semihosting::call_host (SEMIHOSTING_SYS_CLOSE, fields));
 
-  return res;
-}
+    // Reclaim handle?
+    if (res == 0)
+      {
+        pfd->handle = -1;
+      }
+
+    return res;
+  }
 
 // ----------------------------------------------------------------------------
 
@@ -440,255 +455,264 @@ close (int fildes)
 // Translates the return of SYS_READ into
 // bytes read.
 
-ssize_t
-read (int fildes, void* buf, size_t nbyte)
-{
-  struct file* pfd;
-  pfd = find_slot (fildes);
-  if (pfd == nullptr)
-    {
-      errno = EBADF;
-      return -1;
-    }
+  ssize_t
+  read (int fildes, void* buf, size_t nbyte)
+  {
+    struct file* pfd;
+    pfd = find_slot (fildes);
+    if (pfd == nullptr)
+      {
+        os::trace::printf ("%s() EBADF\n", __FUNCTION__);
 
-  field_t fields[3];
-  fields[0] = pfd->handle;
-  fields[1] = (field_t) buf;
-  fields[2] = nbyte;
+        errno = EBADF;
+        return -1;
+      }
 
-  int res;
-  // Returns the number of bytes *not* written.
-  res = check_error (os::semihosting::call_host (SEMIHOSTING_SYS_READ, fields));
-  if (res == -1)
-    {
-      return res;
-    }
+    field_t fields[3];
+    fields[0] = pfd->handle;
+    fields[1] = (field_t) buf;
+    fields[2] = nbyte;
 
-  pfd->pos += nbyte - res;
+    int res;
+    // Returns the number of bytes *not* written.
+    res = check_error (
+        os::semihosting::call_host (SEMIHOSTING_SYS_READ, fields));
+    if (res == -1)
+      {
+        return res;
+      }
 
-  // res == nbyte is not an error,
-  // at least if we want feof() to work.
-  return nbyte - res;
-}
+    pfd->pos += (nbyte - res);
 
-ssize_t
-write (int fildes, const void* buf, size_t nbyte)
-{
-  struct file* pfd;
-  pfd = find_slot (fildes);
-  if (pfd == nullptr)
-    {
-      errno = EBADF;
-      return -1;
-    }
+    // res == nbyte is not an error,
+    // at least if we want feof() to work.
+    return nbyte - res;
+  }
 
-  field_t fields[3];
+  ssize_t
+  write (int fildes, const void* buf, size_t nbyte)
+  {
+    struct file* pfd;
+    pfd = find_slot (fildes);
+    if (pfd == nullptr)
+      {
+        os::trace::printf ("%s() EBADF\n", __FUNCTION__);
 
-  fields[0] = pfd->handle;
-  fields[1] = (field_t) buf;
-  fields[2] = nbyte;
+        errno = EBADF;
+        return -1;
+      }
 
-  // Returns the number of bytes *not* written.
-  int res;
-  res = check_error (
-      os::semihosting::call_host (SEMIHOSTING_SYS_WRITE, fields));
-  /* Clearly an error. */
-  if (res < 0)
-    {
-      return -1;
-    }
+    field_t fields[3];
 
-  pfd->pos += nbyte - res;
+    fields[0] = pfd->handle;
+    fields[1] = (field_t) buf;
+    fields[2] = nbyte;
 
-  // Did we write 0 bytes?
-  // Retrieve errno for just in case.
-  if ((nbyte - res) == 0)
-    {
-      return with_set_errno (0);
-    }
+    // Returns the number of bytes *not* written.
+    int res;
+    res = check_error (
+        os::semihosting::call_host (SEMIHOSTING_SYS_WRITE, fields));
+    /* Clearly an error. */
+    if (res < 0)
+      {
+        return -1;
+      }
 
-  return (nbyte - res);
-}
+    pfd->pos += nbyte - res;
 
-off_t
-lseek (int fildes, off_t offset, int whence)
-{
-  return lseek_impl (fildes, offset, whence);
-}
+    // Did we write 0 bytes?
+    // Retrieve errno for just in case.
+    if ((nbyte - res) == 0)
+      {
+        return with_set_errno (0);
+      }
 
-/**
- * @details
- *
- * This function shall test whether _fildes_, an open file descriptor,
- * is associated with a terminal device.
- */
-int
-isatty (int fildes)
-{
-  struct file* pfd;
-  pfd = find_slot (fildes);
-  if (pfd == nullptr)
-    {
-      errno = EBADF;
-      return 0;
-    }
+    return (nbyte - res);
+  }
 
-  int tty;
-  tty = os::semihosting::call_host (SEMIHOSTING_SYS_ISTTY, &pfd->handle);
+  off_t
+  lseek (int fildes, off_t offset, int whence)
+  {
+    return lseek_impl (fildes, offset, whence);
+  }
 
-  if (tty == 1)
-    {
-      return 1;
-    }
+  /**
+   * @details
+   *
+   * This function shall test whether _fildes_, an open file descriptor,
+   * is associated with a terminal device.
+   */
+  int
+  isatty (int fildes)
+  {
+    struct file* pfd;
+    pfd = find_slot (fildes);
+    if (pfd == nullptr)
+      {
+        os::trace::printf ("%s() EBADF\n", __FUNCTION__);
 
-  errno = get_host_errno ();
-  return 0;
-}
+        errno = EBADF;
+        return 0;
+      }
 
-int
-fstat (int fildes, struct stat* buf)
-{
-  memset (buf, 0, sizeof(*buf));
-  return stat_impl (fildes, buf);
-}
+    int tty;
+    tty = os::semihosting::call_host (SEMIHOSTING_SYS_ISTTY, &pfd->handle);
+
+    if (tty == 1)
+      {
+        return 1;
+      }
+
+    errno = get_host_errno ();
+    return 0;
+  }
+
+  int
+  fstat (int fildes, struct stat* buf)
+  {
+    memset (buf, 0, sizeof(*buf));
+    return stat_impl (fildes, buf);
+  }
 
 // ----------------------------------------------------------------------------
 // ----- POSIX file functions -----
 
-int
-stat (const char* path, struct stat* buf)
-{
-  int fd;
-  memset (buf, 0, sizeof(*buf));
-  // The best we can do is try to open the file read only.
-  // If it exists, then we can guess a few things about it.
-  if ((fd = open (path, O_RDONLY)) == -1)
-    {
-      return -1;
-    }
-  buf->st_mode |= S_IFREG | S_IREAD;
-  int res = stat_impl (fd, buf);
-  // Not interested in the error.
-  close (fd);
-  return res;
-}
+  int
+  stat (const char* path, struct stat* buf)
+  {
+    int fd;
+    memset (buf, 0, sizeof(*buf));
+    // The best we can do is try to open the file read only.
+    // If it exists, then we can guess a few things about it.
+    if ((fd = open (path, O_RDONLY)) == -1)
+      {
+        return -1;
+      }
+    buf->st_mode |= S_IFREG | S_IREAD;
+    int res = stat_impl (fd, buf);
+    // Not interested in the error.
+    close (fd);
+    return res;
+  }
 
-int
-rename (const char* existing, const char* _new)
-{
-  field_t fields[4];
-  fields[0] = (field_t) existing;
-  fields[1] = std::strlen (existing);
-  fields[2] = (field_t) _new;
-  fields[3] = std::strlen (_new);
-  return
-      check_error (
-          os::semihosting::call_host (SEMIHOSTING_SYS_RENAME, fields)) ? -1 : 0;
-}
+  int
+  rename (const char* existing, const char* _new)
+  {
+    field_t fields[4];
+    fields[0] = (field_t) existing;
+    fields[1] = std::strlen (existing);
+    fields[2] = (field_t) _new;
+    fields[3] = std::strlen (_new);
 
-int
-unlink (const char* path)
-{
-  field_t fields[2];
-  fields[0] = (field_t) path;
-  fields[1] = strlen (path);
+    return
+        check_error (
+            os::semihosting::call_host (SEMIHOSTING_SYS_RENAME, fields)) ?
+            -1 : 0;
+  }
 
-  int res;
-  res = os::semihosting::call_host (SEMIHOSTING_SYS_REMOVE, fields);
-  if (res == -1)
-    {
-      return with_set_errno (res);
-    }
-  return 0;
-}
+  int
+  unlink (const char* path)
+  {
+    field_t fields[2];
+    fields[0] = (field_t) path;
+    fields[1] = strlen (path);
 
-int
-system (const char* command)
-{
-  // Hmmm.  The ARM debug interface specification doesn't say whether
-  // SYS_SYSTEM does the right thing with a null argument, or assign any
-  // meaning to its return value.  Try to do something reasonable....
-  if (command == nullptr)
-    {
-      return 1; // maybe there is a shell available? we can hope. :-P
-    }
+    int res;
+    res = os::semihosting::call_host (SEMIHOSTING_SYS_REMOVE, fields);
+    if (res == -1)
+      {
+        return with_set_errno (res);
+      }
+    return 0;
+  }
 
-  field_t fields[2];
-  fields[0] = (field_t) command;
-  fields[1] = strlen (command);
-  int err = check_error (
-      os::semihosting::call_host (SEMIHOSTING_SYS_SYSTEM, fields));
-  if ((err >= 0) && (err < 256))
-    {
-      // We have to convert e, an exit status to the encoded status of
-      // the command.  To avoid hard coding the exit status, we simply
-      // loop until we find the right position.
-      int exit_code;
+  int
+  system (const char* command)
+  {
+    // Hmmm.  The ARM debug interface specification doesn't say whether
+    // SYS_SYSTEM does the right thing with a null argument, or assign any
+    // meaning to its return value.  Try to do something reasonable....
+    if (command == nullptr)
+      {
+        return 1; // maybe there is a shell available? we can hope. :-P
+      }
 
-      for (exit_code = err; (err != 0) && (WEXITSTATUS (err) != exit_code);
-          err <<= 1)
-        {
-          continue;
-        }
-    }
-  return err;
-}
+    field_t fields[2];
+    fields[0] = (field_t) command;
+    fields[1] = strlen (command);
+    int err = check_error (
+        os::semihosting::call_host (SEMIHOSTING_SYS_SYSTEM, fields));
+    if ((err >= 0) && (err < 256))
+      {
+        // We have to convert e, an exit status to the encoded status of
+        // the command.  To avoid hard coding the exit status, we simply
+        // loop until we find the right position.
+        int exit_code;
 
-int
-gettimeofday (struct timeval* ptimeval, void* ptimezone)
-{
-  struct timezone* tzp = (struct timezone*) ptimezone;
-  if (ptimeval)
-    {
-      // Ask the host for the seconds since the Unix epoch.
-      ptimeval->tv_sec = os::semihosting::call_host (SEMIHOSTING_SYS_TIME,
-                                                     nullptr);
-      ptimeval->tv_usec = 0;
-    }
+        for (exit_code = err; (err != 0) && (WEXITSTATUS (err) != exit_code);
+            err <<= 1)
+          {
+            continue;
+          }
+      }
+    return err;
+  }
 
-  // Return fixed data for the time zone.
-  if (tzp)
-    {
-      tzp->tz_minuteswest = 0;
-      tzp->tz_dsttime = 0;
-    }
+  int
+  gettimeofday (struct timeval* ptimeval, void* ptimezone)
+  {
+    struct timezone* tzp = (struct timezone*) ptimezone;
+    if (ptimeval)
+      {
+        // Ask the host for the seconds since the Unix epoch.
+        ptimeval->tv_sec = os::semihosting::call_host (SEMIHOSTING_SYS_TIME,
+                                                       nullptr);
+        ptimeval->tv_usec = 0;
+      }
 
-  return 0;
-}
+    // Return fixed data for the time zone.
+    if (tzp)
+      {
+        tzp->tz_minuteswest = 0;
+        tzp->tz_dsttime = 0;
+      }
+
+    return 0;
+  }
 
 // Return a clock that ticks at 100Hz.
-clock_t
-clock (void)
-{
-  clock_t timeval;
-  timeval = (clock_t) os::semihosting::call_host (SEMIHOSTING_SYS_CLOCK,
-                                                  nullptr);
+  clock_t
+  clock (void)
+  {
+    clock_t timeval;
+    timeval = (clock_t) os::semihosting::call_host (SEMIHOSTING_SYS_CLOCK,
+                                                    nullptr);
 
-  return timeval;
-}
+    return timeval;
+  }
 
-clock_t
-times (struct tms* buf)
-{
-  clock_t timeval = clock ();
-  if (buf)
-    {
-      buf->tms_utime = timeval; // user time
-      buf->tms_stime = 0; // system time
-      buf->tms_cutime = 0; // user time, children
-      buf->tms_cstime = 0; // system time, children
-    }
+  clock_t
+  times (struct tms* buf)
+  {
+    clock_t timeval = clock ();
+    if (buf)
+      {
+        buf->tms_utime = timeval; // user time
+        buf->tms_stime = 0; // system time
+        buf->tms_cutime = 0; // user time, children
+        buf->tms_cstime = 0; // system time, children
+      }
 
-  return timeval;
-}
+    return timeval;
+  }
 
-char*
-getcwd (char* buf, size_t size)
-{
-  // no cwd available via semihosting, so we use the temporary folder
-  strncpy (buf, "/tmp", size);
-  return buf;
-}
+  char*
+  getcwd (char* buf, size_t size)
+  {
+    // no cwd available via semihosting, so we use the temporary folder
+    strncpy (buf, "/tmp", size);
+    return buf;
+  }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -697,95 +721,111 @@ getcwd (char* buf, size_t size)
 // ----- POSIX file_system functions -----
 
 // Required by Google Tests
-int
-mkdir (const char* path, mode_t mode)
-{
+  int
+  mkdir (const char* path, mode_t mode)
+  {
 #if 0
-  // always return true
-  return 0;
+    // always return true
+    return 0;
 #else
-  errno = ENOSYS;
-  return -1;
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+
+    errno = ENOSYS;
+    return -1;
 #endif
-}
+  }
 
-int
-rmdir (const char* path)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
-#endif
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-void
-sync (void)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+  int
+  rmdir (const char* path)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RMDIR_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  void
+  sync (void)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SYNC_BRK))
+    os::arch::brk ();
+#endif
+
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+
+    errno = ENOSYS; // Not implemented
+  }
 
 // ----------------------------------------------------------------------------
 // ----- Directories functions -----
 
-DIR*
-opendir (const char* dirpath)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+  DIR*
+  opendir (const char* dirpath)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_OPENDIR_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return nullptr;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-struct dirent*
-readdir (DIR* dirp)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return nullptr;
+  }
+
+  struct dirent*
+  readdir (DIR* dirp)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_READDIR_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return nullptr;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return nullptr;
+  }
+
+  int
+  readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_READDIR_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return ((ssize_t) -1);
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-void
-rewinddir (DIR* dirp)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return ((ssize_t) -1);
+  }
+
+  void
+  rewinddir (DIR* dirp)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_REWINDDIR_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-closedir (DIR* dirp)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+  }
+
+  int
+  closedir (DIR* dirp)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_CLOSEDIR_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
 
 #pragma GCC diagnostic pop
 
@@ -801,207 +841,243 @@ closedir (DIR* dirp)
 // In addition, the following IO functions should work on sockets:
 // close(), read(), write(), writev(), ioctl(), fcntl(), select().
 
-int
-socket (int domain, int type, int protocol)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+  int
+  socket (int domain, int type, int protocol)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SOCKET_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-socketpair (int domain, int type, int protocol, int socket_vector[2])
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  socketpair (int domain, int type, int protocol, int socket_vector[2])
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SOCKETPAIR_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-accept (int socket, struct sockaddr* address, socklen_t* address_len)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  accept (int socket, struct sockaddr* address, socklen_t* address_len)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_ACCEPT_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-bind (int socket, const struct sockaddr* address, socklen_t address_len)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  bind (int socket, const struct sockaddr* address, socklen_t address_len)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_BIND_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-connect (int socket, const struct sockaddr* address, socklen_t address_len)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  connect (int socket, const struct sockaddr* address, socklen_t address_len)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_CONNECT_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-getpeername (int socket, struct sockaddr* address, socklen_t* address_len)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  getpeername (int socket, struct sockaddr* address, socklen_t* address_len)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_GETPEERNAME_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-getsockname (int socket, struct sockaddr* address, socklen_t* address_len)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  getsockname (int socket, struct sockaddr* address, socklen_t* address_len)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_GETSOCKNAME_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-getsockopt (int socket, int level, int option_name, void* option_value,
-            socklen_t* option_len)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  getsockopt (int socket, int level, int option_name, void* option_value,
+              socklen_t* option_len)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_GETSOCKOPT_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-listen (int socket, int backlog)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  listen (int socket, int backlog)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_LISTEN_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-ssize_t
-recv (int socket, void* buffer, size_t length, int flags)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  ssize_t
+  recv (int socket, void* buffer, size_t length, int flags)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RECV_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-ssize_t
-recvfrom (int socket, void* buffer, size_t length, int flags,
-          struct sockaddr* address, socklen_t* address_len)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  ssize_t
+  recvfrom (int socket, void* buffer, size_t length, int flags,
+            struct sockaddr* address, socklen_t* address_len)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RECVFROM_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-ssize_t
-recvmsg (int socket, struct msghdr* message, int flags)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  ssize_t
+  recvmsg (int socket, struct msghdr* message, int flags)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RECVMSG_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-ssize_t
-send (int socket, const void* buffer, size_t length, int flags)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  ssize_t
+  send (int socket, const void* buffer, size_t length, int flags)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SEND_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-ssize_t
-sendmsg (int socket, const struct msghdr* message, int flags)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  ssize_t
+  sendmsg (int socket, const struct msghdr* message, int flags)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SENDMSG_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-ssize_t
-sendto (int socket, const void* message, size_t length, int flags,
-        const struct sockaddr* dest_addr, socklen_t dest_len)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  ssize_t
+  sendto (int socket, const void* message, size_t length, int flags,
+          const struct sockaddr* dest_addr, socklen_t dest_len)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SENDTO_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-setsockopt (int socket, int level, int option_name, const void* option_value,
-            socklen_t option_len)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  setsockopt (int socket, int level, int option_name, const void* option_value,
+              socklen_t option_len)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SETSOCKOPT_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-shutdown (int socket, int how)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  shutdown (int socket, int how)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SHUTDOWN_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-sockatmark (int socket)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  sockatmark (int socket)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SOCKATMARK_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
 
 #pragma GCC diagnostic pop
 
@@ -1022,227 +1098,265 @@ sockatmark (int socket)
 // ----------------------------------------------------------------------------
 // Not yet implemented.
 
-int
-select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-        struct timeval* timeout)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+  int
+  select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
+          struct timeval* timeout)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SELECT_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-chdir (const char* path)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  chdir (const char* path)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_CHDIR_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
 
 // ----------------------------------------------------------------------------
 // Not available via semihosting.
 
-ssize_t
-writev (int fildes, const struct iovec* iov, int iovcnt)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+  ssize_t
+  writev (int fildes, const struct iovec* iov, int iovcnt)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_WRITEV_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-ioctl (int fildes, int request, ...)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  ioctl (int fildes, int request, ...)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_IOCTL_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-fcntl (int fildes, int cmd, ...)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  fcntl (int fildes, int cmd, ...)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_FCNTL_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-ftruncate (int fildes, off_t length)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  ftruncate (int fildes, off_t length)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_FTRUNCATE_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-fsync (int fildes)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  fsync (int fildes)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_FSYNC_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-chmod (const char* path, mode_t mode)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  chmod (const char* path, mode_t mode)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_CHMOD_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-truncate (const char* path, off_t length)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  truncate (const char* path, off_t length)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_TRUNCATE_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-utime (const char* path, const struct utimbuf* times)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  utime (const char* path, const struct utimbuf* times)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_UTIME_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
 
 // ----------------------------------------------------------------------------
 // Unavailable in non-Unix embedded environments.
 
-int
-execve (const char* path, char* const argv[], char* const envp[])
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+  int
+  execve (const char* path, char* const argv[], char* const envp[])
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_EXECVE_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-pid_t
-fork (void)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  pid_t
+  fork (void)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_FORK_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return ((pid_t) -1);
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-pid_t
-getpid (void)
-{
-  return 1;
-}
+    errno = ENOSYS; // Not implemented
+    return ((pid_t) -1);
+  }
 
-int
-kill (pid_t pid, int sig)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+  pid_t
+  getpid (void)
+  {
+    return 1;
+  }
+
+  int
+  kill (pid_t pid, int sig)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_KILL_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-raise (int sig)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  raise (int sig)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RAISE_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-pid_t
-wait (int* stat_loc)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  pid_t
+  wait (int* stat_loc)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_WAIT_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return ((pid_t) -1);
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-chown (const char* path, uid_t owner, gid_t group)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return ((pid_t) -1);
+  }
+
+  int
+  chown (const char* path, uid_t owner, gid_t group)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_CHOWN_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-link (const char* existing, const char* _new)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  link (const char* existing, const char* _new)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_LINK_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-int
-symlink (const char* existing, const char* _new)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  symlink (const char* existing, const char* _new)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SYMLINK_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
-ssize_t
-readlink (const char* path, char* buf, size_t bufsize)
-{
-#if defined(DEBUG)
-  os::arch::brk ();
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  ssize_t
+  readlink (const char* path, char* buf, size_t bufsize)
+  {
+#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_READLINK_BRK))
+    os::arch::brk ();
 #endif
 
-  errno = ENOSYS; // Not implemented
-  return ((ssize_t) -1);
-}
+    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+
+    errno = ENOSYS; // Not implemented
+    return ((ssize_t) -1);
+  }
 
 #pragma GCC diagnostic pop
 
@@ -1255,206 +1369,287 @@ readlink (const char* path, char* buf, size_t bufsize)
 extern "C"
 {
 
-/**
- * In hosted environments only, alias all functions to C;
- * in freestanding environments these are intentionally omitted.
- *
- * The main trick here is that some of the functions are prefixed
- * with `_`; these are newlib specific functions.
- *
- * The aliases must be in the same compilation unit as the names
- * they alias.
- */
-int __attribute__((weak, alias ("_ZN5posix6acceptEiP8sockaddrPm")))
-accept (int socket, struct sockaddr* address, socklen_t* address_len);
+  /**
+   * In hosted environments only, alias all functions to C;
+   * in freestanding environments these are intentionally omitted.
+   *
+   * The main trick here is that some of the functions are prefixed
+   * with `_`; these are newlib specific functions.
+   *
+   * Aliases might not be very portable, but are very efficient.
+   *
+   * The aliases must be in the same compilation unit as the names
+   * they alias.
+   */
 
-int __attribute__((weak, alias ("_ZN5posix4bindEiPK8sockaddrm")))
-bind (int socket, const struct sockaddr* address, socklen_t address_len);
+#if ( __SIZEOF_POINTER__ == 4 )
+  int __attribute__((weak, alias ("_ZN5posix6acceptEiP8sockaddrPm")))
+  accept (int socket, struct sockaddr* address, socklen_t* address_len);
 
-int __attribute__((weak, alias ("_ZN5posix5chdirEPKc")))
-chdir (const char* path);
+  int __attribute__((weak, alias ("_ZN5posix4bindEiPK8sockaddrm")))
+  bind (int socket, const struct sockaddr* address, socklen_t address_len);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  int __attribute__((weak, alias ("_ZN5posix6acceptEiP8sockaddrPj")))
+  accept (int socket, struct sockaddr* address, socklen_t* address_len);
 
-int __attribute__((weak, alias ("_ZN5posix5chmodEPKcm")))
-chmod (const char* path, mode_t mode);
+  int __attribute__((weak, alias ("_ZN5posix4bindEiPK8sockaddrj")))
+  bind (int socket, const struct sockaddr* address, socklen_t address_len);
+#endif
 
-int __attribute__((weak, alias ("_ZN5posix5chownEPKctt")))
-_chown (const char* path, uid_t owner, gid_t group);
+  int __attribute__((weak, alias ("_ZN5posix5chdirEPKc")))
+  chdir (const char* path);
 
-clock_t __attribute__((weak, alias ("_ZN5posix5clockEv")))
-_clock (void);
+#if ( __SIZEOF_POINTER__ == 4 )
+  int __attribute__((weak, alias ("_ZN5posix5chmodEPKcm")))
+  chmod (const char* path, mode_t mode);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  int __attribute__((weak, alias ("_ZN5posix5chmodEPKcj")))
+  chmod (const char* path, mode_t mode);
+#endif
 
-int __attribute__((weak, alias ("_ZN5posix5closeEi")))
-_close (int fildes);
+  int __attribute__((weak, alias ("_ZN5posix5chownEPKctt")))
+  _chown (const char* path, uid_t owner, gid_t group);
 
-int __attribute__((weak, alias ("_ZN5posix8closedirEP3DIR")))
-closedir (DIR* dirp);
+  clock_t __attribute__((weak, alias ("_ZN5posix5clockEv")))
+  _clock (void);
 
-int __attribute__((weak, alias ("_ZN5posix7connectEiPK8sockaddrm")))
-connect (int socket, const struct sockaddr* address, socklen_t address_len);
+  int __attribute__((weak, alias ("_ZN5posix5closeEi")))
+  _close (int fildes);
 
-int __attribute__((weak, alias ("_ZN5posix6execveEPKcPKPcS4_")))
-_execve (const char* path, char* const argv[], char* const envp[]);
+  int __attribute__((weak, alias ("_ZN5posix8closedirEP3DIR")))
+  closedir (DIR* dirp);
 
-int __attribute__((weak, alias ("_ZN5posix5fcntlEiiz")))
-fcntl (int fildes, int cmd, ...);
+#if ( __SIZEOF_POINTER__ == 4 )
+  int __attribute__((weak, alias ("_ZN5posix7connectEiPK8sockaddrm")))
+  connect (int socket, const struct sockaddr* address, socklen_t address_len);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  int __attribute__((weak, alias ("_ZN5posix7connectEiPK8sockaddrj")))
+  connect (int socket, const struct sockaddr* address, socklen_t address_len);
+#endif
 
-pid_t __attribute__((weak, alias ("_ZN5posix4forkEv")))
-_fork (void);
+  int __attribute__((weak, alias ("_ZN5posix6execveEPKcPKPcS4_")))
+  _execve (const char* path, char* const argv[], char* const envp[]);
 
-int __attribute__((weak, alias ("_ZN5posix5fstatEiP4stat")))
-_fstat (int fildes, struct stat* buf);
+  int __attribute__((weak, alias ("_ZN5posix5fcntlEiiz")))
+  fcntl (int fildes, int cmd, ...);
 
-int __attribute__((weak, alias ("_ZN5posix9ftruncateEil")))
-ftruncate (int fildes, off_t length);
+  pid_t __attribute__((weak, alias ("_ZN5posix4forkEv")))
+  _fork (void);
 
-int __attribute__((weak, alias ("_ZN5posix5fsyncEi")))
-fsync (int fildes);
+  int __attribute__((weak, alias ("_ZN5posix5fstatEiP4stat")))
+  _fstat (int fildes, struct stat* buf);
 
-char*
-__attribute__((weak, alias ("_ZN5posix6getcwdEPcj")))
-getcwd (char* buf, size_t size);
+  int __attribute__((weak, alias ("_ZN5posix9ftruncateEil")))
+  ftruncate (int fildes, off_t length);
 
-int __attribute__((weak, alias ("_ZN5posix11getpeernameEiP8sockaddrPm")))
-getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
+  int __attribute__((weak, alias ("_ZN5posix5fsyncEi")))
+  fsync (int fildes);
 
-pid_t __attribute__((weak, alias ("_ZN5posix6getpidEv")))
-_getpid (void);
+#if ( __SIZEOF_POINTER__ == 4 )
+  char*
+  __attribute__((weak, alias ("_ZN5posix6getcwdEPcj")))
+  getcwd (char* buf, size_t size);
 
-int __attribute__((weak, alias ("_ZN5posix11getsocknameEiP8sockaddrPm")))
-getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
+  int __attribute__((weak, alias ("_ZN5posix11getpeernameEiP8sockaddrPm")))
+  getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  char*
+  __attribute__((weak, alias ("_ZN5posix6getcwdEPcm")))
+  getcwd (char* buf, size_t size);
 
-int __attribute__((weak, alias ("_ZN5posix10getsockoptEiiiPvPm")))
-getsockopt (int socket, int level, int option_name, void* option_value,
-    socklen_t* option_len);
+  int __attribute__((weak, alias ("_ZN5posix11getpeernameEiP8sockaddrPj")))
+  getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
+#endif
 
-int __attribute__((weak, alias ("_ZN5posix12gettimeofdayEP7timevalPv")))
-_gettimeofday (struct timeval* ptimeval, void* ptimezone);
+  pid_t __attribute__((weak, alias ("_ZN5posix6getpidEv")))
+  _getpid (void);
 
-int __attribute__((weak, alias ("_ZN5posix5ioctlEiiz")))
-ioctl (int fildes, int request, ...);
+#if ( __SIZEOF_POINTER__ == 4 )
+  int __attribute__((weak, alias ("_ZN5posix11getsocknameEiP8sockaddrPm")))
+  getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
 
-int __attribute__((weak, alias ("_ZN5posix6isattyEi")))
-_isatty (int fildes);
+  int __attribute__((weak, alias ("_ZN5posix10getsockoptEiiiPvPm")))
+  getsockopt (int socket, int level, int option_name, void* option_value,
+      socklen_t* option_len);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  int __attribute__((weak, alias ("_ZN5posix11getsocknameEiP8sockaddrPj")))
+  getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
 
-int __attribute__((weak, alias ("_ZN5posix4killEii")))
-_kill (pid_t pid, int sig);
+  int __attribute__((weak, alias ("_ZN5posix10getsockoptEiiiPvPj")))
+  getsockopt (int socket, int level, int option_name, void* option_value,
+              socklen_t* option_len);
+#endif
 
-int __attribute__((weak, alias ("_ZN5posix4linkEPKcS1_")))
-_link (const char* existing, const char* _new);
+  int __attribute__((weak, alias ("_ZN5posix12gettimeofdayEP7timevalPv")))
+  _gettimeofday (struct timeval* ptimeval, void* ptimezone);
 
-int __attribute__((weak, alias ("_ZN5posix6listenEii")))
-listen (int socket, int backlog);
+  int __attribute__((weak, alias ("_ZN5posix5ioctlEiiz")))
+  ioctl (int fildes, int request, ...);
 
-off_t __attribute__((weak, alias ("_ZN5posix5lseekEili")))
-_lseek (int fildes, off_t offset, int whence);
+  int __attribute__((weak, alias ("_ZN5posix6isattyEi")))
+  _isatty (int fildes);
 
-int __attribute__((weak, alias ("_ZN5posix5mkdirEPKcm")))
-mkdir (const char* path, mode_t mode);
+  int __attribute__((weak, alias ("_ZN5posix4killEii")))
+  _kill (pid_t pid, int sig);
 
-int __attribute__((weak, alias ("_ZN5posix4openEPKciz")))
-_open (const char* path, int oflag, ...);
+  int __attribute__((weak, alias ("_ZN5posix4linkEPKcS1_")))
+  _link (const char* existing, const char* _new);
 
-DIR*
-__attribute__((weak, alias ("_ZN5posix7opendirEPKc")))
-opendir (const char* dirname);
+  int __attribute__((weak, alias ("_ZN5posix6listenEii")))
+  listen (int socket, int backlog);
 
-int __attribute__((weak, alias ("_ZN5posix5raiseEi")))
-raise (int sig);
+  off_t __attribute__((weak, alias ("_ZN5posix5lseekEili")))
+  _lseek (int fildes, off_t offset, int whence);
 
-ssize_t __attribute__((weak, alias ("_ZN5posix4readEiPvj")))
-_read (int fildes, void* buf, size_t nbyte);
+#if ( __SIZEOF_POINTER__ == 4 )
+  int __attribute__((weak, alias ("_ZN5posix5mkdirEPKcm")))
+  mkdir (const char* path, mode_t mode);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  int __attribute__((weak, alias ("_ZN5posix5mkdirEPKcj")))
+  mkdir (const char* path, mode_t mode);
+#endif
 
-struct dirent*
-__attribute__((weak, alias ("_ZN5posix7readdirEP3DIR")))
-readdir (DIR* dirp);
+  int __attribute__((weak, alias ("_ZN5posix4openEPKciz")))
+  _open (const char* path, int oflag, ...);
 
-int __attribute__((weak, alias ("_ZN5posix9readdir_rEP3DIRP6direntPS3_")))
-readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
+  DIR*
+  __attribute__((weak, alias ("_ZN5posix7opendirEPKc")))
+  opendir (const char* dirname);
 
-ssize_t __attribute__((weak, alias ("_ZN5posix8readlinkEPKcPcj")))
-_readlink (const char* path, char* buf, size_t bufsize);
+  int __attribute__((weak, alias ("_ZN5posix5raiseEi")))
+  raise (int sig);
 
-ssize_t __attribute__((weak, alias ("_ZN5posix4recvEiPvji")))
-recv (int socket, void* buffer, size_t length, int flags);
+#if ( __SIZEOF_POINTER__ == 4 )
+  ssize_t __attribute__((weak, alias ("_ZN5posix4readEiPvj")))
+  _read (int fildes, void* buf, size_t nbyte);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  ssize_t __attribute__((weak, alias ("_ZN5posix4readEiPvm")))
+  _read (int fildes, void* buf, size_t nbyte);
+#endif
 
-ssize_t __attribute__((weak, alias ("_ZN5posix8recvfromEiPvjiP8sockaddrPm")))
-recvfrom (int socket, void* buffer, size_t length, int flags,
-    struct sockaddr* address, socklen_t* address_len);
+  struct dirent*
+  __attribute__((weak, alias ("_ZN5posix7readdirEP3DIR")))
+  readdir (DIR* dirp);
 
-ssize_t __attribute__((weak, alias ("_ZN5posix7recvmsgEiPNS_6msghdrEi")))
-recvmsg (int socket, struct msghdr* message, int flags);
+  int __attribute__((weak, alias ("_ZN5posix9readdir_rEP3DIRP6direntPS3_")))
+  readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
 
-int __attribute__((weak, alias ("_ZN5posix6renameEPKcS1_")))
-rename (const char* oldfn, const char* newfn);
+#if ( __SIZEOF_POINTER__ == 4 )
+  ssize_t __attribute__((weak, alias ("_ZN5posix8readlinkEPKcPcj")))
+  _readlink (const char* path, char* buf, size_t bufsize);
 
-void __attribute__((weak, alias ("_ZN5posix9rewinddirEP3DIR")))
-rewinddir (DIR* dirp);
+  ssize_t __attribute__((weak, alias ("_ZN5posix4recvEiPvji")))
+  recv (int socket, void* buffer, size_t length, int flags);
 
-int __attribute__((weak, alias ("_ZN5posix5rmdirEPKc")))
-rmdir (const char* path);
+  ssize_t __attribute__((weak, alias ("_ZN5posix8recvfromEiPvjiP8sockaddrPm")))
+  recvfrom (int socket, void* buffer, size_t length, int flags,
+      struct sockaddr* address, socklen_t* address_len);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  ssize_t __attribute__((weak, alias ("_ZN5posix8readlinkEPKcPcm")))
+  _readlink (const char* path, char* buf, size_t bufsize);
 
-int __attribute__((weak, alias ("_ZN5posix6selectEiP13_types_fd_setS1_S1_P7timeval")))
-select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-    struct timeval* timeout);
+  ssize_t __attribute__((weak, alias ("_ZN5posix4recvEiPvmi")))
+  recv (int socket, void* buffer, size_t length, int flags);
 
-ssize_t __attribute__((weak, alias ("_ZN5posix4sendEiPKvji")))
-send (int socket, const void* buffer, size_t length, int flags);
+  ssize_t __attribute__((weak, alias ("_ZN5posix8recvfromEiPvmiP8sockaddrPj")))
+  recvfrom (int socket, void* buffer, size_t length, int flags,
+            struct sockaddr* address, socklen_t* address_len);
+#endif
 
-ssize_t __attribute__((weak, alias ("_ZN5posix7sendmsgEiPKNS_6msghdrEi")))
-sendmsg (int socket, const struct msghdr* message, int flags);
+  ssize_t __attribute__((weak, alias ("_ZN5posix7recvmsgEiPNS_6msghdrEi")))
+  recvmsg (int socket, struct msghdr* message, int flags);
 
-ssize_t __attribute__((weak, alias ("_ZN5posix6sendtoEiPKvjiPK8sockaddrm")))
-sendto (int socket, const void* message, size_t length, int flags,
-    const struct sockaddr* dest_addr, socklen_t dest_len);
+  int __attribute__((weak, alias ("_ZN5posix6renameEPKcS1_")))
+  rename (const char* oldfn, const char* newfn);
 
-int __attribute__((weak, alias ("_ZN5posix10setsockoptEiiiPKvm")))
-setsockopt (int socket, int level, int option_name, const void* option_value,
-    socklen_t option_len);
+  void __attribute__((weak, alias ("_ZN5posix9rewinddirEP3DIR")))
+  rewinddir (DIR* dirp);
 
-int __attribute__((weak, alias ("_ZN5posix8shutdownEii")))
-shutdown (int socket, int how);
+  int __attribute__((weak, alias ("_ZN5posix5rmdirEPKc")))
+  rmdir (const char* path);
 
-int __attribute__((weak, alias ("_ZN5posix10sockatmarkEi")))
-sockatmark (int socket);
+  int __attribute__((weak, alias ("_ZN5posix6selectEiP13_types_fd_setS1_S1_P7timeval")))
+  select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
+          struct timeval* timeout);
 
-int __attribute__((weak, alias ("_ZN5posix6socketEiii")))
-socket (int domain, int type, int protocol);
+#if ( __SIZEOF_POINTER__ == 4 )
+  ssize_t __attribute__((weak, alias ("_ZN5posix4sendEiPKvji")))
+  send (int socket, const void* buffer, size_t length, int flags);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  ssize_t __attribute__((weak, alias ("_ZN5posix4sendEiPKvmi")))
+  send (int socket, const void* buffer, size_t length, int flags);
+#endif
 
-int __attribute__((weak, alias ("_ZN5posix10socketpairEiiiPi")))
-socketpair (int domain, int type, int protocol, int socket_vector[2]);
+  ssize_t __attribute__((weak, alias ("_ZN5posix7sendmsgEiPKNS_6msghdrEi")))
+  sendmsg (int socket, const struct msghdr* message, int flags);
 
-int __attribute__((weak, alias ("_ZN5posix4statEPKcP4stat")))
-_stat (const char* path, struct stat* buf);
+#if ( __SIZEOF_POINTER__ == 4 )
+  ssize_t __attribute__((weak, alias ("_ZN5posix6sendtoEiPKvjiPK8sockaddrm")))
+  sendto (int socket, const void* message, size_t length, int flags,
+      const struct sockaddr* dest_addr, socklen_t dest_len);
 
-void __attribute__((weak, alias ("_ZN5posix4syncEv")))
-sync (void);
+  int __attribute__((weak, alias ("_ZN5posix10setsockoptEiiiPKvm")))
+  setsockopt (int socket, int level, int option_name, const void* option_value,
+      socklen_t option_len);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  ssize_t __attribute__((weak, alias ("_ZN5posix6sendtoEiPKvmiPK8sockaddrj")))
+  sendto (int socket, const void* message, size_t length, int flags,
+          const struct sockaddr* dest_addr, socklen_t dest_len);
 
-int __attribute__((weak, alias ("_ZN5posix7symlinkEPKcS1_")))
-_symlink (const char* existing, const char* _new);
+  int __attribute__((weak, alias ("_ZN5posix10setsockoptEiiiPKvj")))
+  setsockopt (int socket, int level, int option_name, const void* option_value,
+              socklen_t option_len);
+#endif
 
-int __attribute__((weak, alias ("_ZN5posix6systemEPKc")))
-system (const char *command);
+  int __attribute__((weak, alias ("_ZN5posix8shutdownEii")))
+  shutdown (int socket, int how);
 
-clock_t __attribute__((weak, alias ("_ZN5posix5timesEP3tms")))
-_times (struct tms* buf);
+  int __attribute__((weak, alias ("_ZN5posix10sockatmarkEi")))
+  sockatmark (int socket);
 
-int __attribute__((weak, alias ("_ZN5posix8truncateEPKcl")))
-truncate (const char* path, off_t length);
+  int __attribute__((weak, alias ("_ZN5posix6socketEiii")))
+  socket (int domain, int type, int protocol);
 
-int __attribute__((weak, alias ("_ZN5posix6unlinkEPKc")))
-_unlink (const char* name);
+  int __attribute__((weak, alias ("_ZN5posix10socketpairEiiiPi")))
+  socketpair (int domain, int type, int protocol, int socket_vector[2]);
 
-int __attribute__((weak, alias ("_ZN5posix5utimeEPKcPKNS_7utimbufE")))
-utime (const char* path, const struct utimbuf* times);
+  int __attribute__((weak, alias ("_ZN5posix4statEPKcP4stat")))
+  _stat (const char* path, struct stat* buf);
 
-pid_t __attribute__((weak, alias ("_ZN5posix4waitEPi")))
-_wait (int* stat_loc);
+  void __attribute__((weak, alias ("_ZN5posix4syncEv")))
+  sync (void);
 
-ssize_t __attribute__((weak, alias ("_ZN5posix5writeEiPKvj")))
-_write (int fildes, const void* buf, size_t nbyte);
+  int __attribute__((weak, alias ("_ZN5posix7symlinkEPKcS1_")))
+  _symlink (const char* existing, const char* _new);
 
-ssize_t __attribute__((weak, alias ("_ZN5posix6writevEiPKNS_5iovecEi")))
-writev (int fildes, const struct iovec* iov, int iovcnt);
+  int __attribute__((weak, alias ("_ZN5posix6systemEPKc")))
+  system (const char *command);
+
+  clock_t __attribute__((weak, alias ("_ZN5posix5timesEP3tms")))
+  _times (struct tms* buf);
+
+  int __attribute__((weak, alias ("_ZN5posix8truncateEPKcl")))
+  truncate (const char* path, off_t length);
+
+  int __attribute__((weak, alias ("_ZN5posix6unlinkEPKc")))
+  _unlink (const char* name);
+
+  int __attribute__((weak, alias ("_ZN5posix5utimeEPKcPKNS_7utimbufE")))
+  utime (const char* path, const struct utimbuf* times);
+
+  pid_t __attribute__((weak, alias ("_ZN5posix4waitEPi")))
+  _wait (int* stat_loc);
+
+#if ( __SIZEOF_POINTER__ == 4 )
+  ssize_t __attribute__((weak, alias ("_ZN5posix5writeEiPKvj")))
+  _write (int fildes, const void* buf, size_t nbyte);
+#elif ( __SIZEOF_POINTER__ == 8 )
+  ssize_t __attribute__((weak, alias ("_ZN5posix5writeEiPKvm")))
+  _write (int fildes, const void* buf, size_t nbyte);
+#endif
+
+  ssize_t __attribute__((weak, alias ("_ZN5posix6writevEiPKNS_5iovecEi")))
+  writev (int fildes, const struct iovec* iov, int iovcnt);
 
 } /* extern "C" */
 
@@ -1487,7 +1682,7 @@ os_terminate (int code)
           code == 0 ? ADP_STOPPED_APPLICATION_EXIT : ADP_STOPPED_RUN_TIME_ERROR));
 #elif ( __SIZEOF_POINTER__ == 8 )
   field_t fields[2];
-  fields[0] = ADP_Stopped_ApplicationExit;
+  fields[0] = ADP_STOPPED_APPLICATION_EXIT;
   fields[1] = code;
   os::semihosting::call_host (SEMIHOSTING_SYS_EXIT, fields);
 #endif
@@ -1534,8 +1729,7 @@ os_startup_initialize_args (int* p_argc, char*** p_argv)
   field_t fields[2];
   fields[0] = (field_t) args_buf;
   fields[1] = sizeof(args_buf) - 1;
-  int ret = os::semihosting::call_host (SEMIHOSTING_SYS_GET_CMDLINE,
-                                        fields);
+  int ret = os::semihosting::call_host (SEMIHOSTING_SYS_GET_CMDLINE, fields);
   if (ret == 0)
     {
       // In case the host send more than we can chew, limit the
