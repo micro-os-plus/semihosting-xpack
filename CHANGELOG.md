@@ -2,7 +2,11 @@
 
 Changes in reverse chronological order.
 
-### v2.0.0 2018-01-23
+### v2.0.1 2018-01-25
+
+* [#3] use void* field_t
+
+### v2.0.0 2018-01-24
 
 ### 2018-01-23
 
