@@ -89,11 +89,8 @@ namespace
 #pragma GCC diagnostic pop
 
   // The type of a field, for the array passed to the host.
-#if ( __SIZEOF_POINTER__ == 4 )
-  typedef uint32_t field_t;
-#elif ( __SIZEOF_POINTER__ == 8 )
-  typedef uint64_t field_t;
-#endif
+  // Should be large enough to hold a pointer.
+  using field_t = void*;
 
 #if !defined(OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
 #define OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES (20)
@@ -184,7 +181,7 @@ namespace
         return -1;
       }
 
-    return (int)i;
+    return (int) i;
   }
 
   int
@@ -262,7 +259,7 @@ namespace
 
     if (whence == SEEK_END)
       {
-        fields[0] = pfd->handle;
+        fields[0] = (field_t) (size_t) pfd->handle;
         res = check_error (
             os::semihosting::call_host (SEMIHOSTING_SYS_FLEN, fields));
         if (res == -1)
@@ -273,8 +270,8 @@ namespace
       }
 
     // This code only does absolute seeks.
-    fields[0] = pfd->handle;
-    fields[1] = offset;
+    fields[0] = (field_t) (size_t) pfd->handle;
+    fields[1] = (field_t) offset;
     res = check_error (
         os::semihosting::call_host (SEMIHOSTING_SYS_SEEK, fields));
 
@@ -393,8 +390,8 @@ namespace posix
 
     field_t fields[3];
     fields[0] = (field_t) path;
-    fields[1] = (field_t) aflags;
-    fields[2] = std::strlen (path);
+    fields[1] = (field_t) (size_t) aflags;
+    fields[2] = (field_t) std::strlen (path);
 
     int fh = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, fields);
 
@@ -433,7 +430,7 @@ namespace posix
       }
 
     field_t fields[1];
-    fields[0] = pfd->handle;
+    fields[0] = (field_t) (size_t) pfd->handle;
 
     // Attempt to close the handle.
     int res;
@@ -469,9 +466,9 @@ namespace posix
       }
 
     field_t fields[3];
-    fields[0] = pfd->handle;
+    fields[0] = (field_t) (size_t) pfd->handle;
     fields[1] = (field_t) buf;
-    fields[2] = nbyte;
+    fields[2] = (field_t) nbyte;
 
     int res;
     // Returns the number of bytes *not* written.
@@ -504,9 +501,9 @@ namespace posix
 
     field_t fields[3];
 
-    fields[0] = pfd->handle;
+    fields[0] = (field_t) (size_t) pfd->handle;
     fields[1] = (field_t) buf;
-    fields[2] = nbyte;
+    fields[2] = (field_t) nbyte;
 
     // Returns the number of bytes *not* written.
     int res;
@@ -600,9 +597,9 @@ namespace posix
   {
     field_t fields[4];
     fields[0] = (field_t) existing;
-    fields[1] = std::strlen (existing);
+    fields[1] = (field_t) std::strlen (existing);
     fields[2] = (field_t) _new;
-    fields[3] = std::strlen (_new);
+    fields[3] = (field_t) std::strlen (_new);
 
     return
         check_error (
@@ -615,7 +612,7 @@ namespace posix
   {
     field_t fields[2];
     fields[0] = (field_t) path;
-    fields[1] = strlen (path);
+    fields[1] = (field_t) strlen (path);
 
     int res;
     res = os::semihosting::call_host (SEMIHOSTING_SYS_REMOVE, fields);
@@ -639,7 +636,7 @@ namespace posix
 
     field_t fields[2];
     fields[0] = (field_t) command;
-    fields[1] = strlen (command);
+    fields[1] = (field_t) strlen (command);
     int err = check_error (
         os::semihosting::call_host (SEMIHOSTING_SYS_SYSTEM, fields));
     if ((err >= 0) && (err < 256))
@@ -1682,8 +1679,8 @@ os_terminate (int code)
           code == 0 ? ADP_STOPPED_APPLICATION_EXIT : ADP_STOPPED_RUN_TIME_ERROR));
 #elif ( __SIZEOF_POINTER__ == 8 )
   field_t fields[2];
-  fields[0] = ADP_STOPPED_APPLICATION_EXIT;
-  fields[1] = code;
+  fields[0] = (field_t) ADP_STOPPED_APPLICATION_EXIT;
+  fields[1] = (field_t) (size_t) code;
   os::semihosting::call_host (SEMIHOSTING_SYS_EXIT, fields);
 #endif
 
@@ -1728,7 +1725,7 @@ os_startup_initialize_args (int* p_argc, char*** p_argv)
 
   field_t fields[2];
   fields[0] = (field_t) args_buf;
-  fields[1] = sizeof(args_buf) - 1;
+  fields[1] = (field_t) (sizeof(args_buf) - 1);
   int ret = os::semihosting::call_host (SEMIHOSTING_SYS_GET_CMDLINE, fields);
   if (ret == 0)
     {
@@ -1828,20 +1825,20 @@ initialise_monitor_handles (void)
   field_t volatile fields[3];
 
   fields[0] = (field_t) ":tt";
-  fields[2] = 3; // length of filename
-  fields[1] = 0; // mode "r"
+  fields[2] = (field_t) 3; // length of filename
+  fields[1] = (field_t) 0; // mode "r"
   monitor_stdin = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN,
                                               (void*) fields);
 
   fields[0] = (field_t) ":tt";
-  fields[2] = 3; // length of filename
-  fields[1] = 4; // mode "w"
+  fields[2] = (field_t) 3; // length of filename
+  fields[1] = (field_t) 4; // mode "w"
   monitor_stdout = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN,
                                                (void*) fields);
 
   fields[0] = (field_t) ":tt";
-  fields[2] = 3; // length of filename
-  fields[1] = 8; // mode "a"
+  fields[2] = (field_t) 3; // length of filename
+  fields[1] = (field_t) 8; // mode "a"
   monitor_stderr = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN,
                                                (void*) fields);
 

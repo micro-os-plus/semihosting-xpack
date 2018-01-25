@@ -146,7 +146,9 @@ namespace os
 
       static int handle; // STATIC!
 
-      void* fields[3];
+      // All fields should be large enough to hold a pointer.
+      using field_t = void*;
+      field_t fields[3];
       int ret;
 
       if (handle == 0)
@@ -154,12 +156,13 @@ namespace os
           // On the very first call get the file handle from the host.
 
           // Special filename for stdin/out/err.
-          fields[0] = (void*) ":tt";
-          fields[1] = (void*) 4;// mode "w"
+          fields[0] = (field_t) ":tt";
+          fields[1] = (field_t) 4; // mode "w"
           // Length of ":tt", except null terminator.
-          fields[2] = (void*) (sizeof(":tt") - 1);
+          fields[2] = (field_t) (sizeof(":tt") - 1);
 
-          ret = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*) fields);
+          ret = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN,
+                                            (void*) fields);
           if (ret == -1)
             {
               return -1;
@@ -168,9 +171,9 @@ namespace os
           handle = ret;
         }
 
-      fields[0] = (void*) handle;
-      fields[1] = (void*) buf;
-      fields[2] = (void*) nbyte;
+      fields[0] = (field_t) (size_t) handle;
+      fields[1] = (field_t) buf;
+      fields[2] = (field_t) nbyte;
       // Send character array to host file/device.
       ret = os::semihosting::call_host (SEMIHOSTING_SYS_WRITE, (void*) fields);
       // This call returns the number of bytes NOT written (0 if all ok).
