@@ -2,6 +2,11 @@
 
 Changes in reverse chronological order.
 
+### v2.0.2 2018-04-16
+
+* cleanup deps
+* update README developer info
+
 ### v2.0.1 2018-01-25
 
 * [#3] use void* field_t
