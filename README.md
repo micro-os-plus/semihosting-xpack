@@ -1,4 +1,8 @@
-## The µOS++ semihosting support
+[![license](https://img.shields.io/github/license/micro-os-plus/semihosting-xpack)](https://github.com/micro-os-plus/semihosting-xpack/blob/xpack/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/micro-os-plus/semihosting-xpack.svg)](https://github.com/micro-os-plus/semihosting-xpack/issues)
+[![GitHub pulls](https://img.shields.io/github/issues-pr/micro-os-plus/semihosting-xpack.svg)](https://github.com/micro-os-plus/semihosting-xpack/pulls)
+
+# The µOS++ semihosting support
 
 This project provides support for semihosting.
 
@@ -76,4 +80,6 @@ The architecture should provide a definition of the following function:
 
 ## License
 
-The original content is released under the [MIT License](https://opensource.org/licenses/MIT), with all rights reserved to [Liviu Ionescu](https://github.com/ilg-ul).
+The original content is released under the
+[MIT License](https://opensource.org/licenses/MIT), with all rights reserved to
+[Liviu Ionescu](https://github.com/ilg-ul).
