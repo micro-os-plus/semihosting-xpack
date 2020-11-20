@@ -1,7 +1,7 @@
 {
   "name": "@micro-os-plus/semihosting",
   "version": "2.0.2",
-  "description": "An xPack with the portable semihosting definitions.",
+  "description": "A source xPack with the portable semihosting definitions",
   "main": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,7 +13,7 @@
   "author": {
     "name": "Liviu Ionescu",
     "email": "ilg@livius.net",
-    "url": "http://liviusdotnet.wordpress.com"
+    "url": "https://github.com/ilg-ul"
   },
   "license": "MIT",
   "bugs": {
