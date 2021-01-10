@@ -1,6 +1,8 @@
-## Change log
+# Change & release log
 
-Changes in reverse chronological order.
+Releases in reverse chronological order.
+
+Please check [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/) and close existing issues and pull requests.
 
 ### v2.0.2 2018-04-16
 
