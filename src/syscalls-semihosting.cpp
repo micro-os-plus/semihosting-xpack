@@ -1866,4 +1866,3 @@ initialise_monitor_handles (void)
 #endif /* defined(OS_USE_SEMIHOSTING_SYSCALLS) */
 
 // ----------------------------------------------------------------------------
-
