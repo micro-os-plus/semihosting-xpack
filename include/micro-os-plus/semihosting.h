@@ -79,8 +79,7 @@ extern "C"
     ADP_STOPPED_RUN_TIME_ERROR = ((2 << 16) + 35),
   };
 
-// ----------------------------------------------------------------------------
-
+  // --------------------------------------------------------------------------
 
   // static int
   // os_semihosting_call_host (int reason, void* arg);
@@ -97,16 +96,15 @@ extern "C"
 
 namespace os
 {
-  namespace semihosting
-  {
-    // ------------------------------------------------------------------------
-    // Portable semihosting functions in C++.
+namespace semihosting
+{
+// ----------------------------------------------------------------------------
+// Portable semihosting functions in C++.
 
-    int
-    call_host (int reason, void* arg);
+int call_host (int reason, void* arg);
 
-  // --------------------------------------------------------------------------
-  } /* namespace semihosting */
+// ----------------------------------------------------------------------------
+} /* namespace semihosting */
 // ----------------------------------------------------------------------------
 } /* namespace os */
 
