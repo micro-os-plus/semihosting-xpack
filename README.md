@@ -63,8 +63,7 @@ All C++ functions have C equivalents:
 The architecture should provide a definition of the following function:
 
 ```c
-  static inline int
-  __attribute__ ((always_inline))
+  static inline __attribute__ ((always_inline)) int
   os_semihosting_call_host (int reason, void* arg);
 ```
 

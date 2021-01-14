@@ -144,7 +144,7 @@ namespace
   struct file*
   find_slot (int fd)
   {
-    if ((size_t) fd >= OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
+    if ((size_t)fd >= OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
       {
         // File descriptor is out of range.
         return nullptr;
@@ -181,7 +181,7 @@ namespace
         return -1;
       }
 
-    return (int) i;
+    return (int)i;
   }
 
   int
@@ -259,7 +259,7 @@ namespace
 
     if (whence == SEEK_END)
       {
-        fields[0] = (field_t) (size_t) pfd->handle;
+        fields[0] = (field_t) (size_t)pfd->handle;
         res = check_error (
             os::semihosting::call_host (SEMIHOSTING_SYS_FLEN, fields));
         if (res == -1)
@@ -270,8 +270,8 @@ namespace
       }
 
     // This code only does absolute seeks.
-    fields[0] = (field_t) (size_t) pfd->handle;
-    fields[1] = (field_t) offset;
+    fields[0] = (field_t) (size_t)pfd->handle;
+    fields[1] = (field_t)offset;
     res = check_error (
         os::semihosting::call_host (SEMIHOSTING_SYS_SEEK, fields));
 
@@ -315,7 +315,7 @@ namespace
     return 0;
   }
 
-}
+} // namespace
 
 // ----------------------------------------------------------------------------
 // ---- Standard POSIX IO functions -------------------------------------------
@@ -389,9 +389,9 @@ namespace posix
       }
 
     field_t fields[3];
-    fields[0] = (field_t) path;
-    fields[1] = (field_t) (size_t) aflags;
-    fields[2] = (field_t) std::strlen (path);
+    fields[0] = (field_t)path;
+    fields[1] = (field_t) (size_t)aflags;
+    fields[2] = (field_t)std::strlen (path);
 
     int fh = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, fields);
 
@@ -430,7 +430,7 @@ namespace posix
       }
 
     field_t fields[1];
-    fields[0] = (field_t) (size_t) pfd->handle;
+    fields[0] = (field_t) (size_t)pfd->handle;
 
     // Attempt to close the handle.
     int res;
@@ -446,11 +446,11 @@ namespace posix
     return res;
   }
 
-// ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
-// fd, is a valid user file handle.
-// Translates the return of SYS_READ into
-// bytes read.
+  // fd, is a valid user file handle.
+  // Translates the return of SYS_READ into
+  // bytes read.
 
   ssize_t
   read (int fildes, void* buf, size_t nbyte)
@@ -466,9 +466,9 @@ namespace posix
       }
 
     field_t fields[3];
-    fields[0] = (field_t) (size_t) pfd->handle;
-    fields[1] = (field_t) buf;
-    fields[2] = (field_t) nbyte;
+    fields[0] = (field_t) (size_t)pfd->handle;
+    fields[1] = (field_t)buf;
+    fields[2] = (field_t)nbyte;
 
     int res;
     // Returns the number of bytes *not* written.
@@ -501,9 +501,9 @@ namespace posix
 
     field_t fields[3];
 
-    fields[0] = (field_t) (size_t) pfd->handle;
-    fields[1] = (field_t) buf;
-    fields[2] = (field_t) nbyte;
+    fields[0] = (field_t) (size_t)pfd->handle;
+    fields[1] = (field_t)buf;
+    fields[2] = (field_t)nbyte;
 
     // Returns the number of bytes *not* written.
     int res;
@@ -567,18 +567,18 @@ namespace posix
   int
   fstat (int fildes, struct stat* buf)
   {
-    memset (buf, 0, sizeof(*buf));
+    memset (buf, 0, sizeof (*buf));
     return stat_impl (fildes, buf);
   }
 
-// ----------------------------------------------------------------------------
-// ----- POSIX file functions -----
+  // --------------------------------------------------------------------------
+  // ----- POSIX file functions -----
 
   int
   stat (const char* path, struct stat* buf)
   {
     int fd;
-    memset (buf, 0, sizeof(*buf));
+    memset (buf, 0, sizeof (*buf));
     // The best we can do is try to open the file read only.
     // If it exists, then we can guess a few things about it.
     if ((fd = open (path, O_RDONLY)) == -1)
@@ -596,23 +596,23 @@ namespace posix
   rename (const char* existing, const char* _new)
   {
     field_t fields[4];
-    fields[0] = (field_t) existing;
-    fields[1] = (field_t) std::strlen (existing);
-    fields[2] = (field_t) _new;
-    fields[3] = (field_t) std::strlen (_new);
+    fields[0] = (field_t)existing;
+    fields[1] = (field_t)std::strlen (existing);
+    fields[2] = (field_t)_new;
+    fields[3] = (field_t)std::strlen (_new);
 
-    return
-        check_error (
-            os::semihosting::call_host (SEMIHOSTING_SYS_RENAME, fields)) ?
-            -1 : 0;
+    return check_error (
+               os::semihosting::call_host (SEMIHOSTING_SYS_RENAME, fields))
+               ? -1
+               : 0;
   }
 
   int
   unlink (const char* path)
   {
     field_t fields[2];
-    fields[0] = (field_t) path;
-    fields[1] = (field_t) strlen (path);
+    fields[0] = (field_t)path;
+    fields[1] = (field_t)strlen (path);
 
     int res;
     res = os::semihosting::call_host (SEMIHOSTING_SYS_REMOVE, fields);
@@ -635,8 +635,8 @@ namespace posix
       }
 
     field_t fields[2];
-    fields[0] = (field_t) command;
-    fields[1] = (field_t) strlen (command);
+    fields[0] = (field_t)command;
+    fields[1] = (field_t)strlen (command);
     int err = check_error (
         os::semihosting::call_host (SEMIHOSTING_SYS_SYSTEM, fields));
     if ((err >= 0) && (err < 256))
@@ -647,7 +647,7 @@ namespace posix
         int exit_code;
 
         for (exit_code = err; (err != 0) && (WEXITSTATUS (err) != exit_code);
-            err <<= 1)
+             err <<= 1)
           {
             continue;
           }
@@ -658,12 +658,12 @@ namespace posix
   int
   gettimeofday (struct timeval* ptimeval, void* ptimezone)
   {
-    struct timezone* tzp = (struct timezone*) ptimezone;
+    struct timezone* tzp = (struct timezone*)ptimezone;
     if (ptimeval)
       {
         // Ask the host for the seconds since the Unix epoch.
-        ptimeval->tv_sec = os::semihosting::call_host (SEMIHOSTING_SYS_TIME,
-                                                       nullptr);
+        ptimeval->tv_sec
+            = os::semihosting::call_host (SEMIHOSTING_SYS_TIME, nullptr);
         ptimeval->tv_usec = 0;
       }
 
@@ -677,13 +677,13 @@ namespace posix
     return 0;
   }
 
-// Return a clock that ticks at 100Hz.
+  // Return a clock that ticks at 100Hz.
   clock_t
   clock (void)
   {
     clock_t timeval;
-    timeval = (clock_t) os::semihosting::call_host (SEMIHOSTING_SYS_CLOCK,
-                                                    nullptr);
+    timeval
+        = (clock_t)os::semihosting::call_host (SEMIHOSTING_SYS_CLOCK, nullptr);
 
     return timeval;
   }
@@ -714,10 +714,10 @@ namespace posix
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-// ----------------------------------------------------------------------------
-// ----- POSIX file_system functions -----
+  // --------------------------------------------------------------------------
+  // ----- POSIX file_system functions -----
 
-// Required by Google Tests
+  // Required by Google Tests
   int
   mkdir (const char* path, mode_t mode)
   {
@@ -735,7 +735,9 @@ namespace posix
   int
   rmdir (const char* path)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RMDIR_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_RMDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -748,7 +750,8 @@ namespace posix
   void
   sync (void)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SYNC_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SYNC_BRK))
     os::arch::brk ();
 #endif
 
@@ -757,13 +760,15 @@ namespace posix
     errno = ENOSYS; // Not implemented
   }
 
-// ----------------------------------------------------------------------------
-// ----- Directories functions -----
+  // --------------------------------------------------------------------------
+  // ----- Directories functions -----
 
   DIR*
   opendir (const char* dirpath)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_OPENDIR_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_OPENDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -776,7 +781,9 @@ namespace posix
   struct dirent*
   readdir (DIR* dirp)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_READDIR_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_READDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -789,20 +796,24 @@ namespace posix
   int
   readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_READDIR_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_READDIR_BRK))
     os::arch::brk ();
 #endif
 
     os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
-    return ((ssize_t) -1);
+    return ((ssize_t)-1);
   }
 
   void
   rewinddir (DIR* dirp)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_REWINDDIR_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_REWINDDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -814,7 +825,9 @@ namespace posix
   int
   closedir (DIR* dirp)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_CLOSEDIR_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_CLOSEDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -826,22 +839,24 @@ namespace posix
 
 #pragma GCC diagnostic pop
 
-// ----------------------------------------------------------------------------
-// Socket functions
+  // --------------------------------------------------------------------------
+  // Socket functions
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-// socket() and socketpair() are the functions creating sockets.
-// The other are socket specific functions.
+  // socket() and socketpair() are the functions creating sockets.
+  // The other are socket specific functions.
 
-// In addition, the following IO functions should work on sockets:
-// close(), read(), write(), writev(), ioctl(), fcntl(), select().
+  // In addition, the following IO functions should work on sockets:
+  // close(), read(), write(), writev(), ioctl(), fcntl(), select().
 
   int
   socket (int domain, int type, int protocol)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SOCKET_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_SOCKET_BRK))
     os::arch::brk ();
 #endif
 
@@ -854,7 +869,9 @@ namespace posix
   int
   socketpair (int domain, int type, int protocol, int socket_vector[2])
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SOCKETPAIR_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_SOCKETPAIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -867,7 +884,9 @@ namespace posix
   int
   accept (int socket, struct sockaddr* address, socklen_t* address_len)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_ACCEPT_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_ACCEPT_BRK))
     os::arch::brk ();
 #endif
 
@@ -880,7 +899,8 @@ namespace posix
   int
   bind (int socket, const struct sockaddr* address, socklen_t address_len)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_BIND_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_BIND_BRK))
     os::arch::brk ();
 #endif
 
@@ -893,7 +913,9 @@ namespace posix
   int
   connect (int socket, const struct sockaddr* address, socklen_t address_len)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_CONNECT_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_CONNECT_BRK))
     os::arch::brk ();
 #endif
 
@@ -906,7 +928,9 @@ namespace posix
   int
   getpeername (int socket, struct sockaddr* address, socklen_t* address_len)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_GETPEERNAME_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_GETPEERNAME_BRK))
     os::arch::brk ();
 #endif
 
@@ -919,7 +943,9 @@ namespace posix
   int
   getsockname (int socket, struct sockaddr* address, socklen_t* address_len)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_GETSOCKNAME_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_GETSOCKNAME_BRK))
     os::arch::brk ();
 #endif
 
@@ -933,7 +959,9 @@ namespace posix
   getsockopt (int socket, int level, int option_name, void* option_value,
               socklen_t* option_len)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_GETSOCKOPT_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_GETSOCKOPT_BRK))
     os::arch::brk ();
 #endif
 
@@ -946,7 +974,9 @@ namespace posix
   int
   listen (int socket, int backlog)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_LISTEN_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_LISTEN_BRK))
     os::arch::brk ();
 #endif
 
@@ -959,7 +989,8 @@ namespace posix
   ssize_t
   recv (int socket, void* buffer, size_t length, int flags)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RECV_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RECV_BRK))
     os::arch::brk ();
 #endif
 
@@ -973,7 +1004,9 @@ namespace posix
   recvfrom (int socket, void* buffer, size_t length, int flags,
             struct sockaddr* address, socklen_t* address_len)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RECVFROM_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_RECVFROM_BRK))
     os::arch::brk ();
 #endif
 
@@ -986,7 +1019,9 @@ namespace posix
   ssize_t
   recvmsg (int socket, struct msghdr* message, int flags)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RECVMSG_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_RECVMSG_BRK))
     os::arch::brk ();
 #endif
 
@@ -999,7 +1034,8 @@ namespace posix
   ssize_t
   send (int socket, const void* buffer, size_t length, int flags)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SEND_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SEND_BRK))
     os::arch::brk ();
 #endif
 
@@ -1012,7 +1048,9 @@ namespace posix
   ssize_t
   sendmsg (int socket, const struct msghdr* message, int flags)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SENDMSG_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_SENDMSG_BRK))
     os::arch::brk ();
 #endif
 
@@ -1026,7 +1064,9 @@ namespace posix
   sendto (int socket, const void* message, size_t length, int flags,
           const struct sockaddr* dest_addr, socklen_t dest_len)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SENDTO_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_SENDTO_BRK))
     os::arch::brk ();
 #endif
 
@@ -1040,7 +1080,9 @@ namespace posix
   setsockopt (int socket, int level, int option_name, const void* option_value,
               socklen_t option_len)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SETSOCKOPT_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_SETSOCKOPT_BRK))
     os::arch::brk ();
 #endif
 
@@ -1053,7 +1095,9 @@ namespace posix
   int
   shutdown (int socket, int how)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SHUTDOWN_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_SHUTDOWN_BRK))
     os::arch::brk ();
 #endif
 
@@ -1066,7 +1110,9 @@ namespace posix
   int
   sockatmark (int socket)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SOCKATMARK_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_SOCKATMARK_BRK))
     os::arch::brk ();
 #endif
 
@@ -1078,28 +1124,30 @@ namespace posix
 
 #pragma GCC diagnostic pop
 
-// ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
-// These functions are defined here to avoid linker errors in free
-// standing applications. They might be called in some error cases
-// from library code.
-//
-// If you detect other functions to be needed, just let us know
-// and we'll add them.
+  // These functions are defined here to avoid linker errors in free
+  // standing applications. They might be called in some error cases
+  // from library code.
+  //
+  // If you detect other functions to be needed, just let us know
+  // and we'll add them.
 
-// ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-// ----------------------------------------------------------------------------
-// Not yet implemented.
+  // --------------------------------------------------------------------------
+  // Not yet implemented.
 
   int
   select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
           struct timeval* timeout)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SELECT_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_SELECT_BRK))
     os::arch::brk ();
 #endif
 
@@ -1112,7 +1160,9 @@ namespace posix
   int
   chdir (const char* path)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_CHDIR_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_CHDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -1122,13 +1172,15 @@ namespace posix
     return -1;
   }
 
-// ----------------------------------------------------------------------------
-// Not available via semihosting.
+  // --------------------------------------------------------------------------
+  // Not available via semihosting.
 
   ssize_t
   writev (int fildes, const struct iovec* iov, int iovcnt)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_WRITEV_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_WRITEV_BRK))
     os::arch::brk ();
 #endif
 
@@ -1141,7 +1193,9 @@ namespace posix
   int
   ioctl (int fildes, int request, ...)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_IOCTL_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_IOCTL_BRK))
     os::arch::brk ();
 #endif
 
@@ -1154,7 +1208,9 @@ namespace posix
   int
   fcntl (int fildes, int cmd, ...)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_FCNTL_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_FCNTL_BRK))
     os::arch::brk ();
 #endif
 
@@ -1167,7 +1223,9 @@ namespace posix
   int
   ftruncate (int fildes, off_t length)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_FTRUNCATE_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_FTRUNCATE_BRK))
     os::arch::brk ();
 #endif
 
@@ -1180,7 +1238,9 @@ namespace posix
   int
   fsync (int fildes)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_FSYNC_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_FSYNC_BRK))
     os::arch::brk ();
 #endif
 
@@ -1193,7 +1253,9 @@ namespace posix
   int
   chmod (const char* path, mode_t mode)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_CHMOD_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_CHMOD_BRK))
     os::arch::brk ();
 #endif
 
@@ -1206,7 +1268,9 @@ namespace posix
   int
   truncate (const char* path, off_t length)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_TRUNCATE_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_TRUNCATE_BRK))
     os::arch::brk ();
 #endif
 
@@ -1219,7 +1283,9 @@ namespace posix
   int
   utime (const char* path, const struct utimbuf* times)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_UTIME_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_UTIME_BRK))
     os::arch::brk ();
 #endif
 
@@ -1229,13 +1295,15 @@ namespace posix
     return -1;
   }
 
-// ----------------------------------------------------------------------------
-// Unavailable in non-Unix embedded environments.
+  // --------------------------------------------------------------------------
+  // Unavailable in non-Unix embedded environments.
 
   int
   execve (const char* path, char* const argv[], char* const envp[])
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_EXECVE_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_EXECVE_BRK))
     os::arch::brk ();
 #endif
 
@@ -1248,14 +1316,15 @@ namespace posix
   pid_t
   fork (void)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_FORK_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_FORK_BRK))
     os::arch::brk ();
 #endif
 
     os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
-    return ((pid_t) -1);
+    return ((pid_t)-1);
   }
 
   pid_t
@@ -1267,7 +1336,8 @@ namespace posix
   int
   kill (pid_t pid, int sig)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_KILL_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_KILL_BRK))
     os::arch::brk ();
 #endif
 
@@ -1280,7 +1350,9 @@ namespace posix
   int
   raise (int sig)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RAISE_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_RAISE_BRK))
     os::arch::brk ();
 #endif
 
@@ -1293,20 +1365,23 @@ namespace posix
   pid_t
   wait (int* stat_loc)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_WAIT_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_WAIT_BRK))
     os::arch::brk ();
 #endif
 
     os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
-    return ((pid_t) -1);
+    return ((pid_t)-1);
   }
 
   int
   chown (const char* path, uid_t owner, gid_t group)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_CHOWN_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_CHOWN_BRK))
     os::arch::brk ();
 #endif
 
@@ -1319,7 +1394,8 @@ namespace posix
   int
   link (const char* existing, const char* _new)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_LINK_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_LINK_BRK))
     os::arch::brk ();
 #endif
 
@@ -1332,7 +1408,9 @@ namespace posix
   int
   symlink (const char* existing, const char* _new)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SYMLINK_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_SYMLINK_BRK))
     os::arch::brk ();
 #endif
 
@@ -1345,19 +1423,21 @@ namespace posix
   ssize_t
   readlink (const char* path, char* buf, size_t bufsize)
   {
-#if defined(DEBUG) && (defined (OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_READLINK_BRK))
+#if defined(DEBUG) \
+    && (defined(OS_DEBUG_SYSCALLS_BRK) \
+        || defined(OS_DEBUG_SYSCALL_READLINK_BRK))
     os::arch::brk ();
 #endif
 
     os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
-    return ((ssize_t) -1);
+    return ((ssize_t)-1);
   }
 
 #pragma GCC diagnostic pop
 
-} /* namespace posix */
+} // namespace posix
 
 // ----------------------------------------------------------------------------
 
@@ -1379,273 +1459,265 @@ extern "C"
    * they alias.
    */
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  int __attribute__((weak, alias ("_ZN5posix6acceptEiP8sockaddrPm")))
+#if (__SIZEOF_POINTER__ == 4)
+  int __attribute__ ((weak, alias ("_ZN5posix6acceptEiP8sockaddrPm")))
   accept (int socket, struct sockaddr* address, socklen_t* address_len);
 
-  int __attribute__((weak, alias ("_ZN5posix4bindEiPK8sockaddrm")))
+  int __attribute__ ((weak, alias ("_ZN5posix4bindEiPK8sockaddrm")))
   bind (int socket, const struct sockaddr* address, socklen_t address_len);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  int __attribute__((weak, alias ("_ZN5posix6acceptEiP8sockaddrPj")))
+#elif (__SIZEOF_POINTER__ == 8)
+  int __attribute__ ((weak, alias ("_ZN5posix6acceptEiP8sockaddrPj")))
   accept (int socket, struct sockaddr* address, socklen_t* address_len);
 
-  int __attribute__((weak, alias ("_ZN5posix4bindEiPK8sockaddrj")))
+  int __attribute__ ((weak, alias ("_ZN5posix4bindEiPK8sockaddrj")))
   bind (int socket, const struct sockaddr* address, socklen_t address_len);
 #endif
 
-  int __attribute__((weak, alias ("_ZN5posix5chdirEPKc")))
+  int __attribute__ ((weak, alias ("_ZN5posix5chdirEPKc")))
   chdir (const char* path);
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  int __attribute__((weak, alias ("_ZN5posix5chmodEPKcm")))
+#if (__SIZEOF_POINTER__ == 4)
+  int __attribute__ ((weak, alias ("_ZN5posix5chmodEPKcm")))
   chmod (const char* path, mode_t mode);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  int __attribute__((weak, alias ("_ZN5posix5chmodEPKcj")))
+#elif (__SIZEOF_POINTER__ == 8)
+  int __attribute__ ((weak, alias ("_ZN5posix5chmodEPKcj")))
   chmod (const char* path, mode_t mode);
 #endif
 
-  int __attribute__((weak, alias ("_ZN5posix5chownEPKctt")))
+  int __attribute__ ((weak, alias ("_ZN5posix5chownEPKctt")))
   _chown (const char* path, uid_t owner, gid_t group);
 
-  clock_t __attribute__((weak, alias ("_ZN5posix5clockEv")))
-  _clock (void);
+  clock_t __attribute__ ((weak, alias ("_ZN5posix5clockEv"))) _clock (void);
 
-  int __attribute__((weak, alias ("_ZN5posix5closeEi")))
-  _close (int fildes);
+  int __attribute__ ((weak, alias ("_ZN5posix5closeEi"))) _close (int fildes);
 
-  int __attribute__((weak, alias ("_ZN5posix8closedirEP3DIR")))
+  int __attribute__ ((weak, alias ("_ZN5posix8closedirEP3DIR")))
   closedir (DIR* dirp);
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  int __attribute__((weak, alias ("_ZN5posix7connectEiPK8sockaddrm")))
+#if (__SIZEOF_POINTER__ == 4)
+  int __attribute__ ((weak, alias ("_ZN5posix7connectEiPK8sockaddrm")))
   connect (int socket, const struct sockaddr* address, socklen_t address_len);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  int __attribute__((weak, alias ("_ZN5posix7connectEiPK8sockaddrj")))
+#elif (__SIZEOF_POINTER__ == 8)
+  int __attribute__ ((weak, alias ("_ZN5posix7connectEiPK8sockaddrj")))
   connect (int socket, const struct sockaddr* address, socklen_t address_len);
 #endif
 
-  int __attribute__((weak, alias ("_ZN5posix6execveEPKcPKPcS4_")))
+  int __attribute__ ((weak, alias ("_ZN5posix6execveEPKcPKPcS4_")))
   _execve (const char* path, char* const argv[], char* const envp[]);
 
-  int __attribute__((weak, alias ("_ZN5posix5fcntlEiiz")))
+  int __attribute__ ((weak, alias ("_ZN5posix5fcntlEiiz")))
   fcntl (int fildes, int cmd, ...);
 
-  pid_t __attribute__((weak, alias ("_ZN5posix4forkEv")))
-  _fork (void);
+  pid_t __attribute__ ((weak, alias ("_ZN5posix4forkEv"))) _fork (void);
 
-  int __attribute__((weak, alias ("_ZN5posix5fstatEiP4stat")))
+  int __attribute__ ((weak, alias ("_ZN5posix5fstatEiP4stat")))
   _fstat (int fildes, struct stat* buf);
 
-  int __attribute__((weak, alias ("_ZN5posix9ftruncateEil")))
+  int __attribute__ ((weak, alias ("_ZN5posix9ftruncateEil")))
   ftruncate (int fildes, off_t length);
 
-  int __attribute__((weak, alias ("_ZN5posix5fsyncEi")))
-  fsync (int fildes);
+  int __attribute__ ((weak, alias ("_ZN5posix5fsyncEi"))) fsync (int fildes);
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  char*
-  __attribute__((weak, alias ("_ZN5posix6getcwdEPcj")))
+#if (__SIZEOF_POINTER__ == 4)
+  char* __attribute__ ((weak, alias ("_ZN5posix6getcwdEPcj")))
   getcwd (char* buf, size_t size);
 
-  int __attribute__((weak, alias ("_ZN5posix11getpeernameEiP8sockaddrPm")))
+  int __attribute__ ((weak, alias ("_ZN5posix11getpeernameEiP8sockaddrPm")))
   getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  char*
-  __attribute__((weak, alias ("_ZN5posix6getcwdEPcm")))
+#elif (__SIZEOF_POINTER__ == 8)
+  char* __attribute__ ((weak, alias ("_ZN5posix6getcwdEPcm")))
   getcwd (char* buf, size_t size);
 
-  int __attribute__((weak, alias ("_ZN5posix11getpeernameEiP8sockaddrPj")))
+  int __attribute__ ((weak, alias ("_ZN5posix11getpeernameEiP8sockaddrPj")))
   getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
 #endif
 
-  pid_t __attribute__((weak, alias ("_ZN5posix6getpidEv")))
-  _getpid (void);
+  pid_t __attribute__ ((weak, alias ("_ZN5posix6getpidEv"))) _getpid (void);
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  int __attribute__((weak, alias ("_ZN5posix11getsocknameEiP8sockaddrPm")))
+#if (__SIZEOF_POINTER__ == 4)
+  int __attribute__ ((weak, alias ("_ZN5posix11getsocknameEiP8sockaddrPm")))
   getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
 
-  int __attribute__((weak, alias ("_ZN5posix10getsockoptEiiiPvPm")))
+  int __attribute__ ((weak, alias ("_ZN5posix10getsockoptEiiiPvPm")))
   getsockopt (int socket, int level, int option_name, void* option_value,
-      socklen_t* option_len);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  int __attribute__((weak, alias ("_ZN5posix11getsocknameEiP8sockaddrPj")))
+              socklen_t* option_len);
+#elif (__SIZEOF_POINTER__ == 8)
+  int __attribute__ ((weak, alias ("_ZN5posix11getsocknameEiP8sockaddrPj")))
   getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
 
-  int __attribute__((weak, alias ("_ZN5posix10getsockoptEiiiPvPj")))
+  int __attribute__ ((weak, alias ("_ZN5posix10getsockoptEiiiPvPj")))
   getsockopt (int socket, int level, int option_name, void* option_value,
               socklen_t* option_len);
 #endif
 
-  int __attribute__((weak, alias ("_ZN5posix12gettimeofdayEP7timevalPv")))
+  int __attribute__ ((weak, alias ("_ZN5posix12gettimeofdayEP7timevalPv")))
   _gettimeofday (struct timeval* ptimeval, void* ptimezone);
 
-  int __attribute__((weak, alias ("_ZN5posix5ioctlEiiz")))
+  int __attribute__ ((weak, alias ("_ZN5posix5ioctlEiiz")))
   ioctl (int fildes, int request, ...);
 
-  int __attribute__((weak, alias ("_ZN5posix6isattyEi")))
+  int __attribute__ ((weak, alias ("_ZN5posix6isattyEi")))
   _isatty (int fildes);
 
-  int __attribute__((weak, alias ("_ZN5posix4killEii")))
+  int __attribute__ ((weak, alias ("_ZN5posix4killEii")))
   _kill (pid_t pid, int sig);
 
-  int __attribute__((weak, alias ("_ZN5posix4linkEPKcS1_")))
+  int __attribute__ ((weak, alias ("_ZN5posix4linkEPKcS1_")))
   _link (const char* existing, const char* _new);
 
-  int __attribute__((weak, alias ("_ZN5posix6listenEii")))
+  int __attribute__ ((weak, alias ("_ZN5posix6listenEii")))
   listen (int socket, int backlog);
 
-  off_t __attribute__((weak, alias ("_ZN5posix5lseekEili")))
+  off_t __attribute__ ((weak, alias ("_ZN5posix5lseekEili")))
   _lseek (int fildes, off_t offset, int whence);
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  int __attribute__((weak, alias ("_ZN5posix5mkdirEPKcm")))
+#if (__SIZEOF_POINTER__ == 4)
+  int __attribute__ ((weak, alias ("_ZN5posix5mkdirEPKcm")))
   mkdir (const char* path, mode_t mode);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  int __attribute__((weak, alias ("_ZN5posix5mkdirEPKcj")))
+#elif (__SIZEOF_POINTER__ == 8)
+  int __attribute__ ((weak, alias ("_ZN5posix5mkdirEPKcj")))
   mkdir (const char* path, mode_t mode);
 #endif
 
-  int __attribute__((weak, alias ("_ZN5posix4openEPKciz")))
+  int __attribute__ ((weak, alias ("_ZN5posix4openEPKciz")))
   _open (const char* path, int oflag, ...);
 
-  DIR*
-  __attribute__((weak, alias ("_ZN5posix7opendirEPKc")))
+  DIR* __attribute__ ((weak, alias ("_ZN5posix7opendirEPKc")))
   opendir (const char* dirname);
 
-  int __attribute__((weak, alias ("_ZN5posix5raiseEi")))
-  raise (int sig);
+  int __attribute__ ((weak, alias ("_ZN5posix5raiseEi"))) raise (int sig);
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  ssize_t __attribute__((weak, alias ("_ZN5posix4readEiPvj")))
+#if (__SIZEOF_POINTER__ == 4)
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix4readEiPvj")))
   _read (int fildes, void* buf, size_t nbyte);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  ssize_t __attribute__((weak, alias ("_ZN5posix4readEiPvm")))
+#elif (__SIZEOF_POINTER__ == 8)
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix4readEiPvm")))
   _read (int fildes, void* buf, size_t nbyte);
 #endif
 
-  struct dirent*
-  __attribute__((weak, alias ("_ZN5posix7readdirEP3DIR")))
+  struct dirent* __attribute__ ((weak, alias ("_ZN5posix7readdirEP3DIR")))
   readdir (DIR* dirp);
 
-  int __attribute__((weak, alias ("_ZN5posix9readdir_rEP3DIRP6direntPS3_")))
+  int __attribute__ ((weak, alias ("_ZN5posix9readdir_rEP3DIRP6direntPS3_")))
   readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  ssize_t __attribute__((weak, alias ("_ZN5posix8readlinkEPKcPcj")))
+#if (__SIZEOF_POINTER__ == 4)
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix8readlinkEPKcPcj")))
   _readlink (const char* path, char* buf, size_t bufsize);
 
-  ssize_t __attribute__((weak, alias ("_ZN5posix4recvEiPvji")))
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix4recvEiPvji")))
   recv (int socket, void* buffer, size_t length, int flags);
 
-  ssize_t __attribute__((weak, alias ("_ZN5posix8recvfromEiPvjiP8sockaddrPm")))
-  recvfrom (int socket, void* buffer, size_t length, int flags,
-      struct sockaddr* address, socklen_t* address_len);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  ssize_t __attribute__((weak, alias ("_ZN5posix8readlinkEPKcPcm")))
+  ssize_t
+      __attribute__ ((weak, alias ("_ZN5posix8recvfromEiPvjiP8sockaddrPm")))
+      recvfrom (int socket, void* buffer, size_t length, int flags,
+                struct sockaddr* address, socklen_t* address_len);
+#elif (__SIZEOF_POINTER__ == 8)
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix8readlinkEPKcPcm")))
   _readlink (const char* path, char* buf, size_t bufsize);
 
-  ssize_t __attribute__((weak, alias ("_ZN5posix4recvEiPvmi")))
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix4recvEiPvmi")))
   recv (int socket, void* buffer, size_t length, int flags);
 
-  ssize_t __attribute__((weak, alias ("_ZN5posix8recvfromEiPvmiP8sockaddrPj")))
-  recvfrom (int socket, void* buffer, size_t length, int flags,
-            struct sockaddr* address, socklen_t* address_len);
+  ssize_t
+      __attribute__ ((weak, alias ("_ZN5posix8recvfromEiPvmiP8sockaddrPj")))
+      recvfrom (int socket, void* buffer, size_t length, int flags,
+                struct sockaddr* address, socklen_t* address_len);
 #endif
 
-  ssize_t __attribute__((weak, alias ("_ZN5posix7recvmsgEiPNS_6msghdrEi")))
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix7recvmsgEiPNS_6msghdrEi")))
   recvmsg (int socket, struct msghdr* message, int flags);
 
-  int __attribute__((weak, alias ("_ZN5posix6renameEPKcS1_")))
+  int __attribute__ ((weak, alias ("_ZN5posix6renameEPKcS1_")))
   rename (const char* oldfn, const char* newfn);
 
-  void __attribute__((weak, alias ("_ZN5posix9rewinddirEP3DIR")))
+  void __attribute__ ((weak, alias ("_ZN5posix9rewinddirEP3DIR")))
   rewinddir (DIR* dirp);
 
-  int __attribute__((weak, alias ("_ZN5posix5rmdirEPKc")))
+  int __attribute__ ((weak, alias ("_ZN5posix5rmdirEPKc")))
   rmdir (const char* path);
 
-  int __attribute__((weak, alias ("_ZN5posix6selectEiP13_types_fd_setS1_S1_P7timeval")))
+  int __attribute__ ((
+      weak, alias ("_ZN5posix6selectEiP13_types_fd_setS1_S1_P7timeval")))
   select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
           struct timeval* timeout);
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  ssize_t __attribute__((weak, alias ("_ZN5posix4sendEiPKvji")))
+#if (__SIZEOF_POINTER__ == 4)
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix4sendEiPKvji")))
   send (int socket, const void* buffer, size_t length, int flags);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  ssize_t __attribute__((weak, alias ("_ZN5posix4sendEiPKvmi")))
+#elif (__SIZEOF_POINTER__ == 8)
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix4sendEiPKvmi")))
   send (int socket, const void* buffer, size_t length, int flags);
 #endif
 
-  ssize_t __attribute__((weak, alias ("_ZN5posix7sendmsgEiPKNS_6msghdrEi")))
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix7sendmsgEiPKNS_6msghdrEi")))
   sendmsg (int socket, const struct msghdr* message, int flags);
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  ssize_t __attribute__((weak, alias ("_ZN5posix6sendtoEiPKvjiPK8sockaddrm")))
-  sendto (int socket, const void* message, size_t length, int flags,
-      const struct sockaddr* dest_addr, socklen_t dest_len);
-
-  int __attribute__((weak, alias ("_ZN5posix10setsockoptEiiiPKvm")))
-  setsockopt (int socket, int level, int option_name, const void* option_value,
-      socklen_t option_len);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  ssize_t __attribute__((weak, alias ("_ZN5posix6sendtoEiPKvmiPK8sockaddrj")))
+#if (__SIZEOF_POINTER__ == 4)
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix6sendtoEiPKvjiPK8sockaddrm")))
   sendto (int socket, const void* message, size_t length, int flags,
           const struct sockaddr* dest_addr, socklen_t dest_len);
 
-  int __attribute__((weak, alias ("_ZN5posix10setsockoptEiiiPKvj")))
+  int __attribute__ ((weak, alias ("_ZN5posix10setsockoptEiiiPKvm")))
+  setsockopt (int socket, int level, int option_name, const void* option_value,
+              socklen_t option_len);
+#elif (__SIZEOF_POINTER__ == 8)
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix6sendtoEiPKvmiPK8sockaddrj")))
+  sendto (int socket, const void* message, size_t length, int flags,
+          const struct sockaddr* dest_addr, socklen_t dest_len);
+
+  int __attribute__ ((weak, alias ("_ZN5posix10setsockoptEiiiPKvj")))
   setsockopt (int socket, int level, int option_name, const void* option_value,
               socklen_t option_len);
 #endif
 
-  int __attribute__((weak, alias ("_ZN5posix8shutdownEii")))
+  int __attribute__ ((weak, alias ("_ZN5posix8shutdownEii")))
   shutdown (int socket, int how);
 
-  int __attribute__((weak, alias ("_ZN5posix10sockatmarkEi")))
+  int __attribute__ ((weak, alias ("_ZN5posix10sockatmarkEi")))
   sockatmark (int socket);
 
-  int __attribute__((weak, alias ("_ZN5posix6socketEiii")))
+  int __attribute__ ((weak, alias ("_ZN5posix6socketEiii")))
   socket (int domain, int type, int protocol);
 
-  int __attribute__((weak, alias ("_ZN5posix10socketpairEiiiPi")))
+  int __attribute__ ((weak, alias ("_ZN5posix10socketpairEiiiPi")))
   socketpair (int domain, int type, int protocol, int socket_vector[2]);
 
-  int __attribute__((weak, alias ("_ZN5posix4statEPKcP4stat")))
+  int __attribute__ ((weak, alias ("_ZN5posix4statEPKcP4stat")))
   _stat (const char* path, struct stat* buf);
 
-  void __attribute__((weak, alias ("_ZN5posix4syncEv")))
-  sync (void);
+  void __attribute__ ((weak, alias ("_ZN5posix4syncEv"))) sync (void);
 
-  int __attribute__((weak, alias ("_ZN5posix7symlinkEPKcS1_")))
+  int __attribute__ ((weak, alias ("_ZN5posix7symlinkEPKcS1_")))
   _symlink (const char* existing, const char* _new);
 
-  int __attribute__((weak, alias ("_ZN5posix6systemEPKc")))
-  system (const char *command);
+  int __attribute__ ((weak, alias ("_ZN5posix6systemEPKc")))
+  system (const char* command);
 
-  clock_t __attribute__((weak, alias ("_ZN5posix5timesEP3tms")))
+  clock_t __attribute__ ((weak, alias ("_ZN5posix5timesEP3tms")))
   _times (struct tms* buf);
 
-  int __attribute__((weak, alias ("_ZN5posix8truncateEPKcl")))
+  int __attribute__ ((weak, alias ("_ZN5posix8truncateEPKcl")))
   truncate (const char* path, off_t length);
 
-  int __attribute__((weak, alias ("_ZN5posix6unlinkEPKc")))
+  int __attribute__ ((weak, alias ("_ZN5posix6unlinkEPKc")))
   _unlink (const char* name);
 
-  int __attribute__((weak, alias ("_ZN5posix5utimeEPKcPKNS_7utimbufE")))
+  int __attribute__ ((weak, alias ("_ZN5posix5utimeEPKcPKNS_7utimbufE")))
   utime (const char* path, const struct utimbuf* times);
 
-  pid_t __attribute__((weak, alias ("_ZN5posix4waitEPi")))
+  pid_t __attribute__ ((weak, alias ("_ZN5posix4waitEPi")))
   _wait (int* stat_loc);
 
-#if ( __SIZEOF_POINTER__ == 4 )
-  ssize_t __attribute__((weak, alias ("_ZN5posix5writeEiPKvj")))
+#if (__SIZEOF_POINTER__ == 4)
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix5writeEiPKvj")))
   _write (int fildes, const void* buf, size_t nbyte);
-#elif ( __SIZEOF_POINTER__ == 8 )
-  ssize_t __attribute__((weak, alias ("_ZN5posix5writeEiPKvm")))
+#elif (__SIZEOF_POINTER__ == 8)
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix5writeEiPKvm")))
   _write (int fildes, const void* buf, size_t nbyte);
 #endif
 
-  ssize_t __attribute__((weak, alias ("_ZN5posix6writevEiPKNS_5iovecEi")))
+  ssize_t __attribute__ ((weak, alias ("_ZN5posix6writevEiPKNS_5iovecEi")))
   writev (int fildes, const struct iovec* iov, int iovcnt);
 
 } /* extern "C" */
@@ -1668,19 +1740,16 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 
-void
-__attribute__ ((noreturn,weak))
-os_terminate (int code)
+void __attribute__ ((noreturn, weak)) os_terminate (int code)
 {
-#if ( __SIZEOF_POINTER__ == 4 )
-  os::semihosting::call_host (
-      SEMIHOSTING_SYS_EXIT,
-      (void*) (
-          code == 0 ? ADP_STOPPED_APPLICATION_EXIT : ADP_STOPPED_RUN_TIME_ERROR));
-#elif ( __SIZEOF_POINTER__ == 8 )
+#if (__SIZEOF_POINTER__ == 4)
+  os::semihosting::call_host (SEMIHOSTING_SYS_EXIT,
+                              (void*)(code == 0 ? ADP_STOPPED_APPLICATION_EXIT
+                                                : ADP_STOPPED_RUN_TIME_ERROR));
+#elif (__SIZEOF_POINTER__ == 8)
   field_t fields[2];
-  fields[0] = (field_t) ADP_STOPPED_APPLICATION_EXIT;
-  fields[1] = (field_t) (size_t) code;
+  fields[0] = (field_t)ADP_STOPPED_APPLICATION_EXIT;
+  fields[1] = (field_t) (size_t)code;
   os::semihosting::call_host (SEMIHOSTING_SYS_EXIT, fields);
 #endif
 
@@ -1724,17 +1793,17 @@ os_startup_initialize_args (int* p_argc, char*** p_argv)
   bool is_in_argument = false;
 
   field_t fields[2];
-  fields[0] = (field_t) args_buf;
-  fields[1] = (field_t) (sizeof(args_buf) - 1);
+  fields[0] = (field_t)args_buf;
+  fields[1] = (field_t) (sizeof (args_buf) - 1);
   int ret = os::semihosting::call_host (SEMIHOSTING_SYS_GET_CMDLINE, fields);
   if (ret == 0)
     {
       // In case the host send more than we can chew, limit the
       // string to our buffer.
-      args_buf[sizeof(args_buf) - 1] = '\0';
+      args_buf[sizeof (args_buf) - 1] = '\0';
 
       // The returned command line is a null terminated string.
-      char* p = (char*) fields[0];
+      char* p = (char*)fields[0];
 
       int delim = '\0';
       int ch;
@@ -1746,7 +1815,7 @@ os_startup_initialize_args (int* p_argc, char*** p_argv)
               if (!isblank (ch))
                 {
                   if (argc
-                      >= (int) ((sizeof(argv_buf) / sizeof(argv_buf[0])) - 1))
+                      >= (int)((sizeof (argv_buf) / sizeof (argv_buf[0])) - 1))
                     break;
 
                   if (ch == '"' || ch == '\'')
@@ -1806,7 +1875,7 @@ namespace
   int monitor_stdin;
   int monitor_stdout;
   int monitor_stderr;
-}
+} // namespace
 
 // ----------------------------------------------------------------------------
 
@@ -1825,22 +1894,22 @@ initialise_monitor_handles (void)
   field_t volatile fields[3];
 
   fields[0] = (field_t) ":tt";
-  fields[2] = (field_t) 3; // length of filename
-  fields[1] = (field_t) 0; // mode "r"
-  monitor_stdin = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN,
-                                              (void*) fields);
+  fields[2] = (field_t)3; // length of filename
+  fields[1] = (field_t)0; // mode "r"
+  monitor_stdin
+      = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*)fields);
 
   fields[0] = (field_t) ":tt";
-  fields[2] = (field_t) 3; // length of filename
-  fields[1] = (field_t) 4; // mode "w"
-  monitor_stdout = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN,
-                                               (void*) fields);
+  fields[2] = (field_t)3; // length of filename
+  fields[1] = (field_t)4; // mode "w"
+  monitor_stdout
+      = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*)fields);
 
   fields[0] = (field_t) ":tt";
-  fields[2] = (field_t) 3; // length of filename
-  fields[1] = (field_t) 8; // mode "a"
-  monitor_stderr = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN,
-                                               (void*) fields);
+  fields[2] = (field_t)3; // length of filename
+  fields[1] = (field_t)8; // mode "a"
+  monitor_stderr
+      = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*)fields);
 
   // If we failed to open stderr, redirect to stdout.
   if (monitor_stderr == -1)

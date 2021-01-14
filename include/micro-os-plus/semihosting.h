@@ -28,6 +28,8 @@
 #ifndef MICRO_OS_PLUS_SEMIHOSTING_H_
 #define MICRO_OS_PLUS_SEMIHOSTING_H_
 
+// ----------------------------------------------------------------------------
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -79,8 +81,7 @@ extern "C"
     ADP_STOPPED_RUN_TIME_ERROR = ((2 << 16) + 35),
   };
 
-// ----------------------------------------------------------------------------
-
+  // --------------------------------------------------------------------------
 
   // static int
   // os_semihosting_call_host (int reason, void* arg);
@@ -105,10 +106,9 @@ namespace os
     int
     call_host (int reason, void* arg);
 
-  // --------------------------------------------------------------------------
-  } /* namespace semihosting */
-// ----------------------------------------------------------------------------
-} /* namespace os */
+    // ------------------------------------------------------------------------
+  } // namespace semihosting
+} // namespace os
 
 #endif /* defined(__cplusplus) */
 
