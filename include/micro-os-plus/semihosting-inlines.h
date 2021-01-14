@@ -34,18 +34,20 @@
 
 namespace os
 {
-namespace semihosting
-{
-// ----------------------------------------------------------------------------
-// Portable semihosting functions in C++.
+  namespace semihosting
+  {
+    // ------------------------------------------------------------------------
+    // Portable semihosting functions in C++.
 
-inline int __attribute__ ((always_inline)) call_host (int reason, void* arg)
-{
-  return os_semihosting_call_host (reason, arg);
-}
+    inline int
+    __attribute__ ((always_inline))
+    call_host (int reason, void* arg)
+    {
+      return os_semihosting_call_host (reason, arg);
+    }
 
-// ----------------------------------------------------------------------------
-} /* namespace semihosting */
+  // --------------------------------------------------------------------------
+  } /* namespace semihosting */
 // ----------------------------------------------------------------------------
 } /* namespace os */
 
