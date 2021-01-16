@@ -222,10 +222,10 @@ namespace posix
 
 } // namespace posix
 
-#endif /* __cplusplus */
+#endif // __cplusplus
 
 // ----------------------------------------------------------------------------
 
-#endif /* MICRO_OS_PLUS_SEMIHOSTING_POSIX_FUNCTIONS_H_ */
+#endif // MICRO_OS_PLUS_SEMIHOSTING_POSIX_FUNCTIONS_H_
 
 // ----------------------------------------------------------------------------

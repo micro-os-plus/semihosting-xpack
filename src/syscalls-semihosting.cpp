@@ -1722,7 +1722,7 @@ extern "C"
 
 } /* extern "C" */
 
-#endif /* (__STDC_HOSTED__ != 0) */
+#endif // (__STDC_HOSTED__ != 0)
 
 // ----------------------------------------------------------------------------
 
@@ -1768,11 +1768,11 @@ void __attribute__ ((noreturn, weak)) os_terminate (int code)
 
 #if !defined(OS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE)
 #define OS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE 80
-#endif /* OS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE */
+#endif // OS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE
 
 #if !defined(OS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE)
 #define OS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE 10
-#endif /* OS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE */
+#endif // OS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE
 
 // This is the semihosting implementation for the routine to
 // process args.
@@ -1932,6 +1932,6 @@ initialise_monitor_handles (void)
 
 // ----------------------------------------------------------------------------
 
-#endif /* defined(OS_USE_SEMIHOSTING_SYSCALLS) */
+#endif // defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
 // ----------------------------------------------------------------------------

@@ -195,13 +195,13 @@ namespace os
       return (ssize_t) (nbyte) - (ssize_t)ret;
     }
 
-#endif /* defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) */
+#endif // defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
 
   } // namespace trace
 } // namespace os
 
 #endif /* defined(OS_USE_TRACE_SEMIHOSTING_DEBUG) || \
           defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) */
-#endif /* defined(TRACE) */
+#endif // defined(TRACE)
 
 // ----------------------------------------------------------------------------

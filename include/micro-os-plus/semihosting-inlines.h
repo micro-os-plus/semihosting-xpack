@@ -49,10 +49,10 @@ namespace os
   } // namespace semihosting
 } // namespace os
 
-#endif /* defined(__cplusplus) */
+#endif // defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
-#endif /* MICRO_OS_PLUS_SEMIHOSTING_INLINES_H_ */
+#endif // MICRO_OS_PLUS_SEMIHOSTING_INLINES_H_
 
 // ----------------------------------------------------------------------------

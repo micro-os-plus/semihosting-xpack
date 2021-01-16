@@ -33,7 +33,7 @@
 #if defined(__cplusplus)
 extern "C"
 {
-#endif /* defined(__cplusplus) */
+#endif // defined(__cplusplus)
 
   enum semihosting_operation_numbers
   {
@@ -90,7 +90,7 @@ extern "C"
 
 #if defined(__cplusplus)
 }
-#endif /* defined(__cplusplus) */
+#endif // defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
@@ -110,7 +110,7 @@ namespace os
   } // namespace semihosting
 } // namespace os
 
-#endif /* defined(__cplusplus) */
+#endif // defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
@@ -123,6 +123,6 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* MICRO_OS_PLUS_SEMIHOSTING_H_ */
+#endif // MICRO_OS_PLUS_SEMIHOSTING_H_
 
 // ----------------------------------------------------------------------------
