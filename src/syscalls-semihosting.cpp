@@ -585,7 +585,10 @@ namespace posix
       {
         return -1;
       }
-    buf->st_mode |= S_IFREG | S_IREAD;
+    buf->st_mode |= S_IFREG;
+#if __BSD_VISIBLE
+    buf->st_mode |= S_IREAD;
+#endif
     int res = stat_impl (fd, buf);
     // Not interested in the error.
     close (fd);
