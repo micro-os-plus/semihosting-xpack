@@ -11,29 +11,35 @@
 
 message(STATUS "Including micro-os-plus-semihosting...")
 
+# -----------------------------------------------------------------------------
+
 function(target_sources_micro_os_plus_semihosting target)
 
-  get_filename_component(PARENT_DIR ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
+  get_filename_component(xpack_root_folder ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
 
   target_sources(
     ${target}
 
     PRIVATE
-      ${PARENT_DIR}/src/syscalls-semihosting.cpp
-      ${PARENT_DIR}/src/trace-semihosting.cpp
+      ${xpack_root_folder}/src/syscalls-semihosting.cpp
+      ${xpack_root_folder}/src/trace-semihosting.cpp
   )
+
 endfunction()
+
+# -----------------------------------------------------------------------------
 
 function(target_include_directories_micro_os_plus_semihosting target)
 
-  get_filename_component(PARENT_DIR ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
+  get_filename_component(xpack_root_folder ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
 
   target_include_directories(
     ${target}
 
     PUBLIC
-      ${PARENT_DIR}/include
+      ${xpack_root_folder}/include
   )
+
 endfunction()
 
 # -----------------------------------------------------------------------------
