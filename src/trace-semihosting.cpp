@@ -25,6 +25,9 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if (!(defined(__APPLE__) || defined(__linux__) || defined(__unix__))) \
+    || defined(__DOXYGEN__)
+
 // ----------------------------------------------------------------------------
 
 #if defined(TRACE)
@@ -203,5 +206,9 @@ namespace os
 #endif /* defined(OS_USE_TRACE_SEMIHOSTING_DEBUG) || \
           defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) */
 #endif // defined(TRACE)
+
+// ----------------------------------------------------------------------------
+
+#endif // !Unix
 
 // ----------------------------------------------------------------------------

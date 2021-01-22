@@ -25,7 +25,11 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if (!(defined(__APPLE__) || defined(__linux__) || defined(__unix__))) \
+    || defined(__DOXYGEN__)
+
 // ----------------------------------------------------------------------------
+
 #if defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
 #include <micro-os-plus/semihosting.h>
@@ -1936,5 +1940,9 @@ initialise_monitor_handles (void)
 // ----------------------------------------------------------------------------
 
 #endif // defined(OS_USE_SEMIHOSTING_SYSCALLS)
+
+// ----------------------------------------------------------------------------
+
+#endif // !Unix
 
 // ----------------------------------------------------------------------------
