@@ -9,20 +9,26 @@
 #
 # -----------------------------------------------------------------------------
 
+if(micro-os-plus-semihosting-included)
+  return()
+endif()
+
+set(micro-os-plus-semihosting-included TRUE)
+
 message(STATUS "Including micro-os-plus-semihosting...")
 
 # -----------------------------------------------------------------------------
 
 function(target_sources_micro_os_plus_semihosting target)
 
-  get_filename_component(xpack_root_folder ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
+  get_filename_component(xpack_current_folder ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
 
   target_sources(
     ${target}
 
     PRIVATE
-      ${xpack_root_folder}/src/syscalls-semihosting.cpp
-      ${xpack_root_folder}/src/trace-semihosting.cpp
+      ${xpack_current_folder}/src/syscalls-semihosting.cpp
+      ${xpack_current_folder}/src/trace-semihosting.cpp
   )
 
 endfunction()
@@ -31,14 +37,81 @@ endfunction()
 
 function(target_include_directories_micro_os_plus_semihosting target)
 
-  get_filename_component(xpack_root_folder ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
+  get_filename_component(xpack_current_folder ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
 
   target_include_directories(
     ${target}
 
     PUBLIC
-      ${xpack_root_folder}/include
+      ${xpack_current_folder}/include
   )
+
+endfunction()
+
+# -----------------------------------------------------------------------------
+
+function(target_compile_definitions_micro_os_plus_semihosting target)
+
+  # None
+
+endfunction()
+
+# =============================================================================
+
+function(add_libraries_micro_os_plus_semihosting)
+
+  # ---------------------------------------------------------------------------
+
+  find_package(micro-os-plus-diag-trace)
+
+  # -----------------------------------------------------------------------------
+  
+    if (NOT TARGET micro-os-plus-semihosting-objects)
+
+    add_library(micro-os-plus-semihosting-objects OBJECT EXCLUDE_FROM_ALL)
+
+    target_sources_micro_os_plus_semihosting(micro-os-plus-semihosting-objects)
+    target_include_directories_micro_os_plus_semihosting(micro-os-plus-semihosting-objects)
+    target_compile_definitions_micro_os_plus_semihosting(micro-os-plus-semihosting-objects)
+
+    add_library(micro-os-plus::semihosting ALIAS micro-os-plus-semihosting-objects)
+    message(STATUS "micro-os-plus::semihosting")
+
+    target_link_libraries(
+      micro-os-plus-semihosting-objects
+
+      PUBLIC
+        micro-os-plus::common
+        micro-os-plus::diag-trace
+        micro-os-plus::architecture
+    )
+
+  endif()
+
+  # ---------------------------------------------------------------------------
+
+  if(NOT TARGET micro-os-plus-semihosting-static)
+
+    add_library(micro-os-plus-semihosting-static STATIC EXCLUDE_FROM_ALL)
+
+    target_sources_micro_os_plus_semihosting(micro-os-plus-semihosting-static)
+    target_include_directories_micro_os_plus_semihosting(micro-os-plus-semihosting-static)
+    target_compile_definitions_micro_os_plus_semihosting(micro-os-plus-semihosting-static)
+
+    add_library(micro-os-plus::semihosting-static ALIAS micro-os-plus-semihosting-static)
+
+    target_link_libraries(
+      micro-os-plus-semihosting-static
+      
+      PUBLIC
+        micro-os-plus::common
+        micro-os-plus::diag-trace-static
+        micro-os-plus::architecture
+    )
+
+  endif()
+
+  # ---------------------------------------------------------------------------
 
 endfunction()
 
