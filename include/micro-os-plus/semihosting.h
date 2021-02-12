@@ -114,10 +114,6 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-// Include the architecture specific definitions, which
-// include `call_host()`.
-#include <micro-os-plus/architecture.h>
-
 // Include the portable definitions.
 #include <micro-os-plus/semihosting-inlines.h>
 

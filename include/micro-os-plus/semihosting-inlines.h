@@ -32,6 +32,10 @@
 
 #if defined(__cplusplus)
 
+// Include the architecture specific definitions, which
+// include `call_host()`.
+#include <micro-os-plus/architecture.h>
+
 namespace os
 {
   namespace semihosting
