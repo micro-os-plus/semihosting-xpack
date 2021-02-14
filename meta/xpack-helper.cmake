@@ -90,6 +90,7 @@ function(add_libraries_micro_os_plus_semihosting)
 
   # ---------------------------------------------------------------------------
 
+if(true)
   if(NOT TARGET micro-os-plus-semihosting-static)
 
     add_library(micro-os-plus-semihosting-static STATIC EXCLUDE_FROM_ALL)
@@ -110,6 +111,7 @@ function(add_libraries_micro_os_plus_semihosting)
     )
 
   endif()
+endif()
 
   # ---------------------------------------------------------------------------
 
