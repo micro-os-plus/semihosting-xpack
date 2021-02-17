@@ -81,7 +81,6 @@ function(add_libraries_micro_os_plus_semihosting)
       micro-os-plus-semihosting-objects
 
       PUBLIC
-        micro-os-plus::common
         micro-os-plus::diag-trace
         micro-os-plus::architecture
     )
@@ -105,7 +104,6 @@ if(true)
       micro-os-plus-semihosting-static
       
       PUBLIC
-        micro-os-plus::common
         micro-os-plus::diag-trace-static
         micro-os-plus::architecture
     )
