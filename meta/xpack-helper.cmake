@@ -64,32 +64,8 @@ function(add_libraries_micro_os_plus_semihosting)
 
   find_package(micro-os-plus-diag-trace)
 
-  # -----------------------------------------------------------------------------
-  
-    if (NOT TARGET micro-os-plus-semihosting-objects)
-
-    add_library(micro-os-plus-semihosting-objects OBJECT EXCLUDE_FROM_ALL)
-
-    target_sources_micro_os_plus_semihosting(micro-os-plus-semihosting-objects)
-    target_include_directories_micro_os_plus_semihosting(micro-os-plus-semihosting-objects)
-    target_compile_definitions_micro_os_plus_semihosting(micro-os-plus-semihosting-objects)
-
-    add_library(micro-os-plus::semihosting ALIAS micro-os-plus-semihosting-objects)
-    message(STATUS "micro-os-plus::semihosting")
-
-    target_link_libraries(
-      micro-os-plus-semihosting-objects
-
-      PUBLIC
-        micro-os-plus::diag-trace
-        micro-os-plus::architecture
-    )
-
-  endif()
-
   # ---------------------------------------------------------------------------
 
-if(true)
   if(NOT TARGET micro-os-plus-semihosting-static)
 
     add_library(micro-os-plus-semihosting-static STATIC EXCLUDE_FROM_ALL)
@@ -99,6 +75,7 @@ if(true)
     target_compile_definitions_micro_os_plus_semihosting(micro-os-plus-semihosting-static)
 
     add_library(micro-os-plus::semihosting-static ALIAS micro-os-plus-semihosting-static)
+    message(STATUS "micro-os-plus::semihosting-static")
 
     target_link_libraries(
       micro-os-plus-semihosting-static
@@ -109,7 +86,6 @@ if(true)
     )
 
   endif()
-endif()
 
   # ---------------------------------------------------------------------------
 
