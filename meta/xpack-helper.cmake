@@ -19,46 +19,9 @@ message(STATUS "Including micro-os-plus-semihosting...")
 
 # -----------------------------------------------------------------------------
 
-function(target_sources_micro_os_plus_semihosting target)
-
-  get_filename_component(xpack_current_folder ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
-
-  target_sources(
-    ${target}
-
-    PRIVATE
-      ${xpack_current_folder}/src/syscalls-semihosting.cpp
-      ${xpack_current_folder}/src/trace-semihosting.cpp
-  )
-
-endfunction()
-
-# -----------------------------------------------------------------------------
-
-function(target_include_directories_micro_os_plus_semihosting target)
-
-  get_filename_component(xpack_current_folder ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
-
-  target_include_directories(
-    ${target}
-
-    PUBLIC
-      ${xpack_current_folder}/include
-  )
-
-endfunction()
-
-# -----------------------------------------------------------------------------
-
-function(target_compile_definitions_micro_os_plus_semihosting target)
-
-  # None
-
-endfunction()
-
-# =============================================================================
-
 function(add_libraries_micro_os_plus_semihosting)
+
+  get_filename_component(xpack_current_folder ${CMAKE_CURRENT_FUNCTION_LIST_DIR} DIRECTORY)
 
   # ---------------------------------------------------------------------------
 
@@ -70,12 +33,22 @@ function(add_libraries_micro_os_plus_semihosting)
 
     add_library(micro-os-plus-semihosting-static STATIC EXCLUDE_FROM_ALL)
 
-    target_sources_micro_os_plus_semihosting(micro-os-plus-semihosting-static)
-    target_include_directories_micro_os_plus_semihosting(micro-os-plus-semihosting-static)
-    target_compile_definitions_micro_os_plus_semihosting(micro-os-plus-semihosting-static)
+    # -------------------------------------------------------------------------
 
-    add_library(micro-os-plus::semihosting-static ALIAS micro-os-plus-semihosting-static)
-    message(STATUS "micro-os-plus::semihosting-static")
+    target_sources(
+      micro-os-plus-semihosting-static
+  
+      PRIVATE
+        ${xpack_current_folder}/src/syscalls-semihosting.cpp
+        ${xpack_current_folder}/src/trace-semihosting.cpp
+    )
+
+    target_include_directories(
+      micro-os-plus-semihosting-static
+  
+      PUBLIC
+        ${xpack_current_folder}/include
+    )
 
     target_link_libraries(
       micro-os-plus-semihosting-static
@@ -84,6 +57,12 @@ function(add_libraries_micro_os_plus_semihosting)
         micro-os-plus::diag-trace-static
         micro-os-plus::architecture
     )
+
+    # -------------------------------------------------------------------------
+    # Aliases
+
+    add_library(micro-os-plus::semihosting-static ALIAS micro-os-plus-semihosting-static)
+    message(STATUS "micro-os-plus::semihosting-static")
 
   endif()
 
