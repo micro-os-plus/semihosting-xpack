@@ -38,12 +38,13 @@ if(NOT TARGET micro-os-plus-semihosting-static)
 
   # ---------------------------------------------------------------------------
 
+  file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${xpack_current_folder}/src/*.c*")
+
   target_sources(
     micro-os-plus-semihosting-static
 
     PRIVATE
-      ${xpack_current_folder}/src/syscalls-semihosting.cpp
-      ${xpack_current_folder}/src/trace-semihosting.cpp
+      ${source_files}
   )
 
   target_include_directories(
