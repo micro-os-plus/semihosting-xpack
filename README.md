@@ -95,7 +95,7 @@ The ... are fully functional.
 The following functions are available:
 
 ```c++
-namespace os
+namespace micro_os_plus
 {
   namespace semihosting
   {

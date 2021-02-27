@@ -96,7 +96,7 @@ extern "C"
 
 #if defined(__cplusplus)
 
-namespace os
+namespace micro_os_plus
 {
   namespace semihosting
   {
@@ -108,7 +108,7 @@ namespace os
 
     // ------------------------------------------------------------------------
   } // namespace semihosting
-} // namespace os
+} // namespace micro_os_plus
 
 #endif // defined(__cplusplus)
 

@@ -36,7 +36,7 @@
 // include `call_host()`.
 #include <micro-os-plus/architecture.h>
 
-namespace os
+namespace micro_os_plus
 {
   namespace semihosting
   {
@@ -51,7 +51,7 @@ namespace os
 
     // ------------------------------------------------------------------------
   } // namespace semihosting
-} // namespace os
+} // namespace micro_os_plus
 
 #endif // defined(__cplusplus)
 

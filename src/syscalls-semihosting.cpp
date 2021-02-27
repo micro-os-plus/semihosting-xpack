@@ -55,6 +55,10 @@
 
 // ----------------------------------------------------------------------------
 
+using namespace micro_os_plus;
+
+// ----------------------------------------------------------------------------
+
 /**
  * This file implements all POSIX functions over the ARM
  * semihosting API.
@@ -191,7 +195,8 @@ namespace
   int
   get_host_errno (void)
   {
-    return os::semihosting::call_host (SEMIHOSTING_SYS_ERRNO, nullptr);
+    return semihosting::call_host (SEMIHOSTING_SYS_ERRNO,
+                                                  nullptr);
   }
 
   /**
@@ -264,8 +269,8 @@ namespace
     if (whence == SEEK_END)
       {
         fields[0] = (field_t) (size_t)pfd->handle;
-        res = check_error (
-            os::semihosting::call_host (SEMIHOSTING_SYS_FLEN, fields));
+        res = check_error (semihosting::call_host (
+            SEMIHOSTING_SYS_FLEN, fields));
         if (res == -1)
           {
             return -1;
@@ -277,7 +282,7 @@ namespace
     fields[0] = (field_t) (size_t)pfd->handle;
     fields[1] = (field_t)offset;
     res = check_error (
-        os::semihosting::call_host (SEMIHOSTING_SYS_SEEK, fields));
+        semihosting::call_host (SEMIHOSTING_SYS_SEEK, fields));
 
     // At this point ptr is the current file position.
     if (res >= 0)
@@ -307,8 +312,8 @@ namespace
     st->st_blksize = 1024;
 
     int res;
-    res = check_error (
-        os::semihosting::call_host (SEMIHOSTING_SYS_FLEN, &pfd->handle));
+    res = check_error (semihosting::call_host (
+        SEMIHOSTING_SYS_FLEN, &pfd->handle));
     if (res == -1)
       {
         return -1;
@@ -343,7 +348,7 @@ namespace posix
     int fd = new_slot ();
     if (fd == -1)
       {
-        os::trace::printf ("%s() EMFILE\n", __FUNCTION__);
+        trace::printf ("%s() EMFILE\n", __FUNCTION__);
 
         errno = EMFILE;
         return -1;
@@ -357,7 +362,7 @@ namespace posix
         res = posix::stat (path, &st);
         if (res != -1)
           {
-            os::trace::printf ("%s() EEXIST\n", __FUNCTION__);
+            trace::printf ("%s() EEXIST\n", __FUNCTION__);
 
             errno = EEXIST;
             return -1;
@@ -397,7 +402,8 @@ namespace posix
     fields[1] = (field_t) (size_t)aflags;
     fields[2] = (field_t)std::strlen (path);
 
-    int fh = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, fields);
+    int fh
+        = semihosting::call_host (SEMIHOSTING_SYS_OPEN, fields);
 
     // Return a user file descriptor or an error.
     if (fh >= 0)
@@ -419,7 +425,7 @@ namespace posix
     pfd = find_slot (fildes);
     if (pfd == nullptr)
       {
-        os::trace::printf ("%s() EBADF\n", __FUNCTION__);
+        trace::printf ("%s() EBADF\n", __FUNCTION__);
 
         errno = EBADF;
         return -1;
@@ -439,7 +445,7 @@ namespace posix
     // Attempt to close the handle.
     int res;
     res = check_error (
-        os::semihosting::call_host (SEMIHOSTING_SYS_CLOSE, fields));
+        semihosting::call_host (SEMIHOSTING_SYS_CLOSE, fields));
 
     // Reclaim handle?
     if (res == 0)
@@ -463,7 +469,7 @@ namespace posix
     pfd = find_slot (fildes);
     if (pfd == nullptr)
       {
-        os::trace::printf ("%s() EBADF\n", __FUNCTION__);
+        trace::printf ("%s() EBADF\n", __FUNCTION__);
 
         errno = EBADF;
         return -1;
@@ -477,7 +483,7 @@ namespace posix
     int res;
     // Returns the number of bytes *not* written.
     res = check_error (
-        os::semihosting::call_host (SEMIHOSTING_SYS_READ, fields));
+        semihosting::call_host (SEMIHOSTING_SYS_READ, fields));
     if (res == -1)
       {
         return res;
@@ -497,7 +503,7 @@ namespace posix
     pfd = find_slot (fildes);
     if (pfd == nullptr)
       {
-        os::trace::printf ("%s() EBADF\n", __FUNCTION__);
+        trace::printf ("%s() EBADF\n", __FUNCTION__);
 
         errno = EBADF;
         return -1;
@@ -512,7 +518,7 @@ namespace posix
     // Returns the number of bytes *not* written.
     int res;
     res = check_error (
-        os::semihosting::call_host (SEMIHOSTING_SYS_WRITE, fields));
+        semihosting::call_host (SEMIHOSTING_SYS_WRITE, fields));
     /* Clearly an error. */
     if (res < 0)
       {
@@ -550,14 +556,15 @@ namespace posix
     pfd = find_slot (fildes);
     if (pfd == nullptr)
       {
-        os::trace::printf ("%s() EBADF\n", __FUNCTION__);
+        trace::printf ("%s() EBADF\n", __FUNCTION__);
 
         errno = EBADF;
         return 0;
       }
 
     int tty;
-    tty = os::semihosting::call_host (SEMIHOSTING_SYS_ISTTY, &pfd->handle);
+    tty = semihosting::call_host (SEMIHOSTING_SYS_ISTTY,
+                                                 &pfd->handle);
 
     if (tty == 1)
       {
@@ -608,8 +615,8 @@ namespace posix
     fields[2] = (field_t)_new;
     fields[3] = (field_t)std::strlen (_new);
 
-    return check_error (
-               os::semihosting::call_host (SEMIHOSTING_SYS_RENAME, fields))
+    return check_error (semihosting::call_host (
+               SEMIHOSTING_SYS_RENAME, fields))
                ? -1
                : 0;
   }
@@ -622,7 +629,8 @@ namespace posix
     fields[1] = (field_t)strlen (path);
 
     int res;
-    res = os::semihosting::call_host (SEMIHOSTING_SYS_REMOVE, fields);
+    res = semihosting::call_host (SEMIHOSTING_SYS_REMOVE,
+                                                 fields);
     if (res == -1)
       {
         return with_set_errno (res);
@@ -644,8 +652,8 @@ namespace posix
     field_t fields[2];
     fields[0] = (field_t)command;
     fields[1] = (field_t)strlen (command);
-    int err = check_error (
-        os::semihosting::call_host (SEMIHOSTING_SYS_SYSTEM, fields));
+    int err = check_error (semihosting::call_host (
+        SEMIHOSTING_SYS_SYSTEM, fields));
     if ((err >= 0) && (err < 256))
       {
         // We have to convert e, an exit status to the encoded status of
@@ -669,8 +677,8 @@ namespace posix
     if (ptimeval)
       {
         // Ask the host for the seconds since the Unix epoch.
-        ptimeval->tv_sec
-            = os::semihosting::call_host (SEMIHOSTING_SYS_TIME, nullptr);
+        ptimeval->tv_sec = semihosting::call_host (
+            SEMIHOSTING_SYS_TIME, nullptr);
         ptimeval->tv_usec = 0;
       }
 
@@ -689,8 +697,8 @@ namespace posix
   clock (void)
   {
     clock_t timeval;
-    timeval
-        = (clock_t)os::semihosting::call_host (SEMIHOSTING_SYS_CLOCK, nullptr);
+    timeval = (clock_t)semihosting::call_host (
+        SEMIHOSTING_SYS_CLOCK, nullptr);
 
     return timeval;
   }
@@ -732,7 +740,7 @@ namespace posix
     // always return true
     return 0;
 #else
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS;
     return -1;
@@ -745,10 +753,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RMDIR_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -760,10 +768,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SYNC_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
   }
@@ -777,10 +785,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_OPENDIR_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return nullptr;
@@ -792,10 +800,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_READDIR_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return nullptr;
@@ -807,10 +815,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_READDIR_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return ((ssize_t)-1);
@@ -822,10 +830,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_REWINDDIR_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
   }
@@ -836,10 +844,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CLOSEDIR_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -865,10 +873,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SOCKET_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -880,10 +888,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SOCKETPAIR_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -895,10 +903,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_ACCEPT_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -910,10 +918,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_BIND_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -925,10 +933,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CONNECT_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -940,10 +948,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_GETPEERNAME_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -955,10 +963,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_GETSOCKNAME_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -971,10 +979,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_GETSOCKOPT_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -986,10 +994,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_LISTEN_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1001,10 +1009,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RECV_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1017,10 +1025,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RECVFROM_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1032,10 +1040,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RECVMSG_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1047,10 +1055,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SEND_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1062,10 +1070,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SENDMSG_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1078,10 +1086,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SENDTO_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1094,10 +1102,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SETSOCKOPT_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1109,10 +1117,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SHUTDOWN_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1124,10 +1132,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SOCKATMARK_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1159,10 +1167,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SELECT_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1174,10 +1182,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CHDIR_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1192,10 +1200,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_WRITEV_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1207,10 +1215,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_IOCTL_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1222,10 +1230,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FCNTL_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1237,10 +1245,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FTRUNCATE_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1252,10 +1260,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FSYNC_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1267,10 +1275,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CHMOD_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1282,10 +1290,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_TRUNCATE_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1297,10 +1305,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_UTIME_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1315,10 +1323,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_EXECVE_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1330,10 +1338,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FORK_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return ((pid_t)-1);
@@ -1351,10 +1359,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_KILL_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1366,10 +1374,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RAISE_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1381,10 +1389,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_WAIT_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return ((pid_t)-1);
@@ -1396,10 +1404,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CHOWN_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1411,10 +1419,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_LINK_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1426,10 +1434,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SYMLINK_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return -1;
@@ -1441,10 +1449,10 @@ namespace posix
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
         || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_READLINK_BRK))
-    os::arch::brk ();
+    arch::brk ();
 #endif
 
-    os::trace::printf ("%s() ENOSYS\n", __FUNCTION__);
+    trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
     return ((ssize_t)-1);
@@ -1758,23 +1766,23 @@ extern "C"
 void __attribute__ ((noreturn, weak)) os_terminate (int code)
 {
 #if (__SIZEOF_POINTER__ == 4)
-  os::semihosting::call_host (SEMIHOSTING_SYS_EXIT,
-                              (void*)(code == 0 ? ADP_STOPPED_APPLICATION_EXIT
-                                                : ADP_STOPPED_RUN_TIME_ERROR));
+  semihosting::call_host (
+      SEMIHOSTING_SYS_EXIT, (void*)(code == 0 ? ADP_STOPPED_APPLICATION_EXIT
+                                              : ADP_STOPPED_RUN_TIME_ERROR));
 #elif (__SIZEOF_POINTER__ == 8)
   field_t fields[2];
   fields[0] = (field_t)ADP_STOPPED_APPLICATION_EXIT;
   fields[1] = (field_t) (size_t)code;
-  os::semihosting::call_host (SEMIHOSTING_SYS_EXIT, fields);
+  semihosting::call_host (SEMIHOSTING_SYS_EXIT, fields);
 #endif
 
 #if defined(DEBUG)
-  os::arch::brk ();
+  arch::brk ();
 #endif
 
   while (true)
     {
-      os::arch::wfi ();
+      arch::wfi ();
     }
   /* NOTREACHED */
 }
@@ -1810,7 +1818,8 @@ os_startup_initialize_args (int* p_argc, char*** p_argv)
   field_t fields[2];
   fields[0] = (field_t)args_buf;
   fields[1] = (field_t) (sizeof (args_buf) - 1);
-  int ret = os::semihosting::call_host (SEMIHOSTING_SYS_GET_CMDLINE, fields);
+  int ret = semihosting::call_host (SEMIHOSTING_SYS_GET_CMDLINE,
+                                                   fields);
   if (ret == 0)
     {
       // In case the host send more than we can chew, limit the
@@ -1911,20 +1920,20 @@ initialise_monitor_handles (void)
   fields[0] = (field_t) ":tt";
   fields[2] = (field_t)3; // length of filename
   fields[1] = (field_t)0; // mode "r"
-  monitor_stdin
-      = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*)fields);
+  monitor_stdin = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
+                                                         (void*)fields);
 
   fields[0] = (field_t) ":tt";
   fields[2] = (field_t)3; // length of filename
   fields[1] = (field_t)4; // mode "w"
-  monitor_stdout
-      = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*)fields);
+  monitor_stdout = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
+                                                          (void*)fields);
 
   fields[0] = (field_t) ":tt";
   fields[2] = (field_t)3; // length of filename
   fields[1] = (field_t)8; // mode "a"
-  monitor_stderr
-      = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*)fields);
+  monitor_stderr = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
+                                                          (void*)fields);
 
   // If we failed to open stderr, redirect to stdout.
   if (monitor_stderr == -1)

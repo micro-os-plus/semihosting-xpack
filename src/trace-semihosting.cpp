@@ -48,7 +48,11 @@
 
 // ----------------------------------------------------------------------------
 
-namespace os
+using namespace micro_os_plus;
+
+// ----------------------------------------------------------------------------
+
+namespace micro_os_plus
 {
   namespace trace
   {
@@ -109,7 +113,8 @@ namespace os
       if (cbuf[nbyte] == '\0')
         {
           // send string
-          os::semihosting::call_host (SEMIHOSTING_SYS_WRITE0, (void*)cbuf);
+          semihosting::call_host (SEMIHOSTING_SYS_WRITE0,
+                                                 (void*)cbuf);
         }
       else
         {
@@ -129,7 +134,8 @@ namespace os
                 }
               tmp[i] = '\0';
 
-              os::semihosting::call_host (SEMIHOSTING_SYS_WRITE0, (void*)tmp);
+              semihosting::call_host (SEMIHOSTING_SYS_WRITE0,
+                                                     (void*)tmp);
 
               togo -= n;
             }
@@ -166,8 +172,8 @@ namespace os
           // Length of ":tt", except null terminator.
           fields[2] = (field_t) (sizeof (":tt") - 1);
 
-          ret = os::semihosting::call_host (SEMIHOSTING_SYS_OPEN,
-                                            (void*)fields);
+          ret = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
+                                                       (void*)fields);
           if (ret == -1)
             {
               return -1;
@@ -180,7 +186,8 @@ namespace os
       fields[1] = (field_t)buf;
       fields[2] = (field_t)nbyte;
       // Send character array to host file/device.
-      ret = os::semihosting::call_host (SEMIHOSTING_SYS_WRITE, (void*)fields);
+      ret = semihosting::call_host (SEMIHOSTING_SYS_WRITE,
+                                                   (void*)fields);
       // This call returns the number of bytes NOT written (0 if all ok).
 
       // -1 is not a legal value, but SEGGER seems to return it
@@ -202,7 +209,7 @@ namespace os
 #endif // defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
 
   } // namespace trace
-} // namespace os
+} // namespace micro_os_plus
 
 #endif /* defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG) || \
           defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT) */
