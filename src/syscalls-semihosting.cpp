@@ -30,7 +30,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(OS_USE_SEMIHOSTING_SYSCALLS)
+#if defined(MICRO_OS_PLUS_USE_SEMIHOSTING_SYSCALLS)
 
 #include <micro-os-plus/semihosting.h>
 #include <micro-os-plus/architecture.h>
@@ -96,8 +96,8 @@ namespace
   // Should be large enough to hold a pointer.
   using field_t = void*;
 
-#if !defined(OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
-#define OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES (20)
+#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
+#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES (20)
 #endif
 
   /*
@@ -116,7 +116,7 @@ namespace
    *
    * Every other function must use find_slot().
    */
-  struct file opened_files[OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES];
+  struct file opened_files[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES];
 
   struct file*
   find_slot (int fd);
@@ -148,7 +148,7 @@ namespace
   struct file*
   find_slot (int fd)
   {
-    if ((size_t)fd >= OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
+    if ((size_t)fd >= MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
       {
         // File descriptor is out of range.
         return nullptr;
@@ -172,7 +172,7 @@ namespace
   new_slot (void)
   {
     size_t i;
-    for (i = 0; i < OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES; i++)
+    for (i = 0; i < MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES; i++)
       {
         if (opened_files[i].handle == -1)
           {
@@ -180,7 +180,7 @@ namespace
           }
       }
 
-    if (i == OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
+    if (i == MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
       {
         return -1;
       }
@@ -743,8 +743,8 @@ namespace posix
   rmdir (const char* path)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_RMDIR_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RMDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -758,7 +758,7 @@ namespace posix
   sync (void)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SYNC_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SYNC_BRK))
     os::arch::brk ();
 #endif
 
@@ -774,8 +774,8 @@ namespace posix
   opendir (const char* dirpath)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_OPENDIR_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_OPENDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -789,8 +789,8 @@ namespace posix
   readdir (DIR* dirp)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_READDIR_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_READDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -804,8 +804,8 @@ namespace posix
   readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_READDIR_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_READDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -819,8 +819,8 @@ namespace posix
   rewinddir (DIR* dirp)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_REWINDDIR_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_REWINDDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -833,8 +833,8 @@ namespace posix
   closedir (DIR* dirp)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_CLOSEDIR_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CLOSEDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -862,8 +862,8 @@ namespace posix
   socket (int domain, int type, int protocol)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_SOCKET_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SOCKET_BRK))
     os::arch::brk ();
 #endif
 
@@ -877,8 +877,8 @@ namespace posix
   socketpair (int domain, int type, int protocol, int socket_vector[2])
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_SOCKETPAIR_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SOCKETPAIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -892,8 +892,8 @@ namespace posix
   accept (int socket, struct sockaddr* address, socklen_t* address_len)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_ACCEPT_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_ACCEPT_BRK))
     os::arch::brk ();
 #endif
 
@@ -907,7 +907,7 @@ namespace posix
   bind (int socket, const struct sockaddr* address, socklen_t address_len)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_BIND_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_BIND_BRK))
     os::arch::brk ();
 #endif
 
@@ -921,8 +921,8 @@ namespace posix
   connect (int socket, const struct sockaddr* address, socklen_t address_len)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_CONNECT_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CONNECT_BRK))
     os::arch::brk ();
 #endif
 
@@ -936,8 +936,8 @@ namespace posix
   getpeername (int socket, struct sockaddr* address, socklen_t* address_len)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_GETPEERNAME_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_GETPEERNAME_BRK))
     os::arch::brk ();
 #endif
 
@@ -951,8 +951,8 @@ namespace posix
   getsockname (int socket, struct sockaddr* address, socklen_t* address_len)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_GETSOCKNAME_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_GETSOCKNAME_BRK))
     os::arch::brk ();
 #endif
 
@@ -967,8 +967,8 @@ namespace posix
               socklen_t* option_len)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_GETSOCKOPT_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_GETSOCKOPT_BRK))
     os::arch::brk ();
 #endif
 
@@ -982,8 +982,8 @@ namespace posix
   listen (int socket, int backlog)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_LISTEN_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_LISTEN_BRK))
     os::arch::brk ();
 #endif
 
@@ -997,7 +997,7 @@ namespace posix
   recv (int socket, void* buffer, size_t length, int flags)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_RECV_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RECV_BRK))
     os::arch::brk ();
 #endif
 
@@ -1012,8 +1012,8 @@ namespace posix
             struct sockaddr* address, socklen_t* address_len)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_RECVFROM_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RECVFROM_BRK))
     os::arch::brk ();
 #endif
 
@@ -1027,8 +1027,8 @@ namespace posix
   recvmsg (int socket, struct msghdr* message, int flags)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_RECVMSG_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RECVMSG_BRK))
     os::arch::brk ();
 #endif
 
@@ -1042,7 +1042,7 @@ namespace posix
   send (int socket, const void* buffer, size_t length, int flags)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_SEND_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SEND_BRK))
     os::arch::brk ();
 #endif
 
@@ -1056,8 +1056,8 @@ namespace posix
   sendmsg (int socket, const struct msghdr* message, int flags)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_SENDMSG_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SENDMSG_BRK))
     os::arch::brk ();
 #endif
 
@@ -1072,8 +1072,8 @@ namespace posix
           const struct sockaddr* dest_addr, socklen_t dest_len)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_SENDTO_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SENDTO_BRK))
     os::arch::brk ();
 #endif
 
@@ -1088,8 +1088,8 @@ namespace posix
               socklen_t option_len)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_SETSOCKOPT_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SETSOCKOPT_BRK))
     os::arch::brk ();
 #endif
 
@@ -1103,8 +1103,8 @@ namespace posix
   shutdown (int socket, int how)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_SHUTDOWN_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SHUTDOWN_BRK))
     os::arch::brk ();
 #endif
 
@@ -1118,8 +1118,8 @@ namespace posix
   sockatmark (int socket)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_SOCKATMARK_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SOCKATMARK_BRK))
     os::arch::brk ();
 #endif
 
@@ -1153,8 +1153,8 @@ namespace posix
           struct timeval* timeout)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_SELECT_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SELECT_BRK))
     os::arch::brk ();
 #endif
 
@@ -1168,8 +1168,8 @@ namespace posix
   chdir (const char* path)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_CHDIR_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CHDIR_BRK))
     os::arch::brk ();
 #endif
 
@@ -1186,8 +1186,8 @@ namespace posix
   writev (int fildes, const struct iovec* iov, int iovcnt)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_WRITEV_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_WRITEV_BRK))
     os::arch::brk ();
 #endif
 
@@ -1201,8 +1201,8 @@ namespace posix
   ioctl (int fildes, int request, ...)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_IOCTL_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_IOCTL_BRK))
     os::arch::brk ();
 #endif
 
@@ -1216,8 +1216,8 @@ namespace posix
   fcntl (int fildes, int cmd, ...)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_FCNTL_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FCNTL_BRK))
     os::arch::brk ();
 #endif
 
@@ -1231,8 +1231,8 @@ namespace posix
   ftruncate (int fildes, off_t length)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_FTRUNCATE_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FTRUNCATE_BRK))
     os::arch::brk ();
 #endif
 
@@ -1246,8 +1246,8 @@ namespace posix
   fsync (int fildes)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_FSYNC_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FSYNC_BRK))
     os::arch::brk ();
 #endif
 
@@ -1261,8 +1261,8 @@ namespace posix
   chmod (const char* path, mode_t mode)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_CHMOD_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CHMOD_BRK))
     os::arch::brk ();
 #endif
 
@@ -1276,8 +1276,8 @@ namespace posix
   truncate (const char* path, off_t length)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_TRUNCATE_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_TRUNCATE_BRK))
     os::arch::brk ();
 #endif
 
@@ -1291,8 +1291,8 @@ namespace posix
   utime (const char* path, const struct utimbuf* times)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_UTIME_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_UTIME_BRK))
     os::arch::brk ();
 #endif
 
@@ -1309,8 +1309,8 @@ namespace posix
   execve (const char* path, char* const argv[], char* const envp[])
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_EXECVE_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_EXECVE_BRK))
     os::arch::brk ();
 #endif
 
@@ -1324,7 +1324,7 @@ namespace posix
   fork (void)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_FORK_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FORK_BRK))
     os::arch::brk ();
 #endif
 
@@ -1344,7 +1344,7 @@ namespace posix
   kill (pid_t pid, int sig)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_KILL_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_KILL_BRK))
     os::arch::brk ();
 #endif
 
@@ -1358,8 +1358,8 @@ namespace posix
   raise (int sig)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_RAISE_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RAISE_BRK))
     os::arch::brk ();
 #endif
 
@@ -1373,7 +1373,7 @@ namespace posix
   wait (int* stat_loc)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_WAIT_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_WAIT_BRK))
     os::arch::brk ();
 #endif
 
@@ -1387,8 +1387,8 @@ namespace posix
   chown (const char* path, uid_t owner, gid_t group)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_CHOWN_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CHOWN_BRK))
     os::arch::brk ();
 #endif
 
@@ -1402,7 +1402,7 @@ namespace posix
   link (const char* existing, const char* _new)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) || defined(OS_DEBUG_SYSCALL_LINK_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_LINK_BRK))
     os::arch::brk ();
 #endif
 
@@ -1416,8 +1416,8 @@ namespace posix
   symlink (const char* existing, const char* _new)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_SYMLINK_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SYMLINK_BRK))
     os::arch::brk ();
 #endif
 
@@ -1431,8 +1431,8 @@ namespace posix
   readlink (const char* path, char* buf, size_t bufsize)
   {
 #if defined(DEBUG) \
-    && (defined(OS_DEBUG_SYSCALLS_BRK) \
-        || defined(OS_DEBUG_SYSCALL_READLINK_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_READLINK_BRK))
     os::arch::brk ();
 #endif
 
@@ -1773,13 +1773,13 @@ void __attribute__ ((noreturn, weak)) os_terminate (int code)
 
 // ----------------------------------------------------------------------------
 
-#if !defined(OS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE)
-#define OS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE 80
-#endif // OS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE
+#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE)
+#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE 80
+#endif // MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE
 
-#if !defined(OS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE)
-#define OS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE 10
-#endif // OS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE
+#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE)
+#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE 10
+#endif // MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE
 
 // This is the semihosting implementation for the routine to
 // process args.
@@ -1790,11 +1790,11 @@ void
 os_startup_initialize_args (int* p_argc, char*** p_argv)
 {
   // Array of chars to receive the command line from the host.
-  static char args_buf[OS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE];
+  static char args_buf[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE];
 
   // Array of pointers to store the final argv pointers (pointing
   // in the above array).
-  static char* argv_buf[OS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE];
+  static char* argv_buf[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE];
 
   int argc = 0;
   bool is_in_argument = false;
@@ -1924,7 +1924,7 @@ initialise_monitor_handles (void)
       monitor_stderr = monitor_stdout;
     }
 
-  for (int i = 0; i < OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES; i++)
+  for (int i = 0; i < MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES; i++)
     {
       opened_files[i].handle = -1;
     }
@@ -1939,7 +1939,7 @@ initialise_monitor_handles (void)
 
 // ----------------------------------------------------------------------------
 
-#endif // defined(OS_USE_SEMIHOSTING_SYSCALLS)
+#endif // defined(MICRO_OS_PLUS_USE_SEMIHOSTING_SYSCALLS)
 
 // ----------------------------------------------------------------------------
 

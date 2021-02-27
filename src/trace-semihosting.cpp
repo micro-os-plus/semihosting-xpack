@@ -32,15 +32,15 @@
 
 #if defined(TRACE)
 
-#if defined(OS_USE_TRACE_SEMIHOSTING_DEBUG) \
-    || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
+#if defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG) \
+    || defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
 
 #include <micro-os-plus/diag/trace.h>
 
 // ----------------------------------------------------------------------------
 
-#if defined(OS_DEBUG_SEMIHOSTING_FAULTS)
-#error "Cannot debug semihosting using semihosting trace; use OS_USE_TRACE_ITM"
+#if defined(MICRO_OS_PLUS_DEBUG_SEMIHOSTING_FAULTS)
+#error "Cannot debug semihosting using semihosting trace; use MICRO_OS_PLUS_USE_TRACE_ITM"
 #endif
 
 #include <micro-os-plus/semihosting.h>
@@ -87,10 +87,10 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-#if defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
+#if defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG)
 
-#if !defined(OS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE)
-#define OS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE (16)
+#if !defined(MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE)
+#define MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE (16)
 #endif
 
     ssize_t
@@ -115,7 +115,7 @@ namespace os
           // If not, use a local buffer to speed things up.
           // For re-entrance, this bugger must be allocated on the stack,
           // so be cautious with the size.
-          char tmp[OS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE];
+          char tmp[MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE];
           size_t togo = nbyte;
           while (togo > 0)
             {
@@ -138,7 +138,7 @@ namespace os
       return (ssize_t)nbyte;
     }
 
-#elif defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
+#elif defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
 
     ssize_t
     write (const void* buf, std::size_t nbyte)
@@ -198,13 +198,13 @@ namespace os
       return (ssize_t) (nbyte) - (ssize_t)ret;
     }
 
-#endif // defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
+#endif // defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
 
   } // namespace trace
 } // namespace os
 
-#endif /* defined(OS_USE_TRACE_SEMIHOSTING_DEBUG) || \
-          defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) */
+#endif /* defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG) || \
+          defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT) */
 #endif // defined(TRACE)
 
 // ----------------------------------------------------------------------------
