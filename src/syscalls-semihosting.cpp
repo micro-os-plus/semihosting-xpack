@@ -758,7 +758,8 @@ namespace posix
   sync (void)
   {
 #if defined(DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SYNC_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SYNC_BRK))
     os::arch::brk ();
 #endif
 
@@ -907,7 +908,8 @@ namespace posix
   bind (int socket, const struct sockaddr* address, socklen_t address_len)
   {
 #if defined(DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_BIND_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_BIND_BRK))
     os::arch::brk ();
 #endif
 
@@ -997,7 +999,8 @@ namespace posix
   recv (int socket, void* buffer, size_t length, int flags)
   {
 #if defined(DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RECV_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RECV_BRK))
     os::arch::brk ();
 #endif
 
@@ -1042,7 +1045,8 @@ namespace posix
   send (int socket, const void* buffer, size_t length, int flags)
   {
 #if defined(DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SEND_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SEND_BRK))
     os::arch::brk ();
 #endif
 
@@ -1324,7 +1328,8 @@ namespace posix
   fork (void)
   {
 #if defined(DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FORK_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FORK_BRK))
     os::arch::brk ();
 #endif
 
@@ -1344,7 +1349,8 @@ namespace posix
   kill (pid_t pid, int sig)
   {
 #if defined(DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_KILL_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_KILL_BRK))
     os::arch::brk ();
 #endif
 
@@ -1373,7 +1379,8 @@ namespace posix
   wait (int* stat_loc)
   {
 #if defined(DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_WAIT_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_WAIT_BRK))
     os::arch::brk ();
 #endif
 
@@ -1402,7 +1409,8 @@ namespace posix
   link (const char* existing, const char* _new)
   {
 #if defined(DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_LINK_BRK))
+    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
+        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_LINK_BRK))
     os::arch::brk ();
 #endif
 

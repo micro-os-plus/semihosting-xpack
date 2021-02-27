@@ -40,7 +40,8 @@
 // ----------------------------------------------------------------------------
 
 #if defined(MICRO_OS_PLUS_DEBUG_SEMIHOSTING_FAULTS)
-#error "Cannot debug semihosting using semihosting trace; use MICRO_OS_PLUS_USE_TRACE_ITM"
+#error \
+    "Cannot debug semihosting using semihosting trace; use MICRO_OS_PLUS_USE_TRACE_ITM"
 #endif
 
 #include <micro-os-plus/semihosting.h>
