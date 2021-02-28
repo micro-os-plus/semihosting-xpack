@@ -1789,7 +1789,7 @@ void __attribute__ ((noreturn, weak)) micro_os_plus_terminate (int code)
 #endif // MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE
 
 // This is the semihosting implementation for the routine to
-// process args.
+// process arguments.
 // The entire command line is received from the host
 // and parsed into strings.
 
@@ -1866,7 +1866,7 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
 
   if (argc == 0)
     {
-      // No args found in string, return a single empty name.
+      // No arguments found in string, return a single empty name.
       args_buf[0] = '\0';
       argv_buf[0] = &args_buf[0];
       ++argc;
