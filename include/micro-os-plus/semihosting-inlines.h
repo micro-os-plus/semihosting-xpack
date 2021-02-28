@@ -46,7 +46,7 @@ namespace micro_os_plus
     inline __attribute__ ((always_inline)) int
     call_host (int reason, void* arg)
     {
-      return os_semihosting_call_host (reason, arg);
+      return micro_os_plus_semihosting_call_host (reason, arg);
     }
 
     // ------------------------------------------------------------------------

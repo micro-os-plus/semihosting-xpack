@@ -84,7 +84,7 @@ extern "C"
   // --------------------------------------------------------------------------
 
   // static int
-  // os_semihosting_call_host (int reason, void* arg);
+  // micro_os_plus_semihosting_call_host (int reason, void* arg);
 
   // The definition is in the architecture semihosting-inlines.h file.
 

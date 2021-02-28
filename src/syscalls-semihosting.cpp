@@ -1746,15 +1746,15 @@ extern "C"
   initialise_monitor_handles (void);
 
   void
-  os_terminate (int code);
+  micro_os_plus_terminate (int code);
 
   void
-  os_startup_initialize_args (int* p_argc, char*** p_argv);
+  micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv);
 }
 
 // ----------------------------------------------------------------------------
 
-void __attribute__ ((noreturn, weak)) os_terminate (int code)
+void __attribute__ ((noreturn, weak)) micro_os_plus_terminate (int code)
 {
 #if (__SIZEOF_POINTER__ == 4)
   semihosting::call_host (SEMIHOSTING_SYS_EXIT,
@@ -1794,7 +1794,7 @@ void __attribute__ ((noreturn, weak)) os_terminate (int code)
 // and parsed into strings.
 
 void
-os_startup_initialize_args (int* p_argc, char*** p_argv)
+micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
 {
   // Array of chars to receive the command line from the host.
   static char args_buf[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE];

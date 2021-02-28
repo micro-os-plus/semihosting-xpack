@@ -111,7 +111,7 @@ All C++ functions have C equivalents:
 
 ```c
   static int
-  os_semihosting_call_host (int reason, void* arg);
+  micro_os_plus_semihosting_call_host (int reason, void* arg);
 
 ```
 
@@ -121,7 +121,7 @@ The architecture should provide a definition of the following function:
 
 ```c
   static inline __attribute__ ((always_inline)) int
-  os_semihosting_call_host (int reason, void* arg);
+  micro_os_plus_semihosting_call_host (int reason, void* arg);
 ```
 
 ### Build & integration info
