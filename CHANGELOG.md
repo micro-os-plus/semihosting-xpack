@@ -6,20 +6,33 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
-## v2.1.0 (2021-02-04)
+## 2021-03-01
 
+- v3.0.0
+
+## 2021-02-28
+
+- rename micro_os_plus
+
+## 2021-02-04
+
+- v2.1.0
 - first restructured release
 
-## v2.0.2 2018-04-16
+## 2018-04-16
 
+- v2.0.2
 - cleanup deps
 - update README developer info
 
-## v2.0.1 2018-01-25
+##  2018-01-25
 
+- v2.0.1
 - [#3] use void* field_t
 
-## v2.0.0 2018-01-24
+## 2018-01-24
+
+- v2.0.0
 
 ## 2018-01-23
 
@@ -31,6 +44,7 @@ and close existing issues and pull requests.
 - [#1] Update semihosting after OpenOCD new definitions; remove `report_exception()`
 - [#2] Add syscall functions
 
-## v1.0.0 2018-01-15
+## 2018-01-15
 
+- v1.0.0
 - initial version, copied from µOS++.
