@@ -18,7 +18,7 @@ endif()
 
 set(micro-os-plus-semihosting-included TRUE)
 
-message(STATUS "Including micro-os-plus-semihosting...")
+message(STATUS "Processing xPack ${PACKAGE_JSON_NAME}@${PACKAGE_JSON_VERSION}...")
 
 # -----------------------------------------------------------------------------
 # Dependencies.
