@@ -67,7 +67,7 @@ if(NOT TARGET micro-os-plus-semihosting-static)
   # Aliases.
 
   add_library(micro-os-plus::semihosting-static ALIAS micro-os-plus-semihosting-static)
-  message(STATUS "micro-os-plus::semihosting-static")
+  message(STATUS "=> micro-os-plus::semihosting-static")
 
 endif()
 
