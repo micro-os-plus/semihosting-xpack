@@ -59,15 +59,15 @@ if(NOT TARGET micro-os-plus-semihosting-static)
     micro-os-plus-semihosting-static
     
     PUBLIC
-      micro-os-plus::diag-trace-static
+      micro-os-plus::diag-trace
       micro-os-plus::architecture
   )
 
   # ---------------------------------------------------------------------------
   # Aliases.
 
-  add_library(micro-os-plus::semihosting-static ALIAS micro-os-plus-semihosting-static)
-  message(STATUS "=> micro-os-plus::semihosting-static")
+  add_library(micro-os-plus::semihosting ALIAS micro-os-plus-semihosting-static)
+  message(STATUS "=> micro-os-plus::semihosting")
 
 endif()
 
