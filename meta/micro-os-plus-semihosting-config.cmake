@@ -38,7 +38,8 @@ if(NOT TARGET micro-os-plus-semihosting-static)
 
   # ---------------------------------------------------------------------------
 
-  file(GLOB_RECURSE source_files CONFIGURE_DEPENDS "${xpack_current_folder}/src/*.c*")
+  xpack_glob_recurse_cxx(source_files "${xpack_current_folder}/src")
+  xpack_display_relative_paths("${source_files}" "${xpack_current_folder}")
 
   target_sources(
     micro-os-plus-semihosting-static
