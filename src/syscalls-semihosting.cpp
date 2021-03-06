@@ -120,9 +120,9 @@ namespace
    *
    * Every other function must use find_slot().
    */
-  struct file opened_files[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES];
+  file opened_files[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES];
 
-  struct file*
+  file*
   find_slot (int fd);
 
   int
@@ -149,10 +149,11 @@ namespace
    * Return a pointer to the structure associated with
    * the user file descriptor fd.
    */
-  struct file*
+  file*
   find_slot (int fd)
   {
-    if ((size_t)fd >= MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
+    if (static_cast<size_t> (fd)
+        >= MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
       {
         // File descriptor is out of range.
         return nullptr;
@@ -189,7 +190,7 @@ namespace
         return -1;
       }
 
-    return (int)i;
+    return static_cast<int> (i);
   }
 
   int
@@ -228,7 +229,7 @@ namespace
   off_t
   lseek_impl (int fd, off_t offset, int whence)
   {
-    struct file* pfd;
+    file* pfd;
 
     // Valid file descriptor?
     pfd = find_slot (fd);
@@ -267,7 +268,7 @@ namespace
 
     if (whence == SEEK_END)
       {
-        fields[0] = (field_t) (size_t)pfd->handle;
+        fields[0] = reinterpret_cast<field_t> (pfd->handle);
         res = check_error (
             semihosting::call_host (SEMIHOSTING_SYS_FLEN, fields));
         if (res == -1)
@@ -278,8 +279,8 @@ namespace
       }
 
     // This code only does absolute seeks.
-    fields[0] = (field_t) (size_t)pfd->handle;
-    fields[1] = (field_t)offset;
+    fields[0] = reinterpret_cast<field_t> (pfd->handle);
+    fields[1] = reinterpret_cast<field_t> (offset);
     res = check_error (semihosting::call_host (SEMIHOSTING_SYS_SEEK, fields));
 
     // At this point ptr is the current file position.
@@ -297,7 +298,7 @@ namespace
   int
   stat_impl (int fd, struct stat* st)
   {
-    struct file* pfd;
+    file* pfd;
     pfd = find_slot (fd);
     if (pfd == nullptr)
       {
@@ -396,9 +397,9 @@ namespace posix
       }
 
     field_t fields[3];
-    fields[0] = (field_t)path;
-    fields[1] = (field_t) (size_t)aflags;
-    fields[2] = (field_t)std::strlen (path);
+    fields[0] = reinterpret_cast<field_t> (const_cast<char*> (path));
+    fields[1] = reinterpret_cast<field_t> (aflags);
+    fields[2] = reinterpret_cast<field_t> (std::strlen (path));
 
     int fh = semihosting::call_host (SEMIHOSTING_SYS_OPEN, fields);
 
@@ -418,7 +419,7 @@ namespace posix
   int
   close (int fildes)
   {
-    struct file* pfd;
+    file* pfd;
     pfd = find_slot (fildes);
     if (pfd == nullptr)
       {
@@ -437,7 +438,7 @@ namespace posix
       }
 
     field_t fields[1];
-    fields[0] = (field_t) (size_t)pfd->handle;
+    fields[0] = reinterpret_cast<field_t> (pfd->handle);
 
     // Attempt to close the handle.
     int res;
@@ -461,7 +462,7 @@ namespace posix
   ssize_t
   read (int fildes, void* buf, size_t nbyte)
   {
-    struct file* pfd;
+    file* pfd;
     pfd = find_slot (fildes);
     if (pfd == nullptr)
       {
@@ -472,9 +473,9 @@ namespace posix
       }
 
     field_t fields[3];
-    fields[0] = (field_t) (size_t)pfd->handle;
-    fields[1] = (field_t)buf;
-    fields[2] = (field_t)nbyte;
+    fields[0] = reinterpret_cast<field_t> (pfd->handle);
+    fields[1] = buf;
+    fields[2] = reinterpret_cast<field_t> (nbyte);
 
     int res;
     // Returns the number of bytes *not* written.
@@ -484,17 +485,17 @@ namespace posix
         return res;
       }
 
-    pfd->pos += (nbyte - res);
+    pfd->pos += static_cast<off_t> (nbyte - static_cast<size_t> (res));
 
     // res == nbyte is not an error,
     // at least if we want feof() to work.
-    return nbyte - res;
+    return static_cast<ssize_t> (nbyte - static_cast<size_t> (res));
   }
 
   ssize_t
   write (int fildes, const void* buf, size_t nbyte)
   {
-    struct file* pfd;
+    file* pfd;
     pfd = find_slot (fildes);
     if (pfd == nullptr)
       {
@@ -506,9 +507,9 @@ namespace posix
 
     field_t fields[3];
 
-    fields[0] = (field_t) (size_t)pfd->handle;
-    fields[1] = (field_t)buf;
-    fields[2] = (field_t)nbyte;
+    fields[0] = reinterpret_cast<field_t> (pfd->handle);
+    fields[1] = const_cast<field_t> (buf);
+    fields[2] = reinterpret_cast<field_t> (nbyte);
 
     // Returns the number of bytes *not* written.
     int res;
@@ -519,16 +520,16 @@ namespace posix
         return -1;
       }
 
-    pfd->pos += nbyte - res;
+    pfd->pos += static_cast<off_t> (nbyte - static_cast<size_t> (res));
 
     // Did we write 0 bytes?
     // Retrieve errno for just in case.
-    if ((nbyte - res) == 0)
+    if ((nbyte - static_cast<size_t> (res)) == 0)
       {
         return with_set_errno (0);
       }
 
-    return (nbyte - res);
+    return static_cast<ssize_t> (nbyte - static_cast<size_t> (res));
   }
 
   off_t
@@ -546,7 +547,7 @@ namespace posix
   int
   isatty (int fildes)
   {
-    struct file* pfd;
+    file* pfd;
     pfd = find_slot (fildes);
     if (pfd == nullptr)
       {
@@ -603,10 +604,10 @@ namespace posix
   rename (const char* existing, const char* _new)
   {
     field_t fields[4];
-    fields[0] = (field_t)existing;
-    fields[1] = (field_t)std::strlen (existing);
-    fields[2] = (field_t)_new;
-    fields[3] = (field_t)std::strlen (_new);
+    fields[0] = reinterpret_cast<field_t> (const_cast<char*> (existing));
+    fields[1] = reinterpret_cast<field_t> (std::strlen (existing));
+    fields[2] = reinterpret_cast<field_t> (const_cast<char*> (_new));
+    fields[3] = reinterpret_cast<field_t> (std::strlen (_new));
 
     return check_error (
                semihosting::call_host (SEMIHOSTING_SYS_RENAME, fields))
@@ -618,8 +619,8 @@ namespace posix
   unlink (const char* path)
   {
     field_t fields[2];
-    fields[0] = (field_t)path;
-    fields[1] = (field_t)strlen (path);
+    fields[0] = reinterpret_cast<field_t> (const_cast<char*> (path));
+    fields[1] = reinterpret_cast<field_t> (strlen (path));
 
     int res;
     res = semihosting::call_host (SEMIHOSTING_SYS_REMOVE, fields);
@@ -642,8 +643,8 @@ namespace posix
       }
 
     field_t fields[2];
-    fields[0] = (field_t)command;
-    fields[1] = (field_t)strlen (command);
+    fields[0] = reinterpret_cast<field_t> (const_cast<char*> (command));
+    fields[1] = reinterpret_cast<field_t> (strlen (command));
     int err = check_error (
         semihosting::call_host (SEMIHOSTING_SYS_SYSTEM, fields));
     if ((err >= 0) && (err < 256))
@@ -663,9 +664,9 @@ namespace posix
   }
 
   int
-  gettimeofday (struct timeval* ptimeval, void* ptimezone)
+  gettimeofday (timeval* ptimeval, void* ptimezone)
   {
-    struct timezone* tzp = (struct timezone*)ptimezone;
+    timezone* tzp = static_cast<timezone*> (ptimezone);
     if (ptimeval)
       {
         // Ask the host for the seconds since the Unix epoch.
@@ -689,13 +690,14 @@ namespace posix
   clock (void)
   {
     clock_t timeval;
-    timeval = (clock_t)semihosting::call_host (SEMIHOSTING_SYS_CLOCK, nullptr);
+    timeval = static_cast<clock_t> (
+        semihosting::call_host (SEMIHOSTING_SYS_CLOCK, nullptr));
 
     return timeval;
   }
 
   clock_t
-  times (struct tms* buf)
+  times (tms* buf)
   {
     clock_t timeval = clock ();
     if (buf)
@@ -785,7 +787,7 @@ namespace posix
     return nullptr;
   }
 
-  struct dirent*
+  dirent*
   readdir (DIR* dirp)
   {
 #if defined(DEBUG) \
@@ -801,7 +803,7 @@ namespace posix
   }
 
   int
-  readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
+  readdir_r (DIR* dirp, dirent* entry, dirent** result)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -812,7 +814,7 @@ namespace posix
     trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
-    return ((ssize_t)-1);
+    return -1;
   }
 
   void
@@ -889,7 +891,7 @@ namespace posix
   }
 
   int
-  accept (int socket, struct sockaddr* address, socklen_t* address_len)
+  accept (int socket, sockaddr* address, socklen_t* address_len)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -904,7 +906,7 @@ namespace posix
   }
 
   int
-  bind (int socket, const struct sockaddr* address, socklen_t address_len)
+  bind (int socket, const sockaddr* address, socklen_t address_len)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -919,7 +921,7 @@ namespace posix
   }
 
   int
-  connect (int socket, const struct sockaddr* address, socklen_t address_len)
+  connect (int socket, const sockaddr* address, socklen_t address_len)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -934,7 +936,7 @@ namespace posix
   }
 
   int
-  getpeername (int socket, struct sockaddr* address, socklen_t* address_len)
+  getpeername (int socket, sockaddr* address, socklen_t* address_len)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -949,7 +951,7 @@ namespace posix
   }
 
   int
-  getsockname (int socket, struct sockaddr* address, socklen_t* address_len)
+  getsockname (int socket, sockaddr* address, socklen_t* address_len)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1011,7 +1013,7 @@ namespace posix
 
   ssize_t
   recvfrom (int socket, void* buffer, size_t length, int flags,
-            struct sockaddr* address, socklen_t* address_len)
+            sockaddr* address, socklen_t* address_len)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1026,7 +1028,7 @@ namespace posix
   }
 
   ssize_t
-  recvmsg (int socket, struct msghdr* message, int flags)
+  recvmsg (int socket, msghdr* message, int flags)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1056,7 +1058,7 @@ namespace posix
   }
 
   ssize_t
-  sendmsg (int socket, const struct msghdr* message, int flags)
+  sendmsg (int socket, const msghdr* message, int flags)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1072,7 +1074,7 @@ namespace posix
 
   ssize_t
   sendto (int socket, const void* message, size_t length, int flags,
-          const struct sockaddr* dest_addr, socklen_t dest_len)
+          const sockaddr* dest_addr, socklen_t dest_len)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1153,7 +1155,7 @@ namespace posix
 
   int
   select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-          struct timeval* timeout)
+          timeval* timeout)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1186,7 +1188,7 @@ namespace posix
   // Not available via semihosting.
 
   ssize_t
-  writev (int fildes, const struct iovec* iov, int iovcnt)
+  writev (int fildes, const iovec* iov, int iovcnt)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1291,7 +1293,7 @@ namespace posix
   }
 
   int
-  utime (const char* path, const struct utimbuf* times)
+  utime (const char* path, const utimbuf* times)
   {
 #if defined(DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1335,7 +1337,7 @@ namespace posix
     trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
-    return ((pid_t)-1);
+    return -1;
   }
 
   pid_t
@@ -1386,7 +1388,7 @@ namespace posix
     trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
-    return ((pid_t)-1);
+    return -1;
   }
 
   int
@@ -1446,7 +1448,7 @@ namespace posix
     trace::printf ("%s() ENOSYS\n", __FUNCTION__);
 
     errno = ENOSYS; // Not implemented
-    return ((ssize_t)-1);
+    return -1;
   }
 
 #pragma GCC diagnostic pop
@@ -1475,16 +1477,16 @@ extern "C"
 
 #if (__SIZEOF_POINTER__ == 4)
   int __attribute__ ((weak, alias ("_ZN5posix6acceptEiP8sockaddrPm")))
-  accept (int socket, struct sockaddr* address, socklen_t* address_len);
+  accept (int socket, sockaddr* address, socklen_t* address_len);
 
   int __attribute__ ((weak, alias ("_ZN5posix4bindEiPK8sockaddrm")))
-  bind (int socket, const struct sockaddr* address, socklen_t address_len);
+  bind (int socket, const sockaddr* address, socklen_t address_len);
 #elif (__SIZEOF_POINTER__ == 8)
   int __attribute__ ((weak, alias ("_ZN5posix6acceptEiP8sockaddrPj")))
-  accept (int socket, struct sockaddr* address, socklen_t* address_len);
+  accept (int socket, sockaddr* address, socklen_t* address_len);
 
   int __attribute__ ((weak, alias ("_ZN5posix4bindEiPK8sockaddrj")))
-  bind (int socket, const struct sockaddr* address, socklen_t address_len);
+  bind (int socket, const sockaddr* address, socklen_t address_len);
 #endif
 
   int __attribute__ ((weak, alias ("_ZN5posix5chdirEPKc")))
@@ -1510,10 +1512,10 @@ extern "C"
 
 #if (__SIZEOF_POINTER__ == 4)
   int __attribute__ ((weak, alias ("_ZN5posix7connectEiPK8sockaddrm")))
-  connect (int socket, const struct sockaddr* address, socklen_t address_len);
+  connect (int socket, const sockaddr* address, socklen_t address_len);
 #elif (__SIZEOF_POINTER__ == 8)
   int __attribute__ ((weak, alias ("_ZN5posix7connectEiPK8sockaddrj")))
-  connect (int socket, const struct sockaddr* address, socklen_t address_len);
+  connect (int socket, const sockaddr* address, socklen_t address_len);
 #endif
 
   int __attribute__ ((weak, alias ("_ZN5posix6execveEPKcPKPcS4_")))
@@ -1537,27 +1539,27 @@ extern "C"
   getcwd (char* buf, size_t size);
 
   int __attribute__ ((weak, alias ("_ZN5posix11getpeernameEiP8sockaddrPm")))
-  getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
+  getpeername (int socket, sockaddr* address, socklen_t* address_len);
 #elif (__SIZEOF_POINTER__ == 8)
   char* __attribute__ ((weak, alias ("_ZN5posix6getcwdEPcm")))
   getcwd (char* buf, size_t size);
 
   int __attribute__ ((weak, alias ("_ZN5posix11getpeernameEiP8sockaddrPj")))
-  getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
+  getpeername (int socket, sockaddr* address, socklen_t* address_len);
 #endif
 
   pid_t __attribute__ ((weak, alias ("_ZN5posix6getpidEv"))) _getpid (void);
 
 #if (__SIZEOF_POINTER__ == 4)
   int __attribute__ ((weak, alias ("_ZN5posix11getsocknameEiP8sockaddrPm")))
-  getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
+  getsockname (int socket, sockaddr* address, socklen_t* address_len);
 
   int __attribute__ ((weak, alias ("_ZN5posix10getsockoptEiiiPvPm")))
   getsockopt (int socket, int level, int option_name, void* option_value,
               socklen_t* option_len);
 #elif (__SIZEOF_POINTER__ == 8)
   int __attribute__ ((weak, alias ("_ZN5posix11getsocknameEiP8sockaddrPj")))
-  getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
+  getsockname (int socket, sockaddr* address, socklen_t* address_len);
 
   int __attribute__ ((weak, alias ("_ZN5posix10getsockoptEiiiPvPj")))
   getsockopt (int socket, int level, int option_name, void* option_value,
@@ -1565,7 +1567,7 @@ extern "C"
 #endif
 
   int __attribute__ ((weak, alias ("_ZN5posix12gettimeofdayEP7timevalPv")))
-  _gettimeofday (struct timeval* ptimeval, void* ptimezone);
+  _gettimeofday (timeval* ptimeval, void* ptimezone);
 
   int __attribute__ ((weak, alias ("_ZN5posix5ioctlEiiz")))
   ioctl (int fildes, int request, ...);
@@ -1609,11 +1611,11 @@ extern "C"
   _read (int fildes, void* buf, size_t nbyte);
 #endif
 
-  struct dirent* __attribute__ ((weak, alias ("_ZN5posix7readdirEP3DIR")))
+  dirent* __attribute__ ((weak, alias ("_ZN5posix7readdirEP3DIR")))
   readdir (DIR* dirp);
 
   int __attribute__ ((weak, alias ("_ZN5posix9readdir_rEP3DIRP6direntPS3_")))
-  readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
+  readdir_r (DIR* dirp, dirent* entry, dirent** result);
 
 #if (__SIZEOF_POINTER__ == 4)
   ssize_t __attribute__ ((weak, alias ("_ZN5posix8readlinkEPKcPcj")))
@@ -1625,7 +1627,7 @@ extern "C"
   ssize_t
       __attribute__ ((weak, alias ("_ZN5posix8recvfromEiPvjiP8sockaddrPm")))
       recvfrom (int socket, void* buffer, size_t length, int flags,
-                struct sockaddr* address, socklen_t* address_len);
+                sockaddr* address, socklen_t* address_len);
 #elif (__SIZEOF_POINTER__ == 8)
   ssize_t __attribute__ ((weak, alias ("_ZN5posix8readlinkEPKcPcm")))
   _readlink (const char* path, char* buf, size_t bufsize);
@@ -1636,7 +1638,7 @@ extern "C"
   ssize_t
       __attribute__ ((weak, alias ("_ZN5posix8recvfromEiPvmiP8sockaddrPj")))
       recvfrom (int socket, void* buffer, size_t length, int flags,
-                struct sockaddr* address, socklen_t* address_len);
+                sockaddr* address, socklen_t* address_len);
 #endif
 
   ssize_t __attribute__ ((weak, alias ("_ZN5posix7recvmsgEiPNS_6msghdrEi")))
@@ -1654,7 +1656,7 @@ extern "C"
   int __attribute__ ((
       weak, alias ("_ZN5posix6selectEiP13_types_fd_setS1_S1_P7timeval")))
   select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-          struct timeval* timeout);
+          timeval* timeout);
 
 #if (__SIZEOF_POINTER__ == 4)
   ssize_t __attribute__ ((weak, alias ("_ZN5posix4sendEiPKvji")))
@@ -1665,12 +1667,12 @@ extern "C"
 #endif
 
   ssize_t __attribute__ ((weak, alias ("_ZN5posix7sendmsgEiPKNS_6msghdrEi")))
-  sendmsg (int socket, const struct msghdr* message, int flags);
+  sendmsg (int socket, const msghdr* message, int flags);
 
 #if (__SIZEOF_POINTER__ == 4)
   ssize_t __attribute__ ((weak, alias ("_ZN5posix6sendtoEiPKvjiPK8sockaddrm")))
   sendto (int socket, const void* message, size_t length, int flags,
-          const struct sockaddr* dest_addr, socklen_t dest_len);
+          const sockaddr* dest_addr, socklen_t dest_len);
 
   int __attribute__ ((weak, alias ("_ZN5posix10setsockoptEiiiPKvm")))
   setsockopt (int socket, int level, int option_name, const void* option_value,
@@ -1678,7 +1680,7 @@ extern "C"
 #elif (__SIZEOF_POINTER__ == 8)
   ssize_t __attribute__ ((weak, alias ("_ZN5posix6sendtoEiPKvmiPK8sockaddrj")))
   sendto (int socket, const void* message, size_t length, int flags,
-          const struct sockaddr* dest_addr, socklen_t dest_len);
+          const sockaddr* dest_addr, socklen_t dest_len);
 
   int __attribute__ ((weak, alias ("_ZN5posix10setsockoptEiiiPKvj")))
   setsockopt (int socket, int level, int option_name, const void* option_value,
@@ -1709,7 +1711,7 @@ extern "C"
   system (const char* command);
 
   clock_t __attribute__ ((weak, alias ("_ZN5posix5timesEP3tms")))
-  _times (struct tms* buf);
+  _times (tms* buf);
 
   int __attribute__ ((weak, alias ("_ZN5posix8truncateEPKcl")))
   truncate (const char* path, off_t length);
@@ -1757,9 +1759,10 @@ extern "C"
 void __attribute__ ((noreturn, weak)) micro_os_plus_terminate (int code)
 {
 #if (__SIZEOF_POINTER__ == 4)
-  semihosting::call_host (SEMIHOSTING_SYS_EXIT,
-                          (void*)(code == 0 ? ADP_STOPPED_APPLICATION_EXIT
-                                            : ADP_STOPPED_RUN_TIME_ERROR));
+  semihosting::call_host (
+      SEMIHOSTING_SYS_EXIT,
+      reinterpret_cast<void*> (code == 0 ? ADP_STOPPED_APPLICATION_EXIT
+                                         : ADP_STOPPED_RUN_TIME_ERROR));
 #elif (__SIZEOF_POINTER__ == 8)
   field_t fields[2];
   fields[0] = (field_t)ADP_STOPPED_APPLICATION_EXIT;
@@ -1807,8 +1810,8 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
   bool is_in_argument = false;
 
   field_t fields[2];
-  fields[0] = (field_t)args_buf;
-  fields[1] = (field_t) (sizeof (args_buf) - 1);
+  fields[0] = static_cast<field_t> (args_buf);
+  fields[1] = reinterpret_cast<field_t> (sizeof (args_buf) - 1);
   int ret = semihosting::call_host (SEMIHOSTING_SYS_GET_CMDLINE, fields);
   if (ret == 0)
     {
@@ -1817,7 +1820,7 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
       args_buf[sizeof (args_buf) - 1] = '\0';
 
       // The returned command line is a null terminated string.
-      char* p = (char*)fields[0];
+      char* p = static_cast<char*> (fields[0]);
 
       int delim = '\0';
       int ch;
@@ -1828,8 +1831,8 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
             {
               if (!isblank (ch))
                 {
-                  if (argc
-                      >= (int)((sizeof (argv_buf) / sizeof (argv_buf[0])) - 1))
+                  if (argc >= static_cast<int> (
+                          (sizeof (argv_buf) / sizeof (argv_buf[0])) - 1))
                     break;
 
                   if (ch == '"' || ch == '\'')
@@ -1905,24 +1908,31 @@ initialise_monitor_handles (void)
   // kernel can differentiate the two using the mode flag and return a
   // different descriptor for standard error.
 
-  field_t volatile fields[3];
+  field_t fields[3];
 
-  fields[0] = (field_t) ":tt";
-  fields[2] = (field_t)3; // length of filename
-  fields[1] = (field_t)0; // mode "r"
-  monitor_stdin = semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*)fields);
+#pragma GCC diagnostic push
 
-  fields[0] = (field_t) ":tt";
-  fields[2] = (field_t)3; // length of filename
-  fields[1] = (field_t)4; // mode "w"
-  monitor_stdout
-      = semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*)fields);
+#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
 
-  fields[0] = (field_t) ":tt";
-  fields[2] = (field_t)3; // length of filename
-  fields[1] = (field_t)8; // mode "a"
-  monitor_stderr
-      = semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*)fields);
+  fields[0] = reinterpret_cast<field_t> (const_cast<char*> (":tt"));
+  fields[2] = reinterpret_cast<field_t> (3); // length of filename
+  fields[1] = reinterpret_cast<field_t> (0); // mode "r"
+  monitor_stdin = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
+                                          static_cast<void*> (fields));
+
+  fields[0] = reinterpret_cast<field_t> (const_cast<char*> (":tt"));
+  fields[2] = reinterpret_cast<field_t> (3); // length of filename
+  fields[1] = reinterpret_cast<field_t> (4); // mode "w"
+  monitor_stdout = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
+                                           static_cast<void*> (fields));
+
+#pragma GCC diagnostic pop
+
+  fields[0] = reinterpret_cast<field_t> (const_cast<char*> (":tt"));
+  fields[2] = reinterpret_cast<field_t> (3); // length of filename
+  fields[1] = reinterpret_cast<field_t> (8); // mode "a"
+  monitor_stderr = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
+                                           static_cast<void*> (fields));
 
   // If we failed to open stderr, redirect to stdout.
   if (monitor_stderr == -1)

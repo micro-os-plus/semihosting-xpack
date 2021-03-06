@@ -106,14 +106,16 @@ namespace micro_os_plus
           return 0;
         }
 
-      const char* cbuf = (const char*)buf;
+      const char* cbuf = static_cast<const char*> (buf);
 
       // Since the single character debug channel is quite slow, try to
       // optimize and send a null terminated string, if possible.
       if (cbuf[nbyte] == '\0')
         {
           // send string
-          semihosting::call_host (SEMIHOSTING_SYS_WRITE0, (void*)cbuf);
+          semihosting::call_host (
+              SEMIHOSTING_SYS_WRITE0,
+              static_cast<void*> (const_cast<char*> (cbuf)));
         }
       else
         {
@@ -133,14 +135,15 @@ namespace micro_os_plus
                 }
               tmp[i] = '\0';
 
-              semihosting::call_host (SEMIHOSTING_SYS_WRITE0, (void*)tmp);
+              semihosting::call_host (SEMIHOSTING_SYS_WRITE0,
+                                      static_cast<void*> (tmp));
 
               togo -= n;
             }
         }
 
       // All bytes written.
-      return (ssize_t)nbyte;
+      return static_cast<ssize_t> (nbyte);
     }
 
 #elif defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)

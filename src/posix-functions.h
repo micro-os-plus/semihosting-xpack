@@ -49,7 +49,7 @@ extern "C"
   // and casted to DIR.
   typedef struct
   {
-    ;
+    // Empty.
   } DIR;
 
   // Maybe 64-bits?
@@ -71,10 +71,10 @@ namespace posix
   // http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_socket.h.html
 
   int __attribute__ ((weak))
-  accept (int socket, struct sockaddr* address, socklen_t* address_len);
+  accept (int socket, sockaddr* address, socklen_t* address_len);
 
   int __attribute__ ((weak))
-  bind (int socket, const struct sockaddr* address, socklen_t address_len);
+  bind (int socket, const sockaddr* address, socklen_t address_len);
 
   int __attribute__ ((weak)) chdir (const char* path);
 
@@ -90,7 +90,7 @@ namespace posix
   int __attribute__ ((weak)) closedir (DIR* dirp);
 
   int __attribute__ ((weak))
-  connect (int socket, const struct sockaddr* address, socklen_t address_len);
+  connect (int socket, const sockaddr* address, socklen_t address_len);
 
   int __attribute__ ((weak))
   execve (const char* path, char* const argv[], char* const envp[]);
@@ -108,19 +108,18 @@ namespace posix
   char* __attribute__ ((weak)) getcwd (char* buf, size_t size);
 
   int __attribute__ ((weak))
-  getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
+  getpeername (int socket, sockaddr* address, socklen_t* address_len);
 
   pid_t __attribute__ ((weak)) getpid (void);
 
   int __attribute__ ((weak))
-  getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
+  getsockname (int socket, sockaddr* address, socklen_t* address_len);
 
   int __attribute__ ((weak))
   getsockopt (int socket, int level, int option_name, void* option_value,
               socklen_t* option_len);
 
-  int __attribute__ ((weak))
-  gettimeofday (struct timeval* ptimeval, void* ptimezone);
+  int __attribute__ ((weak)) gettimeofday (timeval* ptimeval, void* ptimezone);
 
   int __attribute__ ((weak)) ioctl (int fildes, int request, ...);
 
@@ -144,10 +143,10 @@ namespace posix
 
   ssize_t __attribute__ ((weak)) read (int fildes, void* buf, size_t nbyte);
 
-  struct dirent* __attribute__ ((weak)) readdir (DIR* dirp);
+  dirent* __attribute__ ((weak)) readdir (DIR* dirp);
 
   int __attribute__ ((weak))
-  readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
+  readdir_r (DIR* dirp, dirent* entry, dirent** result);
 
   ssize_t __attribute__ ((weak))
   readlink (const char* path, char* buf, size_t bufsize);
@@ -157,7 +156,7 @@ namespace posix
 
   ssize_t __attribute__ ((weak))
   recvfrom (int socket, void* buffer, size_t length, int flags,
-            struct sockaddr* address, socklen_t* address_len);
+            sockaddr* address, socklen_t* address_len);
 
   ssize_t __attribute__ ((weak))
   recvmsg (int socket, struct msghdr* message, int flags);
@@ -170,17 +169,17 @@ namespace posix
 
   int __attribute__ ((weak))
   select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-          struct timeval* timeout);
+          timeval* timeout);
 
   ssize_t __attribute__ ((weak))
   send (int socket, const void* buffer, size_t length, int flags);
 
   ssize_t __attribute__ ((weak))
-  sendmsg (int socket, const struct msghdr* message, int flags);
+  sendmsg (int socket, const msghdr* message, int flags);
 
   ssize_t __attribute__ ((weak))
   sendto (int socket, const void* message, size_t length, int flags,
-          const struct sockaddr* dest_addr, socklen_t dest_len);
+          const sockaddr* dest_addr, socklen_t dest_len);
 
   int __attribute__ ((weak))
   setsockopt (int socket, int level, int option_name, const void* option_value,
@@ -203,7 +202,7 @@ namespace posix
 
   int __attribute__ ((weak)) system (const char* command);
 
-  clock_t __attribute__ ((weak)) times (struct tms* buf);
+  clock_t __attribute__ ((weak)) times (tms* buf);
 
   int __attribute__ ((weak)) truncate (const char* path, off_t length);
 
