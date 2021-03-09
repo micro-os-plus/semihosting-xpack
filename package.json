@@ -1,6 +1,6 @@
 {
   "name": "@micro-os-plus/semihosting",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A source xPack with the portable semihosting definitions",
   "main": "",
   "scripts": {
@@ -20,7 +20,6 @@
     "url": "https://github.com/micro-os-plus/semihosting-xpack/issues/"
   },
   "homepage": "https://github.com/micro-os-plus/semihosting-xpack/",
-  "dependencies": {},
   "devDependencies": {},
   "xpack": {}
 }
