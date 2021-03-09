@@ -96,6 +96,8 @@ extern "C"
 
 #if defined(__cplusplus)
 
+// ----------------------------------------------------------------------------
+
 namespace micro_os_plus
 {
   namespace semihosting
