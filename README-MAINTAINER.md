@@ -14,18 +14,22 @@ The project is hosted on GitHub:
 To clone it:
 
 ```sh
+rm -rf ~/Work/semihosting-xpack.git && \
+mkdir -p ~/Work && \
 git clone \
   https://github.com/micro-os-plus/semihosting-xpack.git \
-  semihosting-xpack.git
+  ~/Work/semihosting-xpack.git
 ```
 
 For development purposes, clone the `xpack-develop` branch:
 
 ```sh
+rm -rf ~/Work/semihosting-xpack.git && \
+mkdir -p ~/Work && \
 git clone \
   --branch xpack-develop \
   https://github.com/micro-os-plus/semihosting-xpack.git \
-  semihosting-xpack.git
+  ~/Work/semihosting-xpack.git
 ```
 
 ## Prerequisites
