@@ -1653,10 +1653,12 @@ extern "C"
   int __attribute__ ((weak, alias ("_ZN5posix5rmdirEPKc")))
   rmdir (const char* path);
 
-  int __attribute__ ((
-      weak, alias ("_ZN5posix6selectEiP13_types_fd_setS1_S1_P7timeval")))
+  int __attribute__ ((weak))
   select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-          timeval* timeout);
+          timeval* timeout)
+  {
+    return posix::select (nfds, readfds, writefds, errorfds, timeout);
+  }
 
 #if (__SIZEOF_POINTER__ == 4)
   ssize_t __attribute__ ((weak, alias ("_ZN5posix4sendEiPKvji")))
