@@ -8,6 +8,11 @@ and close existing issues and pull requests.
 
 ## 2022-01-02
 
+- v3.0.3
+- avoid select alias, it fails with arm-none-eabi-gcc 10.3 on Ubuntu
+
+## 2022-01-02
+
 - v3.0.2
 
 ## 2021-03-09
