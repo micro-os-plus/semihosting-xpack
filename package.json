@@ -1,7 +1,7 @@
 {
   "name": "@micro-os-plus/semihosting",
   "version": "3.0.3",
-  "description": "A source xPack with the portable semihosting definitions",
+  "description": "A source xPack with the µOS++ portable semihosting definitions",
   "main": "",
   "scripts": {
     "npm-install": "npm install",
