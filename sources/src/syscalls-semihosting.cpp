@@ -1883,9 +1883,6 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
   *p_argc = argc;
   *p_argv = &argv_buf[0];
 
-  // Temporary here.
-  initialise_monitor_handles ();
-
   return;
 }
 
