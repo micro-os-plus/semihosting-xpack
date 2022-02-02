@@ -168,12 +168,13 @@ namespace micro_os_plus
           // On the very first call get the file handle from the host.
 
           // Special filename for stdin/out/err.
-          fields[0] = (field_t) ":tt";
-          fields[1] = (field_t)4; // mode "w"
+          fields[0] = const_cast<char*> (":tt");
+          fields[1] = reinterpret_cast<field_t> (4); // mode "w"
           // Length of ":tt", except null terminator.
-          fields[2] = (field_t) (sizeof (":tt") - 1);
+          fields[2] = reinterpret_cast<field_t> (sizeof (":tt") - 1);
 
-          ret = semihosting::call_host (SEMIHOSTING_SYS_OPEN, (void*)fields);
+          ret = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
+                                        static_cast<void*> (fields));
           if (ret == -1)
             {
               return -1;
@@ -182,11 +183,12 @@ namespace micro_os_plus
           handle = ret;
         }
 
-      fields[0] = (field_t) (size_t)handle;
-      fields[1] = (field_t)buf;
-      fields[2] = (field_t)nbyte;
+      fields[0] = reinterpret_cast<field_t> (handle);
+      fields[1] = const_cast<field_t> (buf);
+      fields[2] = reinterpret_cast<field_t> (nbyte);
       // Send character array to host file/device.
-      ret = semihosting::call_host (SEMIHOSTING_SYS_WRITE, (void*)fields);
+      ret = semihosting::call_host (SEMIHOSTING_SYS_WRITE,
+                                    static_cast<void*> (fields));
       // This call returns the number of bytes NOT written (0 if all ok).
 
       // -1 is not a legal value, but SEGGER seems to return it
@@ -196,13 +198,13 @@ namespace micro_os_plus
         }
 
       // The compliant way of returning errors.
-      if (ret == (int)nbyte)
+      if (ret == static_cast<int> (nbyte))
         {
           return -1;
         }
 
       // Return the number of bytes written.
-      return (ssize_t) (nbyte) - (ssize_t)ret;
+      return static_cast<ssize_t> ((nbyte)) - ret;
     }
 
 #endif // defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
