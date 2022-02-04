@@ -8,6 +8,7 @@ and close existing issues and pull requests.
 
 ## 2022-02-04
 
+- v3.2.0
 - 2a3d08b cmake: add xpack_display_target_lists
 
 ## 2022-02-02
