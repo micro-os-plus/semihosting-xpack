@@ -55,8 +55,6 @@ target_include_directories(
     "include"
 )
 
-message(VERBOSE "+ -I include")
-
 target_sources(
   micro-os-plus-semihosting-interface
 
@@ -64,9 +62,6 @@ target_sources(
     "src/syscalls-semihosting.cpp"
     "src/trace-semihosting.cpp"
 )
-
-message(VERBOSE "+ src/syscalls-semihosting.cpp")
-message(VERBOSE "+ src/trace-semihosting.cpp")
 
 target_compile_definitions(
   micro-os-plus-semihosting-interface
@@ -90,6 +85,10 @@ target_link_libraries(
     micro-os-plus::diag-trace
     micro-os-plus::architecture
 )
+
+if (COMMAND xpack_display_target_lists)
+  xpack_display_target_lists(micro-os-plus-semihosting-interface)
+endif()
 
 # -----------------------------------------------------------------------------
 # Aliases.
