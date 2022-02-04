@@ -6,6 +6,23 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2022-02-04
+
+- 2a3d08b cmake: add xpack_display_target_lists
+
+## 2022-02-02
+
+- edadab4 add meson support
+- b9bbe9b trace-semihosting.cpp: fix casts
+
+## 2022-01-28
+
+- 2072ae4 rework CMake, top config, no sources
+
+## 2022-01-27
+
+- 99fd5b7 syscalls: move initialise_monitor_handles to startup
+
 ## 2022-01-26
 
 - v3.1.0
