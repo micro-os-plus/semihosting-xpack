@@ -15,7 +15,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(TRACE)
+#if defined(MICRO_OS_PLUS_TRACE)
 
 #if defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG) \
     || defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
@@ -199,7 +199,7 @@ namespace micro_os_plus
 
 #endif /* defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG) || \
           defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT) */
-#endif // defined(TRACE)
+#endif // defined(MICRO_OS_PLUS_TRACE)
 
 // ----------------------------------------------------------------------------
 
