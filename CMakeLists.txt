@@ -48,42 +48,27 @@ add_library(micro-os-plus-semihosting-interface INTERFACE EXCLUDE_FROM_ALL)
 # -----------------------------------------------------------------------------
 # Target settings.
 
-target_include_directories(
-  micro-os-plus-semihosting-interface
-
-  INTERFACE
-    "include"
+target_include_directories(micro-os-plus-semihosting-interface INTERFACE
+  "include"
 )
 
-target_sources(
-  micro-os-plus-semihosting-interface
-
-  INTERFACE
-    "src/syscalls-semihosting.cpp"
-    "src/trace-semihosting.cpp"
+target_sources(micro-os-plus-semihosting-interface INTERFACE
+  "src/syscalls-semihosting.cpp"
+  "src/trace-semihosting.cpp"
 )
 
-target_compile_definitions(
-  micro-os-plus-semihosting-interface
-
-  INTERFACE
-    # ... add preprocessor macro definitions.
+target_compile_definitions(micro-os-plus-semihosting-interface INTERFACE
+  # None.
 )
 
-target_compile_options(
-  micro-os-plus-semihosting-interface
-
-  INTERFACE
-    # ... perhaps ignore some warnings.
+target_compile_options(micro-os-plus-semihosting-interface INTERFACE
+  # None.
 )
 
-target_link_libraries(
-  micro-os-plus-semihosting-interface
-
-  INTERFACE
-    # Dependencies
-    micro-os-plus::diag-trace
-    micro-os-plus::architecture
+target_link_libraries(micro-os-plus-semihosting-interface INTERFACE
+  # Dependencies
+  micro-os-plus::diag-trace
+  micro-os-plus::architecture
 )
 
 if (COMMAND xpack_display_target_lists)
