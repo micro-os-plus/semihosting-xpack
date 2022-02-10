@@ -15,6 +15,10 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(MICRO_OS_PLUS_INCLUDE_CONFIG_H)
+#include <micro-os-plus/config.h>
+#endif // MICRO_OS_PLUS_INCLUDE_CONFIG_H
+
 #if defined(MICRO_OS_PLUS_USE_SEMIHOSTING_SYSCALLS)
 
 #include <micro-os-plus/semihosting.h>
