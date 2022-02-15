@@ -6,6 +6,20 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2022-02-15
+
+- v3.3.0
+- f815aee trace-semihosting.cpp: add flush()
+
+## 2022-02-10
+
+- 0eb2ebb .c* include <micro-os-plus/config.h>
+
+## 2022-02-09
+
+- 7a079af rename MICRO_OS_PLUS_DEBUG
+- 0a59d26 rename MICRO_OS_PLUS_TRACE
+
 ## 2022-02-05
 
 - v3.2.1
