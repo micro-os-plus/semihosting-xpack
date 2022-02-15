@@ -8,7 +8,7 @@ and close existing issues and pull requests.
 
 ## 2022-02-15
 
-- v3.3.0
+- v4.0.0
 - f815aee trace-semihosting.cpp: add flush()
 
 ## 2022-02-10
