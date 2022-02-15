@@ -53,6 +53,12 @@ namespace micro_os_plus
       // For semihosting, no inits are required.
     }
 
+    void
+    flush (void)
+    {
+      // For semihosting, no flush is required.
+    }
+
     // ------------------------------------------------------------------------
 
     // Semihosting is another output channel that can be used for the trace
