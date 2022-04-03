@@ -117,7 +117,7 @@ When the release is considered stable, promote it as `latest`:
 
 - `npm dist-tag ls @micro-os-plus/semihosting`
 - `npm dist-tag add @micro-os-plus/semihosting@4.0.0 latest`
-- `npm dist-tag ls @@micro-os-plus/semihosting`
+- `npm dist-tag ls @micro-os-plus/semihosting`
 
 ## Announce to the community
 
