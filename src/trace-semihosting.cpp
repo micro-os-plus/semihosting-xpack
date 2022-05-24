@@ -107,10 +107,13 @@ namespace micro_os_plus
       // optimize and send a null terminated string, if possible.
       if (cbuf[nbyte] == '\0')
         {
-          // send string
+          // Send string.
+          // The cast through void* is necessary to silence
+          // an alignment warning.
           semihosting::call_host (
               SEMIHOSTING_SYS_WRITE0,
-              static_cast<void*> (const_cast<char*> (cbuf)));
+              reinterpret_cast<semihosting::param_block_t*> (
+                  static_cast<void*> (const_cast<char*> (cbuf))));
         }
       else
         {
@@ -130,8 +133,12 @@ namespace micro_os_plus
                 }
               tmp[i] = '\0';
 
-              semihosting::call_host (SEMIHOSTING_SYS_WRITE0,
-                                      static_cast<void*> (tmp));
+              // The cast through void* is necessary to silence
+              // an alignment warning.
+              semihosting::call_host (
+                  SEMIHOSTING_SYS_WRITE0,
+                  reinterpret_cast<semihosting::param_block_t*> (
+                      static_cast<void*> (tmp)));
 
               togo -= n;
             }
@@ -154,8 +161,7 @@ namespace micro_os_plus
       static int handle; // STATIC!
 
       // All fields should be large enough to hold a pointer.
-      using field_t = void*;
-      field_t fields[3];
+      semihosting::param_block_t params[3];
       int ret;
 
       if (handle == 0)
@@ -163,13 +169,14 @@ namespace micro_os_plus
           // On the very first call get the file handle from the host.
 
           // Special filename for stdin/out/err.
-          fields[0] = const_cast<char*> (":tt");
-          fields[1] = reinterpret_cast<field_t> (4); // mode "w"
+          params[0] = const_cast<char*> (":tt");
+          params[1] = 4; // mode "w"
           // Length of ":tt", except null terminator.
-          fields[2] = reinterpret_cast<field_t> (sizeof (":tt") - 1);
+          params[2] = sizeof (":tt") - 1;
 
-          ret = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
-                                        static_cast<void*> (fields));
+          ret = semihosting::call_host (
+              SEMIHOSTING_SYS_OPEN,
+              static_cast<semihosting::param_block_t*> (params));
           if (ret == -1)
             {
               return -1;
@@ -178,12 +185,13 @@ namespace micro_os_plus
           handle = ret;
         }
 
-      fields[0] = reinterpret_cast<field_t> (handle);
-      fields[1] = const_cast<field_t> (buf);
-      fields[2] = reinterpret_cast<field_t> (nbyte);
+      params[0] = reinterpret_cast<semihosting::param_block_t> (handle);
+      params[1] = const_cast<semihosting::param_block_t> (buf);
+      params[2] = nbyte;
       // Send character array to host file/device.
-      ret = semihosting::call_host (SEMIHOSTING_SYS_WRITE,
-                                    static_cast<void*> (fields));
+      ret = semihosting::call_host (
+          SEMIHOSTING_SYS_WRITE,
+          static_cast<semihosting::param_block_t*> (params));
       // This call returns the number of bytes NOT written (0 if all ok).
 
       // -1 is not a legal value, but SEGGER seems to return it

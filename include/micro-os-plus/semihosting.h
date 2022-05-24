@@ -15,6 +15,8 @@
 
 // ----------------------------------------------------------------------------
 
+#include <micro-os-plus/architecture.h>
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -34,7 +36,7 @@ extern "C"
     SEMIHOSTING_SYS_EXIT = 0x18,
     SEMIHOSTING_SYS_EXIT_EXTENDED = 0x20,
     SEMIHOSTING_SYS_FLEN = 0x0C,
-    SEMIHOSTING_SYS_GET_CMDLINE = 0x15,
+    SEMIHOSTING_SYS_GETCMDLINE = 0x15,
     SEMIHOSTING_SYS_HEAPINFO = 0x16,
     SEMIHOSTING_SYS_ISERROR = 0x08,
     SEMIHOSTING_SYS_ISTTY = 0x09,
@@ -93,8 +95,11 @@ namespace micro_os_plus
     // ------------------------------------------------------------------------
     // Portable semihosting functions in C++.
 
-    int
-    call_host (int reason, void* arg);
+    typedef micro_os_plus::architecture::register_t param_block_t;
+    typedef micro_os_plus::architecture::register_t response_t;
+
+    response_t
+    call_host (int reason, param_block_t* arg);
 
     // ------------------------------------------------------------------------
   } // namespace semihosting

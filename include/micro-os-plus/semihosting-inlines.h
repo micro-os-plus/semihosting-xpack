@@ -32,8 +32,8 @@ namespace micro_os_plus
     // ------------------------------------------------------------------------
     // Portable semihosting functions in C++.
 
-    inline __attribute__ ((always_inline)) int
-    call_host (int reason, void* arg)
+    inline __attribute__ ((always_inline)) response_t
+    call_host (int reason, param_block_t* arg)
     {
       return micro_os_plus_semihosting_call_host (reason, arg);
     }

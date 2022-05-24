@@ -85,10 +85,6 @@ namespace
 
 #pragma GCC diagnostic pop
 
-  // The type of a field, for the array passed to the host.
-  // Should be large enough to hold a pointer.
-  using field_t = void*;
-
 #if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
 #define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES (20)
 #endif
@@ -103,7 +99,7 @@ namespace
    *
    * find_slot() - Translate entry.
    * new_slot() - Find empty entry.
-   * initilise_monitor_handles() - Initialize entries.
+   * initialise_monitor_handles() - Initialize entries.
    * open()
    * close()
    *
@@ -185,7 +181,8 @@ namespace
   int
   get_host_errno (void)
   {
-    return semihosting::call_host (SEMIHOSTING_SYS_ERRNO, nullptr);
+    return static_cast<int> (
+        semihosting::call_host (SEMIHOSTING_SYS_ERRNO, nullptr));
   }
 
   /**
@@ -252,14 +249,14 @@ namespace
         whence = SEEK_SET;
       }
 
-    field_t fields[2];
+    semihosting::param_block_t fields[2];
     int res;
 
     if (whence == SEEK_END)
       {
-        fields[0] = reinterpret_cast<field_t> (pfd->handle);
-        res = check_error (
-            semihosting::call_host (SEMIHOSTING_SYS_FLEN, fields));
+        fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
+        res = check_error (static_cast<int> (
+            semihosting::call_host (SEMIHOSTING_SYS_FLEN, fields)));
         if (res == -1)
           {
             return -1;
@@ -268,9 +265,10 @@ namespace
       }
 
     // This code only does absolute seeks.
-    fields[0] = reinterpret_cast<field_t> (pfd->handle);
-    fields[1] = reinterpret_cast<field_t> (offset);
-    res = check_error (semihosting::call_host (SEMIHOSTING_SYS_SEEK, fields));
+    fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
+    fields[1] = static_cast<semihosting::param_block_t> (offset);
+    res = check_error (static_cast<int> (
+        semihosting::call_host (SEMIHOSTING_SYS_SEEK, fields)));
 
     // At this point ptr is the current file position.
     if (res >= 0)
@@ -300,8 +298,9 @@ namespace
     st->st_blksize = 1024;
 
     int res;
-    res = check_error (
-        semihosting::call_host (SEMIHOSTING_SYS_FLEN, &pfd->handle));
+    res = check_error (static_cast<int> (semihosting::call_host (
+        SEMIHOSTING_SYS_FLEN,
+        reinterpret_cast<semihosting::param_block_t*> (&pfd->handle))));
     if (res == -1)
       {
         return -1;
@@ -385,12 +384,14 @@ namespace posix
         aflags |= 8;
       }
 
-    field_t fields[3];
-    fields[0] = reinterpret_cast<field_t> (const_cast<char*> (path));
-    fields[1] = reinterpret_cast<field_t> (aflags);
-    fields[2] = reinterpret_cast<field_t> (std::strlen (path));
+    semihosting::param_block_t fields[3];
+    fields[0] = reinterpret_cast<semihosting::param_block_t> (
+        const_cast<char*> (path));
+    fields[1] = static_cast<semihosting::param_block_t> (aflags);
+    fields[2] = std::strlen (path);
 
-    int fh = semihosting::call_host (SEMIHOSTING_SYS_OPEN, fields);
+    int fh = static_cast<int> (
+        semihosting::call_host (SEMIHOSTING_SYS_OPEN, fields));
 
     // Return a user file descriptor or an error.
     if (fh >= 0)
@@ -426,12 +427,13 @@ namespace posix
         return 0;
       }
 
-    field_t fields[1];
-    fields[0] = reinterpret_cast<field_t> (pfd->handle);
+    semihosting::param_block_t fields[1];
+    fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
 
     // Attempt to close the handle.
     int res;
-    res = check_error (semihosting::call_host (SEMIHOSTING_SYS_CLOSE, fields));
+    res = check_error (static_cast<int> (
+        semihosting::call_host (SEMIHOSTING_SYS_CLOSE, fields)));
 
     // Reclaim handle?
     if (res == 0)
@@ -461,14 +463,15 @@ namespace posix
         return -1;
       }
 
-    field_t fields[3];
-    fields[0] = reinterpret_cast<field_t> (pfd->handle);
-    fields[1] = buf;
-    fields[2] = reinterpret_cast<field_t> (nbyte);
+    semihosting::param_block_t fields[3];
+    fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
+    fields[1] = reinterpret_cast<semihosting::param_block_t> (buf);
+    fields[2] = nbyte;
 
     int res;
     // Returns the number of bytes *not* written.
-    res = check_error (semihosting::call_host (SEMIHOSTING_SYS_READ, fields));
+    res = check_error (static_cast<int> (
+        semihosting::call_host (SEMIHOSTING_SYS_READ, fields)));
     if (res == -1)
       {
         return res;
@@ -494,15 +497,16 @@ namespace posix
         return -1;
       }
 
-    field_t fields[3];
+    semihosting::param_block_t fields[3];
 
-    fields[0] = reinterpret_cast<field_t> (pfd->handle);
-    fields[1] = const_cast<field_t> (buf);
-    fields[2] = reinterpret_cast<field_t> (nbyte);
+    fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
+    fields[1] = reinterpret_cast<semihosting::param_block_t> (buf);
+    fields[2] = nbyte;
 
     // Returns the number of bytes *not* written.
     int res;
-    res = check_error (semihosting::call_host (SEMIHOSTING_SYS_WRITE, fields));
+    res = check_error (static_cast<int> (
+        semihosting::call_host (SEMIHOSTING_SYS_WRITE, fields)));
     /* Clearly an error. */
     if (res < 0)
       {
@@ -547,7 +551,9 @@ namespace posix
       }
 
     int tty;
-    tty = semihosting::call_host (SEMIHOSTING_SYS_ISTTY, &pfd->handle);
+    tty = static_cast<int> (semihosting::call_host (
+        SEMIHOSTING_SYS_ISTTY,
+        reinterpret_cast<semihosting::param_block_t*> (&pfd->handle)));
 
     if (tty == 1)
       {
@@ -592,14 +598,16 @@ namespace posix
   int
   rename (const char* existing, const char* _new)
   {
-    field_t fields[4];
-    fields[0] = reinterpret_cast<field_t> (const_cast<char*> (existing));
-    fields[1] = reinterpret_cast<field_t> (std::strlen (existing));
-    fields[2] = reinterpret_cast<field_t> (const_cast<char*> (_new));
-    fields[3] = reinterpret_cast<field_t> (std::strlen (_new));
+    semihosting::param_block_t fields[4];
+    fields[0] = reinterpret_cast<semihosting::param_block_t> (
+        const_cast<char*> (existing));
+    fields[1] = std::strlen (existing);
+    fields[2] = reinterpret_cast<semihosting::param_block_t> (
+        const_cast<char*> (_new));
+    fields[3] = std::strlen (_new);
 
-    return check_error (
-               semihosting::call_host (SEMIHOSTING_SYS_RENAME, fields))
+    return check_error (static_cast<int> (
+               semihosting::call_host (SEMIHOSTING_SYS_RENAME, fields)))
                ? -1
                : 0;
   }
@@ -607,12 +615,14 @@ namespace posix
   int
   unlink (const char* path)
   {
-    field_t fields[2];
-    fields[0] = reinterpret_cast<field_t> (const_cast<char*> (path));
-    fields[1] = reinterpret_cast<field_t> (strlen (path));
+    semihosting::param_block_t fields[2];
+    fields[0] = reinterpret_cast<semihosting::param_block_t> (
+        const_cast<char*> (path));
+    fields[1] = (strlen (path));
 
     int res;
-    res = semihosting::call_host (SEMIHOSTING_SYS_REMOVE, fields);
+    res = static_cast<int> (
+        semihosting::call_host (SEMIHOSTING_SYS_REMOVE, fields));
     if (res == -1)
       {
         return with_set_errno (res);
@@ -631,11 +641,12 @@ namespace posix
         return 1; // maybe there is a shell available? we can hope. :-P
       }
 
-    field_t fields[2];
-    fields[0] = reinterpret_cast<field_t> (const_cast<char*> (command));
-    fields[1] = reinterpret_cast<field_t> (strlen (command));
-    int err = check_error (
-        semihosting::call_host (SEMIHOSTING_SYS_SYSTEM, fields));
+    semihosting::param_block_t fields[2];
+    fields[0] = reinterpret_cast<semihosting::param_block_t> (
+        const_cast<char*> (command));
+    fields[1] = strlen (command);
+    int err = check_error (static_cast<int> (
+        semihosting::call_host (SEMIHOSTING_SYS_SYSTEM, fields)));
     if ((err >= 0) && (err < 256))
       {
         // We have to convert e, an exit status to the encoded status of
@@ -659,8 +670,8 @@ namespace posix
     if (ptimeval)
       {
         // Ask the host for the seconds since the Unix epoch.
-        ptimeval->tv_sec
-            = semihosting::call_host (SEMIHOSTING_SYS_TIME, nullptr);
+        ptimeval->tv_sec = static_cast<time_t> (
+            semihosting::call_host (SEMIHOSTING_SYS_TIME, nullptr));
         ptimeval->tv_usec = 0;
       }
 
@@ -679,8 +690,7 @@ namespace posix
   clock (void)
   {
     clock_t timeval;
-    timeval = static_cast<clock_t> (
-        semihosting::call_host (SEMIHOSTING_SYS_CLOCK, nullptr));
+    timeval = semihosting::call_host (SEMIHOSTING_SYS_CLOCK, nullptr);
 
     return timeval;
   }
@@ -1750,14 +1760,14 @@ extern "C"
 void __attribute__ ((noreturn, weak)) micro_os_plus_terminate (int code)
 {
 #if (__SIZEOF_POINTER__ == 4)
-  semihosting::call_host (
-      SEMIHOSTING_SYS_EXIT,
-      reinterpret_cast<void*> (code == 0 ? ADP_STOPPED_APPLICATION_EXIT
-                                         : ADP_STOPPED_RUN_TIME_ERROR));
+  semihosting::call_host (SEMIHOSTING_SYS_EXIT,
+                          reinterpret_cast<semihosting::param_block_t*> (
+                              code == 0 ? ADP_STOPPED_APPLICATION_EXIT
+                                        : ADP_STOPPED_RUN_TIME_ERROR));
 #elif (__SIZEOF_POINTER__ == 8)
-  field_t fields[2];
-  fields[0] = (field_t)ADP_STOPPED_APPLICATION_EXIT;
-  fields[1] = (field_t) (size_t)code;
+  semihosting::param_block_t fields[2];
+  fields[0] = ADP_STOPPED_APPLICATION_EXIT;
+  fields[1] = static_cast<semihosting::param_block_t> (code);
   semihosting::call_host (SEMIHOSTING_SYS_EXIT, fields);
 #endif
 
@@ -1800,10 +1810,11 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
   int argc = 0;
   bool is_in_argument = false;
 
-  field_t fields[2];
-  fields[0] = static_cast<field_t> (args_buf);
-  fields[1] = reinterpret_cast<field_t> (sizeof (args_buf) - 1);
-  int ret = semihosting::call_host (SEMIHOSTING_SYS_GET_CMDLINE, fields);
+  semihosting::param_block_t fields[2];
+  fields[0] = reinterpret_cast<semihosting::param_block_t> (args_buf);
+  fields[1] = sizeof (args_buf) - 1;
+  int ret = static_cast<int> (
+      semihosting::call_host (SEMIHOSTING_SYS_GETCMDLINE, fields));
   if (ret == 0)
     {
       // In case the host send more than we can chew, limit the
@@ -1811,7 +1822,7 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
       args_buf[sizeof (args_buf) - 1] = '\0';
 
       // The returned command line is a null terminated string.
-      char* p = static_cast<char*> (fields[0]);
+      char* p = reinterpret_cast<char*> (fields[0]);
 
       int delim = '\0';
       int ch;
@@ -1896,31 +1907,37 @@ initialise_monitor_handles (void)
   // kernel can differentiate the two using the mode flag and return a
   // different descriptor for standard error.
 
-  field_t fields[3];
+  semihosting::param_block_t fields[3];
 
 #pragma GCC diagnostic push
 
 #pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
 
-  fields[0] = reinterpret_cast<field_t> (const_cast<char*> (":tt"));
-  fields[2] = reinterpret_cast<field_t> (3); // length of filename
-  fields[1] = reinterpret_cast<field_t> (0); // mode "r"
-  monitor_stdin = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
-                                          static_cast<void*> (fields));
+  fields[0] = reinterpret_cast<semihosting::param_block_t> (
+      const_cast<char*> (":tt"));
+  fields[2] = 3; // length of filename
+  fields[1] = 0; // mode "r"
+  monitor_stdin = static_cast<int> (semihosting::call_host (
+      SEMIHOSTING_SYS_OPEN,
+      static_cast<semihosting::param_block_t*> (fields)));
 
-  fields[0] = reinterpret_cast<field_t> (const_cast<char*> (":tt"));
-  fields[2] = reinterpret_cast<field_t> (3); // length of filename
-  fields[1] = reinterpret_cast<field_t> (4); // mode "w"
-  monitor_stdout = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
-                                           static_cast<void*> (fields));
+  fields[0] = reinterpret_cast<semihosting::param_block_t> (
+      const_cast<char*> (":tt"));
+  fields[2] = 3; // length of filename
+  fields[1] = 4; // mode "w"
+  monitor_stdout = static_cast<int> (semihosting::call_host (
+      SEMIHOSTING_SYS_OPEN,
+      static_cast<semihosting::param_block_t*> (fields)));
 
 #pragma GCC diagnostic pop
 
-  fields[0] = reinterpret_cast<field_t> (const_cast<char*> (":tt"));
-  fields[2] = reinterpret_cast<field_t> (3); // length of filename
-  fields[1] = reinterpret_cast<field_t> (8); // mode "a"
-  monitor_stderr = semihosting::call_host (SEMIHOSTING_SYS_OPEN,
-                                           static_cast<void*> (fields));
+  fields[0] = reinterpret_cast<semihosting::param_block_t> (
+      const_cast<char*> (":tt"));
+  fields[2] = 3; // length of filename
+  fields[1] = 8; // mode "a"
+  monitor_stderr = static_cast<int> (semihosting::call_host (
+      SEMIHOSTING_SYS_OPEN,
+      static_cast<semihosting::param_block_t*> (fields)));
 
   // If we failed to open stderr, redirect to stdout.
   if (monitor_stderr == -1)
