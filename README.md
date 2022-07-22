@@ -97,13 +97,10 @@ The ... are fully functional.
 The following functions are available:
 
 ```c++
-namespace micro_os_plus
+namespace micro_os_plus::semihosting
 {
-  namespace semihosting
-  {
-    int
-    call_host (int reason, void* arg);
-  }
+  int
+  call_host (int reason, void* arg);
 }
 ```
 

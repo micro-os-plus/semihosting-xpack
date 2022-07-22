@@ -6,6 +6,13 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2022-07-22
+
+* v5.0.0
+* 209fe7c reformat namespaces
+* 0e96151 split semihosting-startup.cpp
+* d0c8d25 rename semihosting-trace.cpp
+
 ## 2022-05-24
 
 * 25123f9 use param_block_t; rename SYS_GETCMDLINE
