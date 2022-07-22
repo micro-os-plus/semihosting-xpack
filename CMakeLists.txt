@@ -55,7 +55,7 @@ target_include_directories(micro-os-plus-semihosting-interface INTERFACE
 
 target_sources(micro-os-plus-semihosting-interface INTERFACE
   "src/syscalls-semihosting.cpp"
-  "src/trace-semihosting.cpp"
+  "src/semihosting-trace.cpp"
 )
 
 target_compile_definitions(micro-os-plus-semihosting-interface INTERFACE
