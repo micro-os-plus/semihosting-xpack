@@ -88,22 +88,19 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 
-namespace micro_os_plus
+namespace micro_os_plus::semihosting
 {
-  namespace semihosting
-  {
-    // ------------------------------------------------------------------------
-    // Portable semihosting functions in C++.
+  // --------------------------------------------------------------------------
+  // Portable semihosting functions in C++.
 
-    typedef micro_os_plus::architecture::register_t param_block_t;
-    typedef micro_os_plus::architecture::register_t response_t;
+  typedef micro_os_plus::architecture::register_t param_block_t;
+  typedef micro_os_plus::architecture::register_t response_t;
 
-    response_t
-    call_host (int reason, param_block_t* arg);
+  response_t
+  call_host (int reason, param_block_t* arg);
 
-    // ------------------------------------------------------------------------
-  } // namespace semihosting
-} // namespace micro_os_plus
+  // --------------------------------------------------------------------------
+} // namespace micro_os_plus::semihosting
 
 #endif // defined(__cplusplus)
 

@@ -41,51 +41,49 @@ using namespace micro_os_plus;
 
 // ----------------------------------------------------------------------------
 
-namespace micro_os_plus
+namespace micro_os_plus::trace
 {
-  namespace trace
+  // --------------------------------------------------------------------------
+
+  void
+  initialize (void)
   {
-    // ------------------------------------------------------------------------
+    // For semihosting, no inits are required.
+  }
 
-    void
-    initialize (void)
-    {
-      // For semihosting, no inits are required.
-    }
+  void
+  flush (void)
+  {
+    // For semihosting, no flush is required.
+  }
 
-    void
-    flush (void)
-    {
-      // For semihosting, no flush is required.
-    }
+  // --------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------------
+  // Semihosting is another output channel that can be used for the trace
+  // messages. It comes in two flavours: STDOUT and DEBUG. The STDOUT channel
+  // is the equivalent of the stdout file in POSIX and in most cases it is
+  // forwarded to the GDB server stdout stream. The debug channel is a
+  // separate channel. STDOUT is buffered, so nothing is displayed until
+  // a \n; DEBUG is not buffered, but can be slow.
+  //
+  // Choosing between semihosting stdout and debug depends on the
+  // capabilities of your GDB server, and also on specific needs. It is
+  // recommended to test DEBUG first, and if too slow, try STDOUT.
+  //
+  // The JLink GDB server fully support semihosting, and both configurations
+  // are available; to activate it, use "monitor semihosting enable" or check
+  // the corresponding button in the JLink Debugging plug-in.
+  // In OpenOCD, support for semihosting can be enabled using
+  // "monitor arm semihosting enable".
+  //
+  // Note: Applications built with semihosting output active normally cannot
+  // be executed without the debugger connected and active, since they use
+  // BKPT to communicate with the host. However, with a carefully written
+  // HardFault_Handler, the semihosting BKPT calls can be processed, making
+  // possible to run semihosting applications as standalone, without being
+  // terminated with hardware faults.
 
-    // Semihosting is another output channel that can be used for the trace
-    // messages. It comes in two flavours: STDOUT and DEBUG. The STDOUT channel
-    // is the equivalent of the stdout file in POSIX and in most cases it is
-    // forwarded to the GDB server stdout stream. The debug channel is a
-    // separate channel. STDOUT is buffered, so nothing is displayed until
-    // a \n; DEBUG is not buffered, but can be slow.
-    //
-    // Choosing between semihosting stdout and debug depends on the
-    // capabilities of your GDB server, and also on specific needs. It is
-    // recommended to test DEBUG first, and if too slow, try STDOUT.
-    //
-    // The JLink GDB server fully support semihosting, and both configurations
-    // are available; to activate it, use "monitor semihosting enable" or check
-    // the corresponding button in the JLink Debugging plug-in.
-    // In OpenOCD, support for semihosting can be enabled using
-    // "monitor arm semihosting enable".
-    //
-    // Note: Applications built with semihosting output active normally cannot
-    // be executed without the debugger connected and active, since they use
-    // BKPT to communicate with the host. However, with a carefully written
-    // HardFault_Handler, the semihosting BKPT calls can be processed, making
-    // possible to run semihosting applications as standalone, without being
-    // terminated with hardware faults.
-
-    // ------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
 #if defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG)
 
@@ -93,127 +91,125 @@ namespace micro_os_plus
 #define MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE (16)
 #endif
 
-    ssize_t
-    write (const void* buf, std::size_t nbyte)
-    {
-      if (buf == nullptr || nbyte == 0)
-        {
-          return 0;
-        }
+  ssize_t
+  write (const void* buf, std::size_t nbyte)
+  {
+    if (buf == nullptr || nbyte == 0)
+      {
+        return 0;
+      }
 
-      const char* cbuf = static_cast<const char*> (buf);
+    const char* cbuf = static_cast<const char*> (buf);
 
-      // Since the single character debug channel is quite slow, try to
-      // optimize and send a null terminated string, if possible.
-      if (cbuf[nbyte] == '\0')
-        {
-          // Send string.
-          // The cast through void* is necessary to silence
-          // an alignment warning.
-          semihosting::call_host (
-              SEMIHOSTING_SYS_WRITE0,
-              reinterpret_cast<semihosting::param_block_t*> (
-                  static_cast<void*> (const_cast<char*> (cbuf))));
-        }
-      else
-        {
-          // If not, use a local buffer to speed things up.
-          // For re-entrance, this bugger must be allocated on the stack,
-          // so be cautious with the size.
-          char tmp[MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE];
-          size_t togo = nbyte;
-          while (togo > 0)
-            {
-              std::size_t n
-                  = ((togo < sizeof (tmp)) ? togo : sizeof (tmp) - 1);
-              std::size_t i = 0;
-              for (; i < n; ++i, ++cbuf)
-                {
-                  tmp[i] = *cbuf;
-                }
-              tmp[i] = '\0';
+    // Since the single character debug channel is quite slow, try to
+    // optimize and send a null terminated string, if possible.
+    if (cbuf[nbyte] == '\0')
+      {
+        // Send string.
+        // The cast through void* is necessary to silence
+        // an alignment warning.
+        semihosting::call_host (
+            SEMIHOSTING_SYS_WRITE0,
+            reinterpret_cast<semihosting::param_block_t*> (
+                static_cast<void*> (const_cast<char*> (cbuf))));
+      }
+    else
+      {
+        // If not, use a local buffer to speed things up.
+        // For re-entrance, this bugger must be allocated on the stack,
+        // so be cautious with the size.
+        char tmp[MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE];
+        size_t togo = nbyte;
+        while (togo > 0)
+          {
+            std::size_t n = ((togo < sizeof (tmp)) ? togo : sizeof (tmp) - 1);
+            std::size_t i = 0;
+            for (; i < n; ++i, ++cbuf)
+              {
+                tmp[i] = *cbuf;
+              }
+            tmp[i] = '\0';
 
-              // The cast through void* is necessary to silence
-              // an alignment warning.
-              semihosting::call_host (
-                  SEMIHOSTING_SYS_WRITE0,
-                  reinterpret_cast<semihosting::param_block_t*> (
-                      static_cast<void*> (tmp)));
+            // The cast through void* is necessary to silence
+            // an alignment warning.
+            semihosting::call_host (
+                SEMIHOSTING_SYS_WRITE0,
+                reinterpret_cast<semihosting::param_block_t*> (
+                    static_cast<void*> (tmp)));
 
-              togo -= n;
-            }
-        }
+            togo -= n;
+          }
+      }
 
-      // All bytes written.
-      return static_cast<ssize_t> (nbyte);
-    }
+    // All bytes written.
+    return static_cast<ssize_t> (nbyte);
+  }
 
 #elif defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
 
-    ssize_t
-    write (const void* buf, std::size_t nbyte)
-    {
-      if (buf == nullptr || nbyte == 0)
-        {
-          return 0;
-        }
+  ssize_t
+  write (const void* buf, std::size_t nbyte)
+  {
+    if (buf == nullptr || nbyte == 0)
+      {
+        return 0;
+      }
 
-      static int handle; // STATIC!
+    static int handle; // STATIC!
 
-      // All fields should be large enough to hold a pointer.
-      semihosting::param_block_t params[3];
-      int ret;
+    // All fields should be large enough to hold a pointer.
+    semihosting::param_block_t params[3];
+    int ret;
 
-      if (handle == 0)
-        {
-          // On the very first call get the file handle from the host.
+    if (handle == 0)
+      {
+        // On the very first call get the file handle from the host.
 
-          // Special filename for stdin/out/err.
-          params[0] = const_cast<char*> (":tt");
-          params[1] = 4; // mode "w"
-          // Length of ":tt", except null terminator.
-          params[2] = sizeof (":tt") - 1;
+        // Special filename for stdin/out/err.
+        params[0] = const_cast<char*> (":tt");
+        params[1] = 4; // mode "w"
+        // Length of ":tt", except null terminator.
+        params[2] = sizeof (":tt") - 1;
 
-          ret = semihosting::call_host (
-              SEMIHOSTING_SYS_OPEN,
-              static_cast<semihosting::param_block_t*> (params));
-          if (ret == -1)
-            {
-              return -1;
-            }
+        ret = semihosting::call_host (
+            SEMIHOSTING_SYS_OPEN,
+            static_cast<semihosting::param_block_t*> (params));
+        if (ret == -1)
+          {
+            return -1;
+          }
 
-          handle = ret;
-        }
+        handle = ret;
+      }
 
-      params[0] = reinterpret_cast<semihosting::param_block_t> (handle);
-      params[1] = const_cast<semihosting::param_block_t> (buf);
-      params[2] = nbyte;
-      // Send character array to host file/device.
-      ret = semihosting::call_host (
-          SEMIHOSTING_SYS_WRITE,
-          static_cast<semihosting::param_block_t*> (params));
-      // This call returns the number of bytes NOT written (0 if all ok).
+    params[0] = reinterpret_cast<semihosting::param_block_t> (handle);
+    params[1] = const_cast<semihosting::param_block_t> (buf);
+    params[2] = nbyte;
+    // Send character array to host file/device.
+    ret = semihosting::call_host (
+        SEMIHOSTING_SYS_WRITE,
+        static_cast<semihosting::param_block_t*> (params));
+    // This call returns the number of bytes NOT written (0 if all ok).
 
-      // -1 is not a legal value, but SEGGER seems to return it
-      if (ret == -1)
-        {
-          return -1;
-        }
+    // -1 is not a legal value, but SEGGER seems to return it
+    if (ret == -1)
+      {
+        return -1;
+      }
 
-      // The compliant way of returning errors.
-      if (ret == static_cast<int> (nbyte))
-        {
-          return -1;
-        }
+    // The compliant way of returning errors.
+    if (ret == static_cast<int> (nbyte))
+      {
+        return -1;
+      }
 
-      // Return the number of bytes written.
-      return static_cast<ssize_t> ((nbyte)) - ret;
-    }
+    // Return the number of bytes written.
+    return static_cast<ssize_t> ((nbyte)) - ret;
+  }
 
 #endif // defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
 
-  } // namespace trace
-} // namespace micro_os_plus
+} // namespace micro_os_plus::trace
 
 #endif /* defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG) || \
           defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT) */

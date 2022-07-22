@@ -25,22 +25,19 @@
 
 // ----------------------------------------------------------------------------
 
-namespace micro_os_plus
+namespace micro_os_plus::semihosting
 {
-  namespace semihosting
+  // --------------------------------------------------------------------------
+  // Portable semihosting functions in C++.
+
+  inline __attribute__ ((always_inline)) response_t
+  call_host (int reason, param_block_t* arg)
   {
-    // ------------------------------------------------------------------------
-    // Portable semihosting functions in C++.
+    return micro_os_plus_semihosting_call_host (reason, arg);
+  }
 
-    inline __attribute__ ((always_inline)) response_t
-    call_host (int reason, param_block_t* arg)
-    {
-      return micro_os_plus_semihosting_call_host (reason, arg);
-    }
-
-    // ------------------------------------------------------------------------
-  } // namespace semihosting
-} // namespace micro_os_plus
+  // --------------------------------------------------------------------------
+} // namespace micro_os_plus::semihosting
 
 // ----------------------------------------------------------------------------
 
