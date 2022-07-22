@@ -33,7 +33,8 @@ micro_os_plus_semihosting_dependency = declare_dependency(
     'include',
   ),
   sources: files(
-    'src/syscalls-semihosting.cpp',
+    'src/semihosting-startup.cpp',
+    'src/semihosting-syscalls.cpp',
     'src/semihosting-trace.cpp'
   ),
   dependencies: [
@@ -43,7 +44,8 @@ micro_os_plus_semihosting_dependency = declare_dependency(
 )
 
 message('+ -I include')
-message('+ src/syscalls-semihosting.cpp')
+message('+ src/semihosting-startup.cpp')
+message('+ src/semihosting-syscalls.cpp')
 message('+ src/semihosting-trace.cpp')
 message('> micro_os_plus_semihosting_dependency')
 
