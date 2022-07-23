@@ -5,7 +5,9 @@
 
 This project provides support for semihosting.
 
-Although initially an ARM solution, it is quite portable and can be used on other architectures too.
+It complements the newlib
+implementation (arm/librdimon) with an extensive set of POSIX functions,
+which also include debugging support.
 
 The project is hosted on GitHub as
 [micro-os-plus/semihosting-xpack](https://github.com/micro-os-plus/semihosting-xpack).
@@ -54,7 +56,7 @@ xpm init # Unless a package.json is already present
 
 xpm install @micro-os-plus/semihosting@latest
 
-ls -l xpacks/micro-os-plus-architecture-cortexm
+ls -l xpacks/micro-os-plus-semihosting
 ```
 
 ### Git submodule
@@ -86,11 +88,16 @@ into `xpack`.
 
 ## Developer info
 
-TBD
+This project provides several components, which can be enabled separately:
+
+- the declarations for the basic semihosting calls
+- implementations for the system calls
+- implementations for the initialisations required during the startup
+- implementations for the debug trace channels via semihosting
 
 ### Status
 
-The ... are fully functional.
+The semihosting implementation is fully functional.
 
 ### C++ API
 
@@ -127,23 +134,77 @@ The architecture should provide a definition of the following function:
 
 To include this package in a project, consider the following details.
 
-#### Source files
-
-The source files to be added to the build are:
-
-TODO
-
 #### Include folders
 
 The following folders should be passed to the compiler during the build:
 
 - `include`
 
-TODO: list the available headers
+The header files to be included in user projects are:
+
+```c++
+#include <micro-os-plus/semihosting.h>
+```
+
+#### Source files
+
+The source files to be added to the build are:
+
+- `src/semihosting-startup.cpp`
+- `src/semihosting-syscalls.cpp`
+- `src/semihosting-trace.cpp`
 
 #### Preprocessor definitions
 
-TBD
+- `MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_SYSCALLS`
+- `MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES` 20
+- `MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_ACCEPT_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_BIND_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_CHDIR_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_CHMOD_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_CHOWN_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_CLOSEDIR_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_CONNECT_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_EXECVE_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_FCNTL_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_FORK_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_FSYNC_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_FTRUNCATE_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_GETPEERNAME_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_GETSOCKNAME_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_GETSOCKOPT_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_IOCTL_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_KILL_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_LINK_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_LISTEN_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_OPENDIR_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_RAISE_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_READDIR_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_READLINK_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_RECVFROM_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_RECVMSG_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_RECV_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_REWINDDIR_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_RMDIR_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SELECT_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SENDMSG_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SENDTO_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SEND_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SETSOCKOPT_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SHUTDOWN_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SOCKATMARK_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SOCKETPAIR_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SOCKET_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SYMLINK_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_SYNC_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_TRUNCATE_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_UTIME_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_WAIT_BRK`
+- `MICRO_OS_PLUS_DEBUG_SYSCALL_WRITEV_BRK`
+- `MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_STARTUP`
+- `MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE` 80
+- `MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE` 10
 
 #### Compiler options
 
@@ -152,11 +213,59 @@ TBD
 
 #### C++ Namespaces
 
-TBD
+- `micro_os_plus::semihosting`
 
 #### C++ Classes
 
-TBD
+- none
+
+#### Dependencies
+
+- the `@micro-os-plus/diag-trace` package, for the declarations of the
+  debug trace channels
+
+#### CMake
+
+To integrate the semihosting source library into a CMake application, add this
+folder to the build:
+
+```cmake
+add_subdirectory("xpacks/micro-os-plus-semihosting")`
+```
+
+The result is an interface library that can be added as an application
+dependency with:
+
+```cmake
+target_link_libraries(your-target PRIVATE
+
+  micro-os-plus::semihosting
+)
+```
+
+#### meson
+
+To integrate the µTest++ source library into a meson application, add this
+folder to the build:
+
+```meson
+subdir('xpacks/micro-os-plus-semihosting')
+```
+
+The result is a dependency object that can be added
+to an application with:
+
+```meson
+exe = executable(
+  your-target,
+  link_with: [
+    # Nothing, not static.
+  ],
+  dependencies: [
+    micro_os_plus_semihosting_dependency,
+  ]
+)
+```
 
 ### Examples
 
@@ -177,10 +286,15 @@ According to [semver](https://semver.org) rules:
 > Major version X (X.y.z | X > 0) MUST be incremented if any
 backwards incompatible changes are introduced to the public API.
 
-The incompatible changes, in reverse chronological order,
-are:
+The incompatible changes, in reverse chronological order, are:
 
-- TBD
+- v7.x: get rid of the C++ posix:: namespace
+- v6.x: rename source files
+- v5.x: rename SYS_GETCMDLINE; use param_block_t
+- v4.x: rename MICRO_OS_PLUS_DEBUG, MICRO_OS_PLUS_TRACE
+- v3.x: rename the micro_os_plus namespace
+- v2.x: update for new OpenOCD implementation; use the posix:: namespace
+- v1.x: the code was extracted from the mono-repo µOS++ project
 
 ## License
 

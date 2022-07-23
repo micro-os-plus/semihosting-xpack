@@ -20,6 +20,7 @@ and close existing issues and pull requests.
 
 ## 2022-05-24
 
+* v5.0.0
 * 25123f9 use param_block_t; rename SYS_GETCMDLINE
 * 2a7e329 semihosting.h: add extra numbers
 
