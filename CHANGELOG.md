@@ -6,9 +6,14 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2022-07-23
+
+* v7.0.0
+* 430bbbb #4: get rid of the C++ posix namespace
+
 ## 2022-07-22
 
-* v5.0.0
+* v6.0.0
 * 209fe7c reformat namespaces
 * 0e96151 split semihosting-startup.cpp
 * d0c8d25 rename semihosting-trace.cpp
