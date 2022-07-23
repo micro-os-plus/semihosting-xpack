@@ -29,6 +29,16 @@
 
 // ----------------------------------------------------------------------------
 
+#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE)
+#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE 80
+#endif
+
+#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE)
+#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE 10
+#endif
+
+// ----------------------------------------------------------------------------
+
 using namespace micro_os_plus;
 
 // ----------------------------------------------------------------------------
@@ -43,14 +53,6 @@ extern "C"
 }
 
 // ----------------------------------------------------------------------------
-
-#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE)
-#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE 80
-#endif // MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE
-
-#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE)
-#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE 10
-#endif // MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE
 
 // This is the semihosting implementation for the routine to
 // process arguments.

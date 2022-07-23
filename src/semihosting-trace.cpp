@@ -43,7 +43,7 @@ using namespace micro_os_plus;
 
 namespace micro_os_plus::trace
 {
-  // --------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
 
   void
   initialize (void)
@@ -57,7 +57,7 @@ namespace micro_os_plus::trace
     // For semihosting, no flush is required.
   }
 
-  // --------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
 
   // Semihosting is another output channel that can be used for the trace
   // messages. It comes in two flavours: STDOUT and DEBUG. The STDOUT channel
@@ -83,7 +83,7 @@ namespace micro_os_plus::trace
   // possible to run semihosting applications as standalone, without being
   // terminated with hardware faults.
 
-  // --------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
 
 #if defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG)
 
