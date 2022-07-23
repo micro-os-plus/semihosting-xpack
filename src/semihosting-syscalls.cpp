@@ -53,7 +53,7 @@ using namespace micro_os_plus;
 // ----------------------------------------------------------------------------
 
 /**
- * This file implements all POSIX functions over the ARM
+ * This file implements all POSIX functions over the Arm
  * semihosting API.
  *
  * Compliance:
