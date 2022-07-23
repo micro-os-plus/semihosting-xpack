@@ -20,6 +20,7 @@
     "WRITEC",
     "Wpadded",
     "Wunused",
+    "Xpmake",
     "buildtype",
     "cbuf",
     "cleanup",
@@ -27,6 +28,7 @@
     "cmsis",
     "cortexm",
     "ctest",
+    "diag",
     "eabi",
     "errorfds",
     "iovcnt",
@@ -45,5 +47,6 @@
     "xpack",
     "xpacks"
   ],
-  "cmake.configureOnOpen": false
+  "cmake.configureOnOpen": false,
+  "editor.wordWrap": "on"
 }
