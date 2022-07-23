@@ -1,0 +1,126 @@
+{
+  "minimumXpmakeRequired": "0.0.0",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2022 Liviu Ionescu",
+  "description": "Top semihosting components",
+  "cdlComponents": {
+    "semihosting": {
+      "description": "Define the Arm semihosting call numbers and API.",
+      "parent": "micro-os-plus",
+      "compilerIncludeFolders": [
+        "include"
+      ],
+      "compilerSourceFiles": [],
+      "compilerDefinitions": [],
+      "compilerOptions": [],
+      "dependencies": [],
+      "generatedDefinition": "MICRO_OS_PLUS_INCLUDE_SEMIHOSTING",
+      "cdlComponents": {
+        "startup": {
+          "description": "Get the command line arguments via SYS_GETCMDLINE and parse them as for main(arc, argv); pass the return code back to the debugger when the application terminates.",
+          "generatedDefinition": "MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_STARTUP",
+          "compilerIncludeFolders": [],
+          "compilerSourceFiles": [
+            "src/semihosting-startup.cpp"
+          ],
+          "compilerDefinitions": [],
+          "compilerOptions": [],
+          "dependencies": [],
+          "cdlOptions": {
+            "argsBufferArraySize": {
+              "description": "The maximum number of characters that can be received from the host; the buffer is modified in place, and space characters are replaced by nulls to mark the string terminators.",
+              "type": "integer",
+              "generatedDefinition": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE",
+              "defaultValue": 80
+            },
+            "argvBufferArraySize": {
+              "description": "The maximum number of arguments (pointers to strings) that can be passed as argv[] to main().",
+              "type": "integer",
+              "generatedDefinition": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE",
+              "defaultValue": 10
+            }
+          }
+        },
+        "syscalls": {
+          "description": "Implement all POSIX functions over the Arm semihosting API; it complements the newlib implementation and adds debugging support.",
+          "compilerIncludeFolders": [],
+          "compilerSourceFiles": [
+            "src/semihosting-syscalls.cpp"
+          ],
+          "compilerDefinitions": [],
+          "compilerOptions": [],
+          "dependencies": [],
+          "cdlOptions": {
+            "maxOpenFiles": {
+              "description": "The maximum number of files that can be simultaneously opened (the size of the statically allocated array storing the status of each opened file, i.e. an integer and offset); the first 3 entries are used for STDIN, STDOUT and STDERR.",
+              "type": "integer",
+              "generatedDefinition": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES",
+              "defaultValue": 20,
+              "legalValues": [
+                "4 to 100"
+              ]
+            },
+            "debugSyscallsBrk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK"
+            },
+            "debugSyscallAcceptBrk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_ACCEPT_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debugSyscallBindBrk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_BIND_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debugSyscallChdirBrk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_CHDIR_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "$comment": "TODO: add all 40..."
+          }
+        },
+        "trace": {
+          "description": "Implement the diag trace chanel via semihosting.",
+          "compilerIncludeFolders": [],
+          "compilerSourceFiles": [
+            "src/semihosting-trace.cpp"
+          ],
+          "compilerDefinitions": [],
+          "compilerOptions": [],
+          "dependencies": [
+            "micro-os-plus/diag-trace"
+          ],
+          "cdlComponents": {
+            "debug": {
+              "description": "A diag trace channel implemented over the semihosting SYS_WRITE0 call.",
+              "implementedInterfaces": [
+                "micro-os-plus/diag-trace"
+              ],
+              "generatedDefinition": "MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG",
+              "cdlOptions": {
+                "bufferArraySize": {
+                  "description": "The size of a local buffer allocated on the stack, used to speed up the display.",
+                  "type": "integer",
+                  "generatedDefinition": "MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE",
+                  "defaultValue": 16
+                }
+              }
+            },
+            "stdout": {
+              "description": "A diag trace channel implemented over the semihosting SYS_WRITE call on STDOUT.",
+              "implementedInterfaces": [
+                "micro-os-plus/diag-trace"
+              ],
+              "generatedDefinition": "MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT"
+            }
+          }
+        }
+      }
+    }
+  }
+}
