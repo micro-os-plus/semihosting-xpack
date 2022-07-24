@@ -30,13 +30,13 @@
             "argsBufferArraySize": {
               "description": "The maximum number of characters that can be received from the host; the buffer is modified in place, and space characters are replaced by nulls to mark the string terminators.",
               "type": "integer",
-              "generatedDefinition": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE",
+              "generatedDefinition": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE",
               "defaultValue": 80
             },
             "argvBufferArraySize": {
               "description": "The maximum number of arguments (pointers to strings) that can be passed as argv[] to main().",
               "type": "integer",
-              "generatedDefinition": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE",
+              "generatedDefinition": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE",
               "defaultValue": 10
             }
           }

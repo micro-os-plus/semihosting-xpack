@@ -29,12 +29,12 @@
 
 // ----------------------------------------------------------------------------
 
-#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE)
-#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE 80
+#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE)
+#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE 80
 #endif
 
-#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE)
-#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE 10
+#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE)
+#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE 10
 #endif
 
 // ----------------------------------------------------------------------------
@@ -63,25 +63,25 @@ void
 micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
 {
   // Array of chars to receive the command line from the host.
-  static char args_buf[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGS_BUF_ARRAY_SIZE];
+  static char cmdline[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE];
 
   // Array of pointers to store the final argv pointers (pointing
-  // in the above array).
-  static char* argv_buf[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_BUF_ARRAY_SIZE];
+  // in the cmdline array).
+  static char* argv[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE];
 
   int argc = 0;
   bool is_in_argument = false;
 
   semihosting::param_block_t fields[2];
-  fields[0] = reinterpret_cast<semihosting::param_block_t> (args_buf);
-  fields[1] = sizeof (args_buf) - 1;
+  fields[0] = reinterpret_cast<semihosting::param_block_t> (cmdline);
+  fields[1] = sizeof (cmdline) - 1;
   int ret = static_cast<int> (
       semihosting::call_host (SEMIHOSTING_SYS_GETCMDLINE, fields));
   if (ret == 0)
     {
       // In case the host send more than we can chew, limit the
       // string to our buffer.
-      args_buf[sizeof (args_buf) - 1] = '\0';
+      cmdline[sizeof (cmdline) - 1] = '\0';
 
       // The returned command line is a null terminated string.
       char* p = reinterpret_cast<char*> (fields[0]);
@@ -96,7 +96,7 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
               if (!isblank (ch))
                 {
                   if (argc >= static_cast<int> (
-                          (sizeof (argv_buf) / sizeof (argv_buf[0])) - 1))
+                          (sizeof (argv) / sizeof (argv[0])) - 1))
                     break;
 
                   if (ch == '"' || ch == '\'')
@@ -108,7 +108,7 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
                       ch = *p;
                     }
                   // Remember the arg beginning address.
-                  argv_buf[argc++] = p;
+                  argv[argc++] = p;
                   is_in_argument = true;
                 }
             }
@@ -134,16 +134,16 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
   if (argc == 0)
     {
       // No arguments found in string, return a single empty name.
-      args_buf[0] = '\0';
-      argv_buf[0] = &args_buf[0];
+      cmdline[0] = '\0';
+      argv[0] = &cmdline[0];
       ++argc;
     }
 
   // Must end the array with a null pointer.
-  argv_buf[argc] = nullptr;
+  argv[argc] = nullptr;
 
   *p_argc = argc;
-  *p_argv = &argv_buf[0];
+  *p_argv = &argv[0];
 
   return;
 }
