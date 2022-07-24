@@ -27,13 +27,13 @@
           "compilerOptions": [],
           "dependencies": [],
           "cdlOptions": {
-            "argsBufferArraySize": {
+            "args-buffer-array-size": {
               "description": "The maximum number of characters that can be received from the host; the buffer is modified in place, and space characters are replaced by nulls to mark the string terminators.",
               "type": "integer",
               "generatedDefinition": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE",
               "defaultValue": 80
             },
-            "argvBufferArraySize": {
+            "argv-buffer-array-size": {
               "description": "The maximum number of arguments (pointers to strings) that can be passed as argv[] to main().",
               "type": "integer",
               "generatedDefinition": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE",
@@ -51,7 +51,7 @@
           "compilerOptions": [],
           "dependencies": [],
           "cdlOptions": {
-            "maxOpenFiles": {
+            "max-open-files": {
               "description": "The maximum number of files that can be simultaneously opened (the size of the statically allocated array storing the status of each opened file, i.e. an integer and offset); the first 3 entries are used for STDIN, STDOUT and STDERR.",
               "type": "integer",
               "generatedDefinition": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES",
@@ -60,10 +60,10 @@
                 "4 to 100"
               ]
             },
-            "debugSyscallsBrk": {
+            "debug-syscalls-brk": {
               "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK"
             },
-            "debugSyscallChdirBrk": {
+            "debug-syscall-chdir-brk": {
               "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_CHDIR_BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
@@ -91,7 +91,7 @@
               ],
               "generatedDefinition": "MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG",
               "cdlOptions": {
-                "bufferArraySize": {
+                "buffer-array-size": {
                   "description": "The size of a local buffer allocated on the stack, used to speed up the display.",
                   "type": "integer",
                   "generatedDefinition": "MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE",
