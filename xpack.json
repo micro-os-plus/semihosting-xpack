@@ -69,7 +69,150 @@
                 "!debugSyscallsBrk"
               ]
             },
-            "$comment": "TODO: add all 40..."
+            "debug-syscall-chmod-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_CHMOD_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-chown-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_CHOWN_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-closedir-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_CLOSEDIR_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-execve-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_EXECVE_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-fcntl-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_FCNTL_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-fork-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_FORK_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-fsync-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_FSYNC_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-ftruncate-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_FTRUNCATE_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-ioctl-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_IOCTL_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-kill-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_KILL_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-link-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_LINK_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-opendir-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_OPENDIR_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-raise-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_RAISE_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-readdir-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_READDIR_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-readlink-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_READLINK_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-rewinddir-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_REWINDDIR_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-rmdir-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_RMDIR_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-select-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_SELECT_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-symlink-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_SYMLINK_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-sync-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_SYNC_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-truncate-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_TRUNCATE_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-utime-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_UTIME_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-wait-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_WAIT_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            },
+            "debug-syscall-writev-brk": {
+              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_WRITEV_BRK",
+              "activeIf": [
+                "!debugSyscallsBrk"
+              ]
+            }
           }
         },
         "trace": {
