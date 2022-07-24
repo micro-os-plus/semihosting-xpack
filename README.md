@@ -101,7 +101,7 @@ The semihosting implementation is fully functional.
 
 ### C++ API
 
-The following functions are available:
+The following functions are declared:
 
 ```c++
 namespace micro_os_plus::semihosting
@@ -157,7 +157,7 @@ The source files to be added to the build are:
 #### Preprocessor definitions
 
 - `MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_SYSCALLS`
-- `MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES` 20
+- `MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES` (20)
 - `MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK`
 - `MICRO_OS_PLUS_DEBUG_SYSCALL_CHDIR_BRK`
 - `MICRO_OS_PLUS_DEBUG_SYSCALL_CHMOD_BRK`
@@ -185,8 +185,8 @@ The source files to be added to the build are:
 - `MICRO_OS_PLUS_DEBUG_SYSCALL_WAIT_BRK`
 - `MICRO_OS_PLUS_DEBUG_SYSCALL_WRITEV_BRK`
 - `MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_STARTUP`
-- `MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE` 80
-- `MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE` 10
+- `MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE` (80)
+- `MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE` (10)
 
 #### Compiler options
 
