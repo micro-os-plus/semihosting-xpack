@@ -63,18 +63,6 @@
             "debugSyscallsBrk": {
               "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK"
             },
-            "debugSyscallAcceptBrk": {
-              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_ACCEPT_BRK",
-              "activeIf": [
-                "!debugSyscallsBrk"
-              ]
-            },
-            "debugSyscallBindBrk": {
-              "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_BIND_BRK",
-              "activeIf": [
-                "!debugSyscallsBrk"
-              ]
-            },
             "debugSyscallChdirBrk": {
               "generatedDefinition": "MICRO_OS_PLUS_DEBUG_SYSCALL_CHDIR_BRK",
               "activeIf": [
