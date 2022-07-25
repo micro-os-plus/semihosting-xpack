@@ -224,7 +224,7 @@
           "compilerDefinitions": [],
           "compilerOptions": [],
           "dependencies": [
-            "micro-os-plus/diag-trace"
+            "micro-os-plus::diag-trace"
           ],
           "cdlComponents": {
             "debug": {
