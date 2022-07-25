@@ -73,10 +73,13 @@ extern "C"
 
   // ----------------------------------------------------------------------------
 
-  // static int
-  // micro_os_plus_semihosting_call_host (int reason, void* arg);
+  // To allow for static inline optimizations, this definition is actually not
+  // in this package, but in the architecture semihosting-inlines.h file.
 
-  // The definition is in the architecture semihosting-inlines.h file.
+  // static micro_os_plus_semihosting_response_t
+  // micro_os_plus_semihosting_call_host (
+  //    int reason,
+  //    micro_os_plus_semihosting_param_block_t* arg);
 
 #if defined(__cplusplus)
 }
