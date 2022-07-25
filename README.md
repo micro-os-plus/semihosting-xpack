@@ -1,13 +1,14 @@
 [![license](https://img.shields.io/github/license/micro-os-plus/semihosting-xpack)](https://github.com/micro-os-plus/semihosting-xpack/blob/xpack/LICENSE)
-[![CI on Push](https://github.com/micro-os-plus/semihosting-xpack/workflows/CI%20on%20Push/badge.svg)](https://github.com/micro-os-plus/semihosting-xpack/actions?query=workflow%3A%22CI+on+Push%22)
+[![CI on Push](https://github.com/micro-os-plus/semihosting-xpack/actions/workflows/CI.yml/badge.svg)](https://github.com/micro-os-plus/semihosting-xpack/actions/workflows/CI.yml)
 
 # A source library xPack with the µOS++ semihosting support
 
-This project provides support for semihosting.
+This project provides the **XXXX YYYY** source library as an xPack
+dependency and includes support for semihosting.
 
 It complements the newlib
-implementation (arm/librdimon) with an extensive set of POSIX functions,
-which also include debugging support.
+implementation (arm/librdimon) with a more complete set of POSIX functions,
+and also includes debugging support.
 
 The project is hosted on GitHub as
 [micro-os-plus/semihosting-xpack](https://github.com/micro-os-plus/semihosting-xpack).
@@ -22,7 +23,7 @@ For maintainer info, please see the
 
 ## Install
 
-As a source library xPacks, the easiest way to add it to a project is via
+As a source library xPack, the easiest way to add it to a project is via
 **xpm**, but it can also be used as any Git project, for example as a submodule.
 
 ### Prerequisites
@@ -88,6 +89,8 @@ into `xpack`.
 
 ## Developer info
 
+### Overview
+
 This project provides several components, which can be enabled separately:
 
 - the declarations for the basic semihosting calls
@@ -97,28 +100,30 @@ This project provides several components, which can be enabled separately:
 
 ### Status
 
-The semihosting implementation is fully functional.
+The **semihosting** source library is fully functional.
 
 ### C++ API
 
-The following functions are declared:
+The C++ methods available to call semihosting functions are:
 
 ```c++
 namespace micro_os_plus::semihosting
 {
-  int
-  call_host (int reason, void* arg);
+  response_t
+  call_host (int reason, param_block_t* arg);
 }
 ```
 
 ### C API
 
-All C++ functions have C equivalents:
+The same functionality is available from a similar C function,
+defined in the architecture package:
 
 ```c
-  static int
-  micro_os_plus_semihosting_call_host (int reason, void* arg);
-
+static micro_os_plus_semihosting_response_t
+micro_os_plus_semihosting_call_host (
+    int reason,
+    micro_os_plus_semihosting_param_block_t* arg);
 ```
 
 ### Implementation
@@ -132,7 +137,16 @@ The architecture should provide a definition of the following function:
 
 ### Build & integration info
 
-To include this package in a project, consider the following details.
+The project is written in C++, and it is expected
+to be used in C and C++ projects.
+
+The source code was compiled with GCC 11, clang 12, clang 13
+arm-none-eabi-gcc 11, riscv-none-elf-gcc 12, and should be warning free.
+
+To ease the integration of this package into user projects, there
+are already made CMake and meson configuration files (see below).
+
+For other build systems, consider the following details:
 
 #### Include folders
 
@@ -156,6 +170,7 @@ The source files to be added to the build are:
 
 #### Preprocessor definitions
 
+- `MICRO_OS_PLUS_INCLUDE_CONFIG_H` - to include `<micro-os-plus/config.h>`
 - `MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_SYSCALLS`
 - `MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES` (20)
 - `MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK`
@@ -208,8 +223,8 @@ The source files to be added to the build are:
 
 #### CMake
 
-To integrate the semihosting source library into a CMake application, add this
-folder to the build:
+To integrate the semihosting source library into a CMake application,
+add this folder to the build:
 
 ```cmake
 add_subdirectory("xpacks/micro-os-plus-semihosting")`
@@ -227,8 +242,8 @@ target_link_libraries(your-target PRIVATE
 
 #### meson
 
-To integrate the µTest++ source library into a meson application, add this
-folder to the build:
+To integrate the semihosting source library into a meson application,
+add this folder to the build:
 
 ```meson
 subdir('xpacks/micro-os-plus-semihosting')
