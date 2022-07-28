@@ -71,6 +71,22 @@ extern "C"
     ADP_STOPPED_RUN_TIME_ERROR = ((2 << 16) + 35),
   };
 
+  //
+  enum semihosting_feature_magic_numbers
+  {
+    NUM_SHFB_MAGIC = 4,
+    SHFB_MAGIC_0 = 0x53,
+    SHFB_MAGIC_1 = 0x48,
+    SHFB_MAGIC_2 = 0x46,
+    SHFB_MAGIC_3 = 0x42
+  };
+
+  enum semihosting_extensions
+  {
+    SH_EXT_EXIT_EXTENDED_BITNUM = 0x0,
+    SH_EXT_STDOUT_STDERR_BITNUM = 0x1
+  };
+
   // ----------------------------------------------------------------------------
 
   // To allow for static inline optimizations, this definition is actually not
