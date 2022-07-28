@@ -6,14 +6,34 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2022-07-28
+
+* v7.1.0
+* 38d818b #7: rework, implement the newlib underscore functions
+* 94c139c semihosting.h: add feature magic numbers
+* 56799d5 update response to signed_register_t
+
+## 2022-07-25
+
+* be0bea9 semihosting.h: explain C declaration not here
+* 22c9f3d add preliminary xpack.json
+
+## 2022-07-24
+
+2022-07-24 * bf2f2be xpack.json: add missing *-brk options
+2022-07-24 * 61de2db xpack.json: no more camelCase for option names
+2022-07-24 * 3b41c6f #6: rename startup cmdline & argv
+2022-07-24 * 6dd77bb #5: remove socket functions
+
 ## 2022-07-23
 
-* v7.0.0
+* v7.0.0 (not published on npmjs)
+* 80c09e8 add experimental xpack.json
 * 430bbbb #4: get rid of the C++ posix namespace
 
 ## 2022-07-22
 
-* v6.0.0
+* v6.0.0 (not published on npmjs)
 * 209fe7c reformat namespaces
 * 0e96151 split semihosting-startup.cpp
 * d0c8d25 rename semihosting-trace.cpp
