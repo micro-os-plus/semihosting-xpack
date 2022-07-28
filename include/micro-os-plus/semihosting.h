@@ -97,7 +97,7 @@ namespace micro_os_plus::semihosting
   // Portable semihosting functions in C++.
 
   typedef micro_os_plus::architecture::register_t param_block_t;
-  typedef micro_os_plus::architecture::register_t response_t;
+  typedef micro_os_plus::architecture::signed_register_t response_t;
 
   response_t
   call_host (int reason, param_block_t* arg);
