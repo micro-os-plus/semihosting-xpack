@@ -159,31 +159,29 @@ namespace micro_os_plus::trace
 
     // All fields should be large enough to hold a pointer.
     semihosting::param_block_t params[3];
-    int ret;
+    semihosting::response_t ret;
 
     if (handle == 0)
       {
         // On the very first call get the file handle from the host.
 
         // Special filename for stdin/out/err.
-        params[0] = const_cast<char*> (":tt");
+        params[0] = reinterpret_cast<semihosting::param_block_t> (":tt");
         params[1] = 4; // mode "w"
         // Length of ":tt", except null terminator.
         params[2] = sizeof (":tt") - 1;
 
-        ret = semihosting::call_host (
-            SEMIHOSTING_SYS_OPEN,
-            static_cast<semihosting::param_block_t*> (params));
+        ret = semihosting::call_host (SEMIHOSTING_SYS_OPEN, params);
         if (ret == -1)
           {
             return -1;
           }
 
-        handle = ret;
+        handle = static_cast<int> (ret);
       }
 
-    params[0] = reinterpret_cast<semihosting::param_block_t> (handle);
-    params[1] = const_cast<semihosting::param_block_t> (buf);
+    params[0] = static_cast<semihosting::param_block_t> (handle);
+    params[1] = reinterpret_cast<semihosting::param_block_t> (buf);
     params[2] = nbyte;
     // Send character array to host file/device.
     ret = semihosting::call_host (

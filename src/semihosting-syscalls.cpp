@@ -35,10 +35,14 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <sys/time.h>
+#include <sys/timeb.h>
 #include <sys/times.h>
 #include <ctype.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+// DO NOT include it, not supported.
+// #include <dirent.h>
 
 // ----------------------------------------------------------------------------
 
@@ -58,7 +62,7 @@ using namespace micro_os_plus;
  *
  * Compliance:
  * "Semihosting for AArch32 and AArch64, Release 2.0"
- * https://static.docs.arm.com/100863/0200/semihosting.pdf
+ * https://github.com/ARM-software/abi-aa/releases/download/2022Q1/semihosting.pdf
  *
  * Notes: Reentrancy and 'errno'.
  * The standard headers define errno as '*(__errno())';
@@ -75,38 +79,10 @@ using namespace micro_os_plus;
 
 extern "C"
 {
-  struct dirent;
-
-  // The content of this structure is not relevant, it is here just to keep
-  // POSIX compatibility, in real life the directory class is used
-  // and casted to DIR.
-  typedef struct
-  {
-    // Empty.
-  } DIR;
-
-  // Maybe 64-bits?
-  typedef uint32_t socklen_t;
-
-  typedef unsigned int sa_family_t;
-
-  struct sockaddr;
-
-  struct fd_set;
-
-  // Name used by newlib; for compatibility reasons, better preserve it.
+  // This name is used by newlib; for compatibility reasons, better preserve
+  // it.
   void
   initialise_monitor_handles (void);
-
-  // Standard POSIX IO functions. Prototypes are from:
-  // http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html
-
-  int __attribute__ ((weak)) symlink (const char* existing, const char* _new);
-
-  ssize_t __attribute__ ((weak))
-  readlink (const char* path, char* buf, size_t bufsize);
-
-  int __attribute__ ((weak)) kill (pid_t pid, int sig);
 }
 
 // ----------------------------------------------------------------------------
@@ -160,9 +136,6 @@ namespace
 
   int
   check_error (int result);
-
-  off_t
-  lseek_impl (int fd, off_t offset, int whence);
 
   int
   stat_impl (int fd, struct stat* st);
@@ -319,79 +292,6 @@ namespace
     return result;
   }
 
-  /*
-   *  fd, is a user file descriptor.
-   */
-  off_t
-  lseek_impl (int fd, off_t offset, int whence)
-  {
-    file* pfd;
-
-    // Valid file descriptor?
-    pfd = find_slot (fd);
-    if (pfd == nullptr)
-      {
-        errno = EBADF;
-        return -1;
-      }
-
-    // Valid whence?
-    if ((whence != SEEK_CUR) && (whence != SEEK_SET) && (whence != SEEK_END))
-      {
-        errno = EINVAL;
-        return -1;
-      }
-
-    // Convert SEEK_CUR to SEEK_SET.
-    if (whence == SEEK_CUR)
-      {
-        offset += pfd->pos;
-        // The resulting file offset would be negative.
-        if (offset < 0)
-          {
-            errno = EINVAL;
-            if ((pfd->pos > 0) && (offset > 0))
-              {
-                errno = EOVERFLOW;
-              }
-            return -1;
-          }
-        whence = SEEK_SET;
-      }
-
-    semihosting::param_block_t fields[2];
-    int res;
-
-    if (whence == SEEK_END)
-      {
-        fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
-        res = check_error (static_cast<int> (
-            semihosting::call_host (SEMIHOSTING_SYS_FLEN, fields)));
-        if (res == -1)
-          {
-            return -1;
-          }
-        offset += res;
-      }
-
-    // This code only does absolute seeks.
-    fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
-    fields[1] = static_cast<semihosting::param_block_t> (offset);
-    res = check_error (static_cast<int> (
-        semihosting::call_host (SEMIHOSTING_SYS_SEEK, fields)));
-
-    // At this point ptr is the current file position.
-    if (res >= 0)
-      {
-        pfd->pos = offset;
-        return offset;
-      }
-    else
-      {
-        return -1;
-      }
-  }
-
   int
   stat_impl (int fd, struct stat* st)
   {
@@ -407,10 +307,12 @@ namespace
     st->st_mode |= S_IFCHR;
     st->st_blksize = 1024;
 
+    semihosting::param_block_t fields[1];
+    fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
+
     int res;
-    res = check_error (static_cast<int> (semihosting::call_host (
-        SEMIHOSTING_SYS_FLEN,
-        reinterpret_cast<semihosting::param_block_t*> (&pfd->handle))));
+    res = check_error (static_cast<int> (
+        semihosting::call_host (SEMIHOSTING_SYS_FLEN, fields)));
     if (res == -1)
       {
         return -1;
@@ -424,7 +326,74 @@ namespace
 } // namespace
 
 // ----------------------------------------------------------------------------
-// ---- Standard POSIX IO functions -------------------------------------------
+// ---- Newlib libgloss functions ---------------------------------------------
+
+extern "C"
+{
+  int
+  _open (const char* path, int oflag, ...);
+
+  int
+  _close (int fildes);
+
+  ssize_t
+  _read (int fildes, void* buf, size_t nbyte);
+
+  ssize_t
+  _write (int fildes, const void* buf, size_t nbyte);
+
+  off_t
+  _lseek (int fildes, off_t offset, int whence);
+
+  int
+  _isatty (int fildes);
+
+  int
+  _fstat (int fildes, struct stat* buf);
+
+  int
+  _stat (const char* path, struct stat* buf);
+
+  int
+  _rename (const char* existing, const char* _new);
+
+  int
+  _unlink (const char* path);
+
+  int
+  _system (const char* command);
+
+  int
+  _gettimeofday (timeval* ptimeval, void* ptimezone);
+
+  int
+  _ftime (timeb* tp);
+
+  clock_t
+  _times (tms* buf);
+
+  clock_t
+  _clock (void);
+
+  pid_t
+  _getpid (void);
+
+  int
+  _execve (const char* path, char* const argv[], char* const envp[]);
+
+  pid_t
+  _fork (void);
+
+  int
+  _kill (pid_t pid, int sig);
+
+  // In `include/sys/wait.h`
+  // pid_t
+  // _wait (int* stat_loc);
+
+  int
+  _link (const char* existing, const char* _new);
+}
 
 /**
  * @details
@@ -437,7 +406,7 @@ namespace
  * the file.
  */
 int
-open (const char* path, int oflag, ...)
+_open (const char* path, int oflag, ...)
 {
 
   int fd = new_slot ();
@@ -515,7 +484,7 @@ open (const char* path, int oflag, ...)
 }
 
 int
-close (int fildes)
+_close (int fildes)
 {
   file* pfd;
   pfd = find_slot (fildes);
@@ -559,7 +528,7 @@ close (int fildes)
 // bytes read.
 
 ssize_t
-read (int fildes, void* buf, size_t nbyte)
+_read (int fildes, void* buf, size_t nbyte)
 {
   file* pfd;
   pfd = find_slot (fildes);
@@ -582,7 +551,7 @@ read (int fildes, void* buf, size_t nbyte)
       semihosting::call_host (SEMIHOSTING_SYS_READ, fields)));
   if (res == -1)
     {
-      return res;
+      return -1;
     }
 
   pfd->pos += static_cast<off_t> (nbyte - static_cast<size_t> (res));
@@ -593,7 +562,7 @@ read (int fildes, void* buf, size_t nbyte)
 }
 
 ssize_t
-write (int fildes, const void* buf, size_t nbyte)
+_write (int fildes, const void* buf, size_t nbyte)
 {
   file* pfd;
   pfd = find_slot (fildes);
@@ -634,9 +603,73 @@ write (int fildes, const void* buf, size_t nbyte)
 }
 
 off_t
-lseek (int fildes, off_t offset, int whence)
+_lseek (int fildes, off_t offset, int whence)
 {
-  return lseek_impl (fildes, offset, whence);
+  file* pfd;
+
+  // Valid file descriptor?
+  pfd = find_slot (fildes);
+  if (pfd == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+
+  // Valid whence?
+  if ((whence != SEEK_CUR) && (whence != SEEK_SET) && (whence != SEEK_END))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  // Convert SEEK_CUR to SEEK_SET.
+  if (whence == SEEK_CUR)
+    {
+      offset += pfd->pos;
+      // The resulting file offset would be negative.
+      if (offset < 0)
+        {
+          errno = EINVAL;
+          if ((pfd->pos > 0) && (offset > 0))
+            {
+              errno = EOVERFLOW;
+            }
+          return -1;
+        }
+      whence = SEEK_SET;
+    }
+
+  semihosting::param_block_t fields[2];
+  int res;
+
+  if (whence == SEEK_END)
+    {
+      fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
+      res = check_error (static_cast<int> (
+          semihosting::call_host (SEMIHOSTING_SYS_FLEN, fields)));
+      if (res == -1)
+        {
+          return -1;
+        }
+      offset += res;
+    }
+
+  // This code only does absolute seeks.
+  fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
+  fields[1] = static_cast<semihosting::param_block_t> (offset);
+  res = check_error (static_cast<int> (
+      semihosting::call_host (SEMIHOSTING_SYS_SEEK, fields)));
+
+  // At this point ptr is the current file position.
+  if (res >= 0)
+    {
+      pfd->pos = offset;
+      return offset;
+    }
+  else
+    {
+      return -1;
+    }
 }
 
 /**
@@ -646,7 +679,7 @@ lseek (int fildes, off_t offset, int whence)
  * is associated with a terminal device.
  */
 int
-isatty (int fildes)
+_isatty (int fildes)
 {
   file* pfd;
   pfd = find_slot (fildes);
@@ -658,10 +691,12 @@ isatty (int fildes)
       return 0;
     }
 
+  semihosting::param_block_t fields[1];
+  fields[0] = static_cast<semihosting::param_block_t> (pfd->handle);
+
   int tty;
-  tty = static_cast<int> (semihosting::call_host (
-      SEMIHOSTING_SYS_ISTTY,
-      reinterpret_cast<semihosting::param_block_t*> (&pfd->handle)));
+  tty = static_cast<int> (
+      semihosting::call_host (SEMIHOSTING_SYS_ISTTY, fields));
 
   if (tty == 1)
     {
@@ -673,7 +708,7 @@ isatty (int fildes)
 }
 
 int
-fstat (int fildes, struct stat* buf)
+_fstat (int fildes, struct stat* buf)
 {
   memset (buf, 0, sizeof (*buf));
   return stat_impl (fildes, buf);
@@ -683,7 +718,7 @@ fstat (int fildes, struct stat* buf)
 // ----- POSIX file functions -----
 
 int
-stat (const char* path, struct stat* buf)
+_stat (const char* path, struct stat* buf)
 {
   int fd;
   memset (buf, 0, sizeof (*buf));
@@ -704,7 +739,7 @@ stat (const char* path, struct stat* buf)
 }
 
 int
-rename (const char* existing, const char* _new)
+_rename (const char* existing, const char* _new)
 {
   semihosting::param_block_t fields[4];
   fields[0] = reinterpret_cast<semihosting::param_block_t> (
@@ -721,7 +756,7 @@ rename (const char* existing, const char* _new)
 }
 
 int
-unlink (const char* path)
+_unlink (const char* path)
 {
   semihosting::param_block_t fields[2];
   fields[0] = reinterpret_cast<semihosting::param_block_t> (
@@ -739,7 +774,7 @@ unlink (const char* path)
 }
 
 int
-system (const char* command)
+_system (const char* command)
 {
   // Hmmm.  The ARM debug interface specification doesn't say whether
   // SYS_SYSTEM does the right thing with a null argument, or assign any
@@ -772,14 +807,14 @@ system (const char* command)
 }
 
 int
-gettimeofday (timeval* ptimeval, void* ptimezone)
+_gettimeofday (timeval* ptimeval, void* ptimezone)
 {
   timezone* tzp = static_cast<timezone*> (ptimezone);
   if (ptimeval)
     {
       // Ask the host for the seconds since the Unix epoch.
-      ptimeval->tv_sec = static_cast<time_t> (
-          semihosting::call_host (SEMIHOSTING_SYS_TIME, nullptr));
+      ptimeval->tv_sec
+          = semihosting::call_host (SEMIHOSTING_SYS_TIME, nullptr);
       ptimeval->tv_usec = 0;
     }
 
@@ -793,18 +828,30 @@ gettimeofday (timeval* ptimeval, void* ptimezone)
   return 0;
 }
 
+int
+_ftime (timeb* tp)
+{
+  // Ask the host for the seconds since the Unix epoch.
+  tp->time = semihosting::call_host (SEMIHOSTING_SYS_TIME, nullptr);
+  tp->millitm = 0;
+
+  return 0;
+}
+
 // Return a clock that ticks at 100Hz.
 clock_t
-clock (void)
+_clock (void)
 {
   clock_t timeval;
-  timeval = semihosting::call_host (SEMIHOSTING_SYS_CLOCK, nullptr);
+  timeval = static_cast<clock_t> (
+      semihosting::call_host (SEMIHOSTING_SYS_CLOCK, nullptr));
 
   return timeval;
 }
 
+// RISC-V provides a more elaborate definition in newlib.
 clock_t
-times (tms* buf)
+_times (tms* buf)
 {
   clock_t timeval = clock ();
   if (buf)
@@ -818,319 +865,17 @@ times (tms* buf)
   return timeval;
 }
 
-char*
-getcwd (char* buf, size_t size)
+pid_t
+_getpid (void)
 {
-  // no cwd available via semihosting, so we use the temporary folder
-  strncpy (buf, "/tmp", size);
-  return buf;
+  return 1;
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-// ----------------------------------------------------------------------------
-// ----- POSIX file_system functions -----
-
-// Required by Google Tests
 int
-mkdir (const char* path, mode_t mode)
-{
-#if 0
-    // always return true
-    return 0;
-#else
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS;
-  return -1;
-#endif
-}
-
-int
-rmdir (const char* path)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RMDIR_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-void
-sync (void)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SYNC_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-}
-
-// ----------------------------------------------------------------------------
-// ----- Directories functions -----
-
-DIR*
-opendir (const char* dirpath)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_OPENDIR_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return nullptr;
-}
-
-dirent*
-readdir (DIR* dirp)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_READDIR_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return nullptr;
-}
-
-int
-readdir_r (DIR* dirp, dirent* entry, dirent** result)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_READDIR_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-void
-rewinddir (DIR* dirp)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_REWINDDIR_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-}
-
-int
-closedir (DIR* dirp)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CLOSEDIR_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-#pragma GCC diagnostic pop
-
-// ----------------------------------------------------------------------------
-
-// These functions are defined here to avoid linker errors in free
-// standing applications. They might be called in some error cases
-// from library code.
-//
-// If you detect other functions to be needed, just let us know
-// and we'll add them.
-
-// ----------------------------------------------------------------------------
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-// ----------------------------------------------------------------------------
-// Not yet implemented.
-
-int
-select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-        timeval* timeout)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SELECT_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-int
-chdir (const char* path)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CHDIR_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-// ----------------------------------------------------------------------------
-// Not available via semihosting.
-
-ssize_t
-writev (int fildes, const struct iovec* iov, int iovcnt)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_WRITEV_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-int
-ioctl (int fildes, int request, ...)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_IOCTL_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-int
-fcntl (int fildes, int cmd, ...)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FCNTL_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-int
-ftruncate (int fildes, off_t length)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FTRUNCATE_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-int
-fsync (int fildes)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FSYNC_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-int
-chmod (const char* path, mode_t mode)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CHMOD_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-int
-truncate (const char* path, off_t length)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_TRUNCATE_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-int
-utime (const char* path, const struct utimbuf* times)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_UTIME_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-// ----------------------------------------------------------------------------
-// Unavailable in non-Unix embedded environments.
-
-int
-execve (const char* path, char* const argv[], char* const envp[])
+_execve (const char* path, char* const argv[], char* const envp[])
 {
 #if defined(MICRO_OS_PLUS_DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1145,7 +890,7 @@ execve (const char* path, char* const argv[], char* const envp[])
 }
 
 pid_t
-fork (void)
+_fork (void)
 {
 #if defined(MICRO_OS_PLUS_DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1159,14 +904,8 @@ fork (void)
   return -1;
 }
 
-pid_t
-getpid (void)
-{
-  return 1;
-}
-
 int
-kill (pid_t pid, int sig)
+_kill (pid_t pid, int sig)
 {
 #if defined(MICRO_OS_PLUS_DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1180,23 +919,8 @@ kill (pid_t pid, int sig)
   return -1;
 }
 
-int
-raise (int sig)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_RAISE_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
 pid_t
-wait (int* stat_loc)
+_wait (int* stat_loc)
 {
 #if defined(MICRO_OS_PLUS_DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1211,22 +935,7 @@ wait (int* stat_loc)
 }
 
 int
-chown (const char* path, uid_t owner, gid_t group)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_CHOWN_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-int
-link (const char* existing, const char* _new)
+_link (const char* existing, const char* _new)
 {
 #if defined(MICRO_OS_PLUS_DEBUG) \
     && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
@@ -1240,107 +949,38 @@ link (const char* existing, const char* _new)
   return -1;
 }
 
-int
-symlink (const char* existing, const char* _new)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_SYMLINK_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-ssize_t
-readlink (const char* path, char* buf, size_t bufsize)
-{
-#if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_READLINK_BRK))
-  architecture::brk ();
-#endif
-
-  trace::printf ("%s() ENOSYS\n", __FUNCTION__);
-
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
 #pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 
-extern "C"
+#if 0
+
+char*
+getcwd (char* buf, size_t size)
 {
+  // no cwd available via semihosting, so we use the temporary folder
+  strncpy (buf, "/tmp", size);
+  return buf;
+}
 
-  /**
-   * Alias the newlib specific functions.
-   *
-   * Aliases might not be very portable, but are very efficient.
-   *
-   * The aliases must be in the same compilation unit as the names
-   * they alias.
-   */
+#endif
 
-  int __attribute__ ((weak, alias ("chown")))
-  _chown (const char* path, uid_t owner, gid_t group);
+// ----------------------------------------------------------------------------
 
-  clock_t __attribute__ ((weak, alias ("clock"))) _clock (void);
+/*
 
-  int __attribute__ ((weak, alias ("close"))) _close (int fildes);
+Other RISC-V calls:
 
-  int __attribute__ ((weak, alias ("execve")))
-  _execve (const char* path, char* const argv[], char* const envp[]);
+int
+_access(const char *file, int mode);
 
-  pid_t __attribute__ ((weak, alias ("fork"))) _fork (void);
+int
+_fstatat(int dirfd, const char *file, struct stat *st, int flags);
 
-  int __attribute__ ((weak, alias ("fstat")))
-  _fstat (int fildes, struct stat* buf);
+int
+_openat(int dirfd, const char *name, int flags, int mode);
 
-  pid_t __attribute__ ((weak, alias ("getpid"))) _getpid (void);
-
-  int __attribute__ ((weak, alias ("gettimeofday")))
-  _gettimeofday (timeval* ptimeval, void* ptimezone);
-
-  int __attribute__ ((weak, alias ("isatty"))) _isatty (int fildes);
-
-  int __attribute__ ((weak, alias ("kill"))) _kill (pid_t pid, int sig);
-
-  int __attribute__ ((weak, alias ("link")))
-  _link (const char* existing, const char* _new);
-
-  off_t __attribute__ ((weak, alias ("lseek")))
-  _lseek (int fildes, off_t offset, int whence);
-
-  int __attribute__ ((weak, alias ("open")))
-  _open (const char* path, int oflag, ...);
-
-  ssize_t __attribute__ ((weak, alias ("read")))
-  _read (int fildes, void* buf, size_t nbyte);
-
-  ssize_t __attribute__ ((weak, alias ("readlink")))
-  _readlink (const char* path, char* buf, size_t bufsize);
-
-  int __attribute__ ((weak, alias ("stat")))
-  _stat (const char* path, struct stat* buf);
-
-  int __attribute__ ((weak, alias ("symlink")))
-  _symlink (const char* existing, const char* _new);
-
-  clock_t __attribute__ ((weak, alias ("times"))) _times (tms* buf);
-
-  int __attribute__ ((weak, alias ("unlink"))) _unlink (const char* name);
-
-  pid_t __attribute__ ((weak, alias ("wait"))) _wait (int* stat_loc);
-
-  ssize_t __attribute__ ((weak, alias ("write")))
-  _write (int fildes, const void* buf, size_t nbyte);
-
-} /* extern "C" */
+*/
 
 // ----------------------------------------------------------------------------
 
