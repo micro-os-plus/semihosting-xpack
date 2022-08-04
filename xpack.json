@@ -237,7 +237,7 @@
                 "buffer-array-size": {
                   "description": "The size of a local buffer allocated on the stack, used to speed up the display.",
                   "type": "integer",
-                  "generatedDefinition": "MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE",
+                  "generatedDefinition": "MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE",
                   "defaultValue": 16
                 }
               }

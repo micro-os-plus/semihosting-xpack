@@ -87,8 +87,8 @@ namespace micro_os_plus::trace
 
 #if defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG)
 
-#if !defined(MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE)
-#define MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE (16)
+#if !defined(MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE)
+#define MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE (16)
 #endif
 
   ssize_t
@@ -118,7 +118,7 @@ namespace micro_os_plus::trace
         // If not, use a local buffer to speed things up.
         // For re-entrance, this bugger must be allocated on the stack,
         // so be cautious with the size.
-        char tmp[MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE];
+        char tmp[MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE];
         size_t togo = nbyte;
         while (togo > 0)
           {
