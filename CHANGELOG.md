@@ -6,6 +6,13 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2022-08-04
+
+* v8.0.0
+* 4425dc3 rename MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE
+* d11f17e .vscode/settings.json: cmake.ignoreCMakeListsMissing
+* 6942748 .vscode/settings.json: makefile.configureOnOpen
+
 ## 2022-07-28
 
 * v7.1.0
