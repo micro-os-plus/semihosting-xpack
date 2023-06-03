@@ -2,7 +2,7 @@
 [![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/micro-os-plus/semihosting-xpack)](https://github.com/micro-os-plus/semihosting-xpack/tags/)
 [![npm (scoped)](https://img.shields.io/npm/v/@micro-os-plus/semihosting.svg?color=blue)](https://www.npmjs.com/package/@micro-os-plus/semihosting/)
 [![license](https://img.shields.io/github/license/micro-os-plus/semihosting-xpack)](https://github.com/micro-os-plus/semihosting-xpack/blob/xpack/LICENSE)
-[![CI on Push](https://github.com/micro-os-plus/semihosting-xpack/actions/workflows/CI.yml/badge.svg)](https://github.com/micro-os-plus/semihosting-xpack/actions/workflows/CI.yml)
+[![CI on Push](https://github.com/micro-os-plus/semihosting-xpack/actions/workflows/ci.yml/badge.svg)](https://github.com/micro-os-plus/semihosting-xpack/actions/workflows/ci.yml)
 
 # A source library xPack with the µOS++ semihosting support
 
