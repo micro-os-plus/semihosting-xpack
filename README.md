@@ -66,7 +66,7 @@ xpm init # Unless a package.json is already present
 
 xpm install @micro-os-plus/semihosting@latest
 
-ls -l xpacks/micro-os-plus-semihosting
+ls -l xpacks/@micro-os-plus/semihosting
 ```
 
 ### Git submodule
@@ -80,7 +80,7 @@ git init # Unless already a Git project
 mkdir -p xpacks
 
 git submodule add https://github.com/micro-os-plus/semihosting-xpack.git \
-  xpacks/micro-os-plus-semihosting
+  xpacks/@micro-os-plus/semihosting
 ```
 
 ## Branches
@@ -236,7 +236,7 @@ To integrate the semihosting source library into a CMake application,
 add this folder to the build:
 
 ```cmake
-add_subdirectory("xpacks/micro-os-plus-semihosting")`
+add_subdirectory("xpacks/@micro-os-plus/semihosting")`
 ```
 
 The result is an interface library that can be added as an application
@@ -255,7 +255,7 @@ To integrate the semihosting source library into a meson application,
 add this folder to the build:
 
 ```meson
-subdir('xpacks/micro-os-plus-semihosting')
+subdir('xpacks/@micro-os-plus/semihosting')
 ```
 
 The result is a dependency object that can be added
