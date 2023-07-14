@@ -13,11 +13,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/micro-os-plus/semihosting-xpack.git/"
+    "url": "https://github.com/micro-os-plus/semihosting-xpack.git"
   },
-  "homepage": "https://github.com/micro-os-plus/semihosting-xpack/",
+  "homepage": "https://github.com/micro-os-plus/semihosting-xpack",
   "bugs": {
-    "url": "https://github.com/micro-os-plus/semihosting-xpack/issues/"
+    "url": "https://github.com/micro-os-plus/semihosting-xpack/issues"
   },
   "keywords": [
     "xpack",
@@ -27,7 +27,7 @@
   "author": {
     "name": "Liviu Ionescu",
     "email": "ilg@livius.net",
-    "url": "https://github.com/ilg-ul/"
+    "url": "https://github.com/ilg-ul"
   },
   "dependencies": {},
   "bundleDependencies": [],
