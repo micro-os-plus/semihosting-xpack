@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/github/license/micro-os-plus/semihosting-xpack)](https://github.com/micro-os-plus/semihosting-xpack/blob/xpack/LICENSE)
 [![CI on Push](https://github.com/micro-os-plus/semihosting-xpack/actions/workflows/ci.yml/badge.svg)](https://github.com/micro-os-plus/semihosting-xpack/actions/workflows/ci.yml)
 
-# A source library xPack with the µOS++ semihosting support
+# A source code library with the µOS++ semihosting support
 
 This project provides the **XXXX YYYY** source library as an xPack
 dependency and includes support for semihosting.
@@ -304,7 +304,7 @@ The incompatible changes, in reverse chronological order, are:
 
 ## License
 
-The original content is released under the
-[MIT License](https://opensource.org/licenses/MIT/),
+Unless otherwise stated, the content is released under the terms of the
+[MIT License](https://opensource.org/licenses/mit/),
 with all rights reserved to
 [Liviu Ionescu](https://github.com/ilg-ul).
