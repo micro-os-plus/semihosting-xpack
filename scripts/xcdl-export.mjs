@@ -34,8 +34,6 @@ if (process.argv.length < 3) {
   process.exit(1)
 }
 
-const xcdlJsoncPath = process.argv[2]
-
 // ----------------------------------------------------------------------------
 
 const packageJsonPath = path.resolve(projectFolderPath, 'package.json')
@@ -44,6 +42,7 @@ if (!fs.existsSync(packageJsonPath)) {
   process.exit(1)
 }
 
+const xcdlJsoncPath = process.argv[2]
 if (!fs.existsSync(xcdlJsoncPath)) {
   console.error(`missing mandatory ${xcdlJsoncPath}...`)
   process.exit(1)
@@ -165,7 +164,10 @@ xcdlJson.cdlComponents = sorted
 
 // ----------------------------------------------------------------------------
 
+console.log(`Parsing ${path.basename(packageJsonPath)}...`)
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+
+// ----------------------------------------------------------------------------
 
 const context = {
   libraryFilePath: xcdlJsoncPath,
@@ -174,43 +176,48 @@ const context = {
 }
 
 console.log()
-console.log('"xcdl_context":')
+console.log('Liquid "context":')
 console.log(JSON.stringify(context, null, 2))
 
 // ----------------------------------------------------------------------------
 
-const engine = new Liquid({
+const liquidEngine = new Liquid({
   strictFilters: true,
   strictVariables: true,
   lenientIf: true,
 })
 
-const substitute = (fromFilePath, toFilePath) => {
-  console.log(`liquidjs -> ${toFilePath}`)
-  const template = fs.readFileSync(fromFilePath, 'utf8')
-  const result = engine.parseAndRenderSync(template, context)
-  fs.writeFileSync(toFilePath, result)
+const liquidSubstitute = (fromFilePath, toFilePath) => {
+  const fromRelativeFilePath = path.relative(process.cwd(), fromFilePath)
+  const toRelativeFilePath = path.relative(process.cwd(), toFilePath)
+  console.log(`liquidjs ${fromRelativeFilePath} -> ${toRelativeFilePath}`)
+  const templateContent = fs.readFileSync(fromFilePath, 'utf8')
+  const renderedResult = liquidEngine.parseAndRenderSync(templateContent, context)
+  fs.writeFileSync(toFilePath, renderedResult)
 }
 
 // ----------------------------------------------------------------------------
-
-const argv = process.argv.slice(2).join(' ')
 
 console.log()
 console.log('generating files...')
 console.log()
 
-substitute(
+liquidSubstitute(
   path.resolve(scriptFolderPath, 'templates', 'CMakeLists-liquid.txt'),
   path.resolve(projectFolderPath, 'CMakeLists.txt')
 )
 
-substitute(
+liquidSubstitute(
   path.resolve(scriptFolderPath, 'templates', 'meson-liquid.build'),
   path.resolve(projectFolderPath, 'meson.build')
 )
 
+// ----------------------------------------------------------------------------
+
+const scriptRelativePath = path.relative(process.cwd(), scriptPath)
+const argvs = process.argv.slice(2).join(' ')
+
 console.log()
-console.log(`node '${scriptName} ${argv}' done`)
+console.log(`'node ${scriptRelativePath} ${argvs}' done`)
 
 // ----------------------------------------------------------------------------
