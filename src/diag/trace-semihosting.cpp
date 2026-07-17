@@ -14,28 +14,22 @@
 
 // ----------------------------------------------------------------------------
 
-#if __has_include(<micro-os-plus/project-config.h>)
-#include <micro-os-plus/project-config.h>
-#elif __has_include(<micro-os-plus/config.h>)
-#pragma message "micro-os-plus/config.h is deprecated, rename to micro-os-plus/project-config.h and include it instead of micro-os-plus/config.h"
-#include <micro-os-plus/config.h>
-#endif // __has_include(<micro-os-plus/project-config.h>)
-
-#if defined(MICRO_OS_PLUS_TRACE)
-
-#if defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG) \
-    || defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
-
 #include <micro-os-plus/diag/trace.h>
+#include <micro-os-plus/semihosting.h>
 
 // ----------------------------------------------------------------------------
 
-#if defined(MICRO_OS_PLUS_DEBUG_SEMIHOSTING_FAULTS)
-#error \
-    "Cannot debug semihosting using semihosting trace; use MICRO_OS_PLUS_USE_TRACE_ITM"
-#endif
+#if defined(MICRO_OS_PLUS_DIAG_TRACE_ENABLED)
 
-#include <micro-os-plus/semihosting.h>
+#if defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED) \
+    || defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED)
+
+// ----------------------------------------------------------------------------
+
+#if defined(MICRO_OS_PLUS_SEMIHOSTING_DEBUG_FAULTS)
+#error \
+    "Cannot debug semihosting using semihosting trace; use MICRO_OS_PLUS_DIAG_TRACE_ITM_ENABLED"
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -43,23 +37,23 @@ using namespace micro_os_plus;
 
 // ----------------------------------------------------------------------------
 
-namespace micro_os_plus::trace
+namespace micro_os_plus::trace::detail
 {
-  // ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   void
-  initialize (void)
+  implementation::initialise (void) noexcept
   {
     // For semihosting, no inits are required.
   }
 
   void
-  flush (void)
+  implementation::flush (void) noexcept
   {
     // For semihosting, no flush is required.
   }
 
-  // ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   // Semihosting is another output channel that can be used for the trace
   // messages. It comes in two flavours: STDOUT and DEBUG. The STDOUT channel
@@ -85,16 +79,16 @@ namespace micro_os_plus::trace
   // possible to run semihosting applications as standalone, without being
   // terminated with hardware faults.
 
-  // ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
-#if defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG)
+#if defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED)
 
 #if !defined(MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE)
 #define MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE (16)
 #endif
 
   ssize_t
-  write (const void* buf, std::size_t nbyte)
+  implementation::write (const void* buf, std::size_t nbyte) noexcept
   {
     if (buf == nullptr || nbyte == 0)
       {
@@ -147,10 +141,10 @@ namespace micro_os_plus::trace
     return static_cast<ssize_t> (nbyte);
   }
 
-#elif defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
+#elif defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED)
 
   ssize_t
-  write (const void* buf, std::size_t nbyte)
+  implementation::write (const void* buf, std::size_t nbyte) noexcept
   {
     if (buf == nullptr || nbyte == 0)
       {
@@ -207,12 +201,12 @@ namespace micro_os_plus::trace
     return static_cast<ssize_t> ((nbyte)) - ret;
   }
 
-#endif // defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT)
+#endif // defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED)
 
-} // namespace micro_os_plus::trace
+} // namespace micro_os_plus::trace::detail
 
-#endif /* defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_DEBUG) || \
-          defined(MICRO_OS_PLUS_USE_TRACE_SEMIHOSTING_STDOUT) */
+#endif /* defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED) || \
+          defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED) */
 #endif // defined(MICRO_OS_PLUS_TRACE)
 
 // ----------------------------------------------------------------------------

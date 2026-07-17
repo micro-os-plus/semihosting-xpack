@@ -14,15 +14,6 @@
 
 // ----------------------------------------------------------------------------
 
-#if __has_include(<micro-os-plus/project-config.h>)
-#include <micro-os-plus/project-config.h>
-#elif __has_include(<micro-os-plus/config.h>)
-#pragma message "micro-os-plus/config.h is deprecated, rename to micro-os-plus/project-config.h and include it instead of micro-os-plus/config.h"
-#include <micro-os-plus/config.h>
-#endif // __has_include(<micro-os-plus/project-config.h>)
-
-#if defined(MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_STARTUP)
-
 #include <micro-os-plus/semihosting.h>
 #include <micro-os-plus/architecture.h>
 #include <micro-os-plus/diag/trace.h>
@@ -30,6 +21,8 @@
 #include <ctype.h>
 
 // ----------------------------------------------------------------------------
+
+#if defined(MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_STARTUP)
 
 #if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE)
 #define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE 80
@@ -152,7 +145,8 @@ micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
 
 // ----------------------------------------------------------------------------
 
-void __attribute__ ((noreturn, weak)) micro_os_plus_terminate (int code)
+void __attribute__ ((noreturn, weak))
+micro_os_plus_terminate (int code)
 {
 #if (__SIZEOF_POINTER__ == 4)
   semihosting::call_host (SEMIHOSTING_SYS_EXIT,
