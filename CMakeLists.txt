@@ -21,9 +21,9 @@
 # ~~~
 # target_link_libraries(your-target PUBLIC micro-os-plus::semihosting-startup)
 # target_link_libraries(your-target PUBLIC micro-os-plus::semihosting-syscalls)
-# target_link_libraries(your-target PUBLIC micro-os-plus::semihosting-trace-debug)
-# target_link_libraries(your-target PUBLIC micro-os-plus::semihosting-trace-stdout)
-# target_link_libraries(your-target PUBLIC micro-os-plus::semihosting-trace)
+# target_link_libraries(your-target PUBLIC micro-os-plus::diag-trace-semihosting-debug)
+# target_link_libraries(your-target PUBLIC micro-os-plus::diag-trace-semihosting-stdout)
+# target_link_libraries(your-target PUBLIC micro-os-plus::diag-trace-semihosting)
 # target_link_libraries(your-target PUBLIC micro-os-plus::semihosting)
 # ~~~
 
@@ -132,11 +132,14 @@ message (
 # Visibility keywords: PRIVATE applies to the target itself; INTERFACE passes
 # properties up to targets that link against it; PUBLIC does both.
 add_library (
-  micro-os-plus-semihosting-trace-debug-interface INTERFACE EXCLUDE_FROM_ALL
+  micro-os-plus-diag-trace-semihosting-debug-interface INTERFACE
+  EXCLUDE_FROM_ALL
 )
 
 if (COMMAND xpack_display_target_lists)
-  xpack_display_target_lists (micro-os-plus-semihosting-trace-debug-interface)
+  xpack_display_target_lists (
+    micro-os-plus-diag-trace-semihosting-debug-interface
+  )
 endif ()
 
 # -----------------------------------------------------------------------------
@@ -144,12 +147,12 @@ endif ()
 
 # https://cmake.org/cmake/help/v3.20/command/add_library.html#alias-libraries
 add_library (
-  micro-os-plus::semihosting-trace-debug ALIAS
-  micro-os-plus-semihosting-trace-debug-interface
+  micro-os-plus::diag-trace-semihosting-debug ALIAS
+  micro-os-plus-diag-trace-semihosting-debug-interface
 )
 message (
   VERBOSE
-  "> micro-os-plus::semihosting-trace-debug -> micro-os-plus-semihosting-trace-debug-interface"
+  "> micro-os-plus::diag-trace-semihosting-debug -> micro-os-plus-diag-trace-semihosting-debug-interface"
 )
 
 # -----------------------------------------------------------------------------
@@ -158,11 +161,14 @@ message (
 # Visibility keywords: PRIVATE applies to the target itself; INTERFACE passes
 # properties up to targets that link against it; PUBLIC does both.
 add_library (
-  micro-os-plus-semihosting-trace-stdout-interface INTERFACE EXCLUDE_FROM_ALL
+  micro-os-plus-diag-trace-semihosting-stdout-interface INTERFACE
+  EXCLUDE_FROM_ALL
 )
 
 if (COMMAND xpack_display_target_lists)
-  xpack_display_target_lists (micro-os-plus-semihosting-trace-stdout-interface)
+  xpack_display_target_lists (
+    micro-os-plus-diag-trace-semihosting-stdout-interface
+  )
 endif ()
 
 # -----------------------------------------------------------------------------
@@ -170,12 +176,12 @@ endif ()
 
 # https://cmake.org/cmake/help/v3.20/command/add_library.html#alias-libraries
 add_library (
-  micro-os-plus::semihosting-trace-stdout ALIAS
-  micro-os-plus-semihosting-trace-stdout-interface
+  micro-os-plus::diag-trace-semihosting-stdout ALIAS
+  micro-os-plus-diag-trace-semihosting-stdout-interface
 )
 message (
   VERBOSE
-  "> micro-os-plus::semihosting-trace-stdout -> micro-os-plus-semihosting-trace-stdout-interface"
+  "> micro-os-plus::diag-trace-semihosting-stdout -> micro-os-plus-diag-trace-semihosting-stdout-interface"
 )
 
 # -----------------------------------------------------------------------------
@@ -184,23 +190,23 @@ message (
 # Visibility keywords: PRIVATE applies to the target itself; INTERFACE passes
 # properties up to targets that link against it; PUBLIC does both.
 add_library (
-  micro-os-plus-semihosting-trace-interface INTERFACE EXCLUDE_FROM_ALL
+  micro-os-plus-diag-trace-semihosting-interface INTERFACE EXCLUDE_FROM_ALL
 )
 
 target_sources (
-  micro-os-plus-semihosting-trace-interface
+  micro-os-plus-diag-trace-semihosting-interface
   INTERFACE "src/diag/trace-semihosting.cpp"
 )
 
 target_link_libraries (
-  micro-os-plus-semihosting-trace-interface
+  micro-os-plus-diag-trace-semihosting-interface
   INTERFACE "micro-os-plus::diag-trace"
-            "micro-os-plus::semihosting-trace-debug"
-            "micro-os-plus::semihosting-trace-stdout"
+            "micro-os-plus::diag-trace-semihosting-debug"
+            "micro-os-plus::diag-trace-semihosting-stdout"
 )
 
 if (COMMAND xpack_display_target_lists)
-  xpack_display_target_lists (micro-os-plus-semihosting-trace-interface)
+  xpack_display_target_lists (micro-os-plus-diag-trace-semihosting-interface)
 endif ()
 
 # -----------------------------------------------------------------------------
@@ -208,12 +214,12 @@ endif ()
 
 # https://cmake.org/cmake/help/v3.20/command/add_library.html#alias-libraries
 add_library (
-  micro-os-plus::semihosting-trace ALIAS
-  micro-os-plus-semihosting-trace-interface
+  micro-os-plus::diag-trace-semihosting ALIAS
+  micro-os-plus-diag-trace-semihosting-interface
 )
 message (
   VERBOSE
-  "> micro-os-plus::semihosting-trace -> micro-os-plus-semihosting-trace-interface"
+  "> micro-os-plus::diag-trace-semihosting -> micro-os-plus-diag-trace-semihosting-interface"
 )
 
 # -----------------------------------------------------------------------------
@@ -229,11 +235,9 @@ target_include_directories (
 
 target_link_libraries (
   micro-os-plus-semihosting-interface
-  INTERFACE "micro-os-plus::diag-trace"
-            "micro-os-plus::architecture"
-            "micro-os-plus::semihosting-startup"
+  INTERFACE "micro-os-plus::diag-trace" "micro-os-plus::diag-trace-semihosting"
+            "micro-os-plus::architecture" "micro-os-plus::semihosting-startup"
             "micro-os-plus::semihosting-syscalls"
-            "micro-os-plus::semihosting-trace"
 )
 
 if (COMMAND xpack_display_target_lists)

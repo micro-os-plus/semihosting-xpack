@@ -15,9 +15,10 @@
       "sourceFiles": [],
       "dependencies": [
         "micro-os-plus.diag.trace",
+        "micro-os-plus.diag.trace.semihosting",
         "micro-os-plus.architecture"
       ],
-      // "$customDefine": "MICRO_OS_PLUS_INCLUDE_SEMIHOSTING",
+      // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_ENABLED",
       "cdlComponents": [
         {
           "id": "startup",
@@ -28,21 +29,21 @@
             "src/semihosting-startup.cpp"
           ],
           "dependencies": [],
-          "$customDefine": "MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_STARTUP",
+          // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ENABLED",
           "cdlOptions": [
             {
-              "id": "args-buffer-array-size",
+              "id": "cmdline-buffer-array-size",
               "description": "The maximum number of characters that can be received from the host; the buffer is modified in place, and space characters are replaced by nulls to mark the string terminators",
               "type": "integer",
               "defaultValue": 80,
-              // "customDefine": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_CMDLINE_BUFFER_ARRAY_SIZE_INTEGER"
             },
             {
               "id": "argv-buffer-array-size",
               "description": "The maximum number of arguments (pointers to strings) that can be passed as argv[] to main()",
               "type": "integer",
               "defaultValue": 10,
-              // "customDefine": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ARGV_BUFFER_ARRAY_SIZE_INTEGER"
             }
           ]
         },
@@ -55,6 +56,7 @@
             "src/semihosting-syscalls.cpp"
           ],
           "dependencies": [],
+          // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_ENABLED",
           "cdlOptions": [
             {
               "id": "max-open-files",
@@ -65,283 +67,241 @@
               "legalValues": [
                 "4 to 100"
               ],
-              // "customDefine": "MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER"
             },
             {
-              "id": "debug-syscalls-brk",
+              "id": "debug-brk",
               "display": "Debug syscalls BRK",
               "description": "Enable debugging for all syscalls BRK",
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-chdir-brk",
+              "id": "debug-chdir-brk",
               "display": "Debug syscall chdir() BRK",
               "description": "Enable debugging for the chdir() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_CHDIR_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHDIR_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-chmod-brk",
+              "id": "debug-chmod-brk",
               "display": "Debug syscall chmod() BRK",
               "description": "Enable debugging for the chmod() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_CHMOD_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHMOD_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-chown-brk",
+              "id": "debug-chown-brk",
               "display": "Debug syscall chown() BRK",
               "description": "Enable debugging for the chown() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_CHOWN_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHOWN_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-closedir-brk",
+              "id": "debug-closedir-brk",
               "display": "Debug syscall closedir() BRK",
               "description": "Enable debugging for the closedir() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_CLOSEDIR_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CLOSEDIR_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-execve-brk",
+              "id": "debug-execve-brk",
               "display": "Debug syscall execve() BRK",
               "description": "Enable debugging for the execve() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_EXECVE_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_EXECVE_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-fcntl-brk",
+              "id": "debug-fcntl-brk",
               "display": "Debug syscall fcntl() BRK",
               "description": "Enable debugging for the fcntl() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_FCNTL_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FCNTL_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-fork-brk",
+              "id": "debug-fork-brk",
               "display": "Debug syscall fork() BRK",
               "description": "Enable debugging for the fork() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_FORK_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FORK_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-fsync-brk",
+              "id": "debug-fsync-brk",
               "display": "Debug syscall fsync() BRK",
               "description": "Enable debugging for the fsync() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_FSYNC_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FSYNC_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-ftruncate-brk",
+              "id": "debug-ftruncate-brk",
               "display": "Debug syscall ftruncate() BRK",
               "description": "Enable debugging for the ftruncate() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_FTRUNCATE_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FTRUNCATE_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-ioctl-brk",
+              "id": "debug-ioctl-brk",
               "display": "Debug syscall ioctl() BRK",
               "description": "Enable debugging for the ioctl() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_IOCTL_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_IOCTL_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-kill-brk",
+              "id": "debug-kill-brk",
               "display": "Debug syscall kill() BRK",
               "description": "Enable debugging for the kill() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_KILL_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_KILL_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-link-brk",
+              "id": "debug-link-brk",
               "display": "Debug syscall link() BRK",
               "description": "Enable debugging for the link() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_LINK_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_LINK_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-opendir-brk",
+              "id": "debug-opendir-brk",
               "display": "Debug syscall opendir() BRK",
               "description": "Enable debugging for the opendir() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_OPENDIR_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_OPENDIR_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-raise-brk",
+              "id": "debug-raise-brk",
               "display": "Debug syscall raise() BRK",
               "description": "Enable debugging for the raise() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_RAISE_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_RAISE_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-readdir-brk",
+              "id": "debug-readdir-brk",
               "display": "Debug syscall readdir() BRK",
               "description": "Enable debugging for the readdir() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_READDIR_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_READDIR_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-readlink-brk",
+              "id": "debug-readlink-brk",
               "display": "Debug syscall readlink() BRK",
               "description": "Enable debugging for the readlink() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_READLINK_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_READLINK_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-rewinddir-brk",
+              "id": "debug-rewinddir-brk",
               "display": "Debug syscall rewinddir() BRK",
               "description": "Enable debugging for the rewinddir() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_REWINDDIR_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_REWINDDIR_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-rmdir-brk",
+              "id": "debug-rmdir-brk",
               "display": "Debug syscall rmdir() BRK",
               "description": "Enable debugging for the rmdir() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_RMDIR_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_RMDIR_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-select-brk",
+              "id": "debug-select-brk",
               "display": "Debug syscall select() BRK",
               "description": "Enable debugging for the select() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_SELECT_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SELECT_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-symlink-brk",
+              "id": "debug-symlink-brk",
               "display": "Debug syscall symlink() BRK",
               "description": "Enable debugging for the symlink() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_SYMLINK_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SYMLINK_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-sync-brk",
+              "id": "debug-sync-brk",
               "display": "Debug syscall sync() BRK",
               "description": "Enable debugging for the sync() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_SYNC_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SYNC_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-truncate-brk",
+              "id": "debug-truncate-brk",
               "display": "Debug syscall truncate() BRK",
               "description": "Enable debugging for the truncate() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_TRUNCATE_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_TRUNCATE_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-utime-brk",
+              "id": "debug-utime-brk",
               "display": "Debug syscall utime() BRK",
               "description": "Enable debugging for the utime() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_UTIME_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_UTIME_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-wait-brk",
+              "id": "debug-wait-brk",
               "display": "Debug syscall wait() BRK",
               "description": "Enable debugging for the wait() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_WAIT_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_WAIT_BRK_ENABLED"
             },
             {
-              "id": "debug-syscall-writev-brk",
+              "id": "debug-writev-brk",
               "display": "Debug syscall writev() BRK",
               "description": "Enable debugging for the writev() syscall BRK",
               "activeIf": [
                 "!debugSyscallsBrk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_DEBUG_SYSCALL_WRITEV_BRK"
+              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_WRITEV_BRK_ENABLED"
             }
           ]
         },
-        {
-          "id": "trace",
-          "display": "Semihosting trace",
-          "description": "Implement the diag trace chanel via semihosting",
-          "publicIncludeFolders": [],
-          "sourceFiles": [
-            "src/diag/trace-semihosting.cpp"
-          ],
-          "dependencies": [
-            "micro-os-plus.diag.trace"
-          ],
-          "cdlComponents": [
-            {
-              "id": "debug",
-              "display": "Trace via semihosting debug",
-              "description": "A diag trace channel implemented over the semihosting SYS_WRITE0 call",
-              "implements": [
-                "micro-os-plus.diag.trace.interface"
-              ],
-              // "customDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED",
-              "cdlOptions": [
-                {
-                  "name": "buffer-array-size",
-                  "display": "Semihosting trace buffer array size",
-                  "description": "The size of a local buffer allocated on the stack, used to speed up the display",
-                  "type": "integer",
-                  "defaultValue": 16,
-                  // "customDefine": "MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE"
-                }
-              ]
-            },
-            {
-              "id": "stdout",
-              "display": "Trace via semihosting stdout",
-              "description": "A diag trace channel implemented over the semihosting SYS_WRITE call on STDOUT",
-              "implements": [
-                "micro-os-plus.diag.trace.interface"
-              ],
-              // "customDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED"
-            }
-          ]
-        }
       ],
       "cdlOptions": [
         {
@@ -349,6 +309,50 @@
           "display": "Debug faults",
           "description": "Enable debugging for the semihosting trace channel faults",
           // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_DEBUG_FAULTS"
+        }
+      ]
+    },
+    {
+      "id": "micro-os-plus.diag.trace.semihosting",
+      "display": "Diagnostics trace over semihosting",
+      "description": "The semihosting trace::printf() implementation",
+      "publicIncludeFolders": [],
+      "sourceFiles": [
+        "src/diag/trace-semihosting.cpp"
+      ],
+      // Requires isEnabled('semihosting').
+      "dependencies": [
+        "micro-os-plus.diag.trace"
+      ],
+      // "customDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_ENABLED",
+      "cdlComponents": [
+        {
+          "id": "debug",
+          "display": "Trace via semihosting debug",
+          "description": "A diag trace channel implemented over the semihosting SYS_WRITE0 call",
+          "implements": [
+            "diag.trace.output-channel-interface"
+          ],
+          // "customDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED",
+          "cdlOptions": [
+            {
+              "name": "buffer-array-size",
+              "display": "Semihosting trace buffer array size",
+              "description": "The size of a local buffer allocated on the stack, used to speed up the display",
+              "type": "integer",
+              "defaultValue": 16,
+              // "customDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_BUFFER_ARRAY_SIZE_INTEGER"
+            }
+          ]
+        },
+        {
+          "id": "stdout",
+          "display": "Trace via semihosting stdout",
+          "description": "A diag trace channel implemented over the semihosting SYS_WRITE call on STDOUT",
+          "implements": [
+            "micro-os-plus.diag.trace.interface"
+          ],
+          // "customDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED"
         }
       ]
     }

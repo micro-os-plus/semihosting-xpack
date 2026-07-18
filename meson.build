@@ -21,9 +21,9 @@
 #
 # `dependencies: [micro_os_plus_semihosting_startup_dependency],`
 # `dependencies: [micro_os_plus_semihosting_syscalls_dependency],`
-# `dependencies: [micro_os_plus_semihosting_trace_debug_dependency],`
-# `dependencies: [micro_os_plus_semihosting_trace_stdout_dependency],`
-# `dependencies: [micro_os_plus_semihosting_trace_dependency],`
+# `dependencies: [micro_os_plus_diag_trace_semihosting_debug_dependency],`
+# `dependencies: [micro_os_plus_diag_trace_semihosting_stdout_dependency],`
+# `dependencies: [micro_os_plus_diag_trace_semihosting_dependency],`
 # `dependencies: [micro_os_plus_semihosting_dependency],`
 
 # Note: the Meson configuration is provided only as a proof of concept;
@@ -130,7 +130,7 @@ _local_link_args = []
 _local_link_with = []
 
 # https://mesonbuild.com/Reference-manual_functions.html#declare_dependency
-micro_os_plus_semihosting_trace_debug_dependency = declare_dependency(
+micro_os_plus_diag_trace_semihosting_debug_dependency = declare_dependency(
   include_directories: include_directories(_local_include_directories),
   compile_args: _local_compile_args,
   sources: files(_local_sources),
@@ -141,8 +141,8 @@ micro_os_plus_semihosting_trace_debug_dependency = declare_dependency(
 
 # Meson dependencies cannot differentiate between C and C++ compile args;
 # they are therefore exposed as separate variables alongside the dependency.
-micro_os_plus_semihosting_trace_debug_dependency_compile_c_args = _local_compile_c_args
-micro_os_plus_semihosting_trace_debug_dependency_compile_cpp_args = _local_compile_cpp_args
+micro_os_plus_diag_trace_semihosting_debug_dependency_compile_c_args = _local_compile_c_args
+micro_os_plus_diag_trace_semihosting_debug_dependency_compile_cpp_args = _local_compile_cpp_args
 
 foreach name : _local_include_directories
   message('+ -I ' + name)
@@ -150,7 +150,7 @@ endforeach
 foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args
   message('+ ' + name)
 endforeach
-message('> micro_os_plus_semihosting_trace_debug_dependency')
+message('> micro_os_plus_diag_trace_semihosting_debug_dependency')
 
 # -----------------------------------------------------------------------------
 
@@ -165,7 +165,7 @@ _local_link_args = []
 _local_link_with = []
 
 # https://mesonbuild.com/Reference-manual_functions.html#declare_dependency
-micro_os_plus_semihosting_trace_stdout_dependency = declare_dependency(
+micro_os_plus_diag_trace_semihosting_stdout_dependency = declare_dependency(
   include_directories: include_directories(_local_include_directories),
   compile_args: _local_compile_args,
   sources: files(_local_sources),
@@ -176,8 +176,8 @@ micro_os_plus_semihosting_trace_stdout_dependency = declare_dependency(
 
 # Meson dependencies cannot differentiate between C and C++ compile args;
 # they are therefore exposed as separate variables alongside the dependency.
-micro_os_plus_semihosting_trace_stdout_dependency_compile_c_args = _local_compile_c_args
-micro_os_plus_semihosting_trace_stdout_dependency_compile_cpp_args = _local_compile_cpp_args
+micro_os_plus_diag_trace_semihosting_stdout_dependency_compile_c_args = _local_compile_c_args
+micro_os_plus_diag_trace_semihosting_stdout_dependency_compile_cpp_args = _local_compile_cpp_args
 
 foreach name : _local_include_directories
   message('+ -I ' + name)
@@ -185,7 +185,7 @@ endforeach
 foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args
   message('+ ' + name)
 endforeach
-message('> micro_os_plus_semihosting_trace_stdout_dependency')
+message('> micro_os_plus_diag_trace_semihosting_stdout_dependency')
 
 # -----------------------------------------------------------------------------
 
@@ -205,12 +205,12 @@ _local_sources += [
 
 _local_dependencies += [
   micro_os_plus_diag_trace_dependency,
-  micro_os_plus_semihosting_trace_debug_dependency,
-  micro_os_plus_semihosting_trace_stdout_dependency,
+  micro_os_plus_diag_trace_semihosting_debug_dependency,
+  micro_os_plus_diag_trace_semihosting_stdout_dependency,
 ]
 
 # https://mesonbuild.com/Reference-manual_functions.html#declare_dependency
-micro_os_plus_semihosting_trace_dependency = declare_dependency(
+micro_os_plus_diag_trace_semihosting_dependency = declare_dependency(
   include_directories: include_directories(_local_include_directories),
   compile_args: _local_compile_args,
   sources: files(_local_sources),
@@ -221,8 +221,8 @@ micro_os_plus_semihosting_trace_dependency = declare_dependency(
 
 # Meson dependencies cannot differentiate between C and C++ compile args;
 # they are therefore exposed as separate variables alongside the dependency.
-micro_os_plus_semihosting_trace_dependency_compile_c_args = _local_compile_c_args
-micro_os_plus_semihosting_trace_dependency_compile_cpp_args = _local_compile_cpp_args
+micro_os_plus_diag_trace_semihosting_dependency_compile_c_args = _local_compile_c_args
+micro_os_plus_diag_trace_semihosting_dependency_compile_cpp_args = _local_compile_cpp_args
 
 foreach name : _local_include_directories
   message('+ -I ' + name)
@@ -230,7 +230,7 @@ endforeach
 foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args
   message('+ ' + name)
 endforeach
-message('> micro_os_plus_semihosting_trace_dependency')
+message('> micro_os_plus_diag_trace_semihosting_dependency')
 
 # -----------------------------------------------------------------------------
 
@@ -250,10 +250,10 @@ _local_include_directories += [
 
 _local_dependencies += [
   micro_os_plus_diag_trace_dependency,
+  micro_os_plus_diag_trace_semihosting_dependency,
   micro_os_plus_architecture_dependency,
   micro_os_plus_semihosting_startup_dependency,
   micro_os_plus_semihosting_syscalls_dependency,
-  micro_os_plus_semihosting_trace_dependency,
 ]
 
 # https://mesonbuild.com/Reference-manual_functions.html#declare_dependency
