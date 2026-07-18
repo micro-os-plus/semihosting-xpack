@@ -39,10 +39,11 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_SYSCALLS)
+#if defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED) \
+    && defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_ENABLED)
 
-#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
-#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES (20)
+#if !defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER)
+#define MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER (20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -115,7 +116,7 @@ namespace
    *
    * Every other function must use find_slot().
    */
-  file opened_files[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES];
+  file opened_files[MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER];
 
   file*
   find_slot (int fd);
@@ -189,7 +190,8 @@ initialise_monitor_handles (void)
       monitor_stderr = monitor_stdout;
     }
 
-  for (int i = 0; i < MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES; i++)
+  for (int i = 0;
+       i < MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER; i++)
     {
       opened_files[i].handle = -1;
     }
@@ -216,7 +218,7 @@ namespace
   find_slot (int fd)
   {
     if (static_cast<size_t> (fd)
-        >= MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
+        >= MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER)
       {
         // File descriptor is out of range.
         return nullptr;
@@ -240,7 +242,8 @@ namespace
   new_slot (void)
   {
     size_t i;
-    for (i = 0; i < MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES; i++)
+    for (i = 0; i < MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER;
+         i++)
       {
         if (opened_files[i].handle == -1)
           {
@@ -248,7 +251,7 @@ namespace
           }
       }
 
-    if (i == MICRO_OS_PLUS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
+    if (i == MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER)
       {
         return -1;
       }
@@ -873,8 +876,9 @@ int
 _execve (const char* path, char* const argv[], char* const envp[])
 {
 #if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_EXECVE_BRK))
+    && (defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED) \
+        || defined( \
+            MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_EXECVE_BRK_ENABLED))
   architecture::brk ();
 #endif
 
@@ -888,8 +892,9 @@ pid_t
 _fork (void)
 {
 #if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_FORK_BRK))
+    && (defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED) \
+        || defined( \
+            MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FORK_BRK_ENABLED))
   architecture::brk ();
 #endif
 
@@ -903,8 +908,9 @@ int
 _kill (pid_t pid, int sig)
 {
 #if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_KILL_BRK))
+    && (defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED) \
+        || defined( \
+            MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_KILL_BRK_ENABLED))
   architecture::brk ();
 #endif
 
@@ -918,8 +924,9 @@ pid_t
 _wait (int* stat_loc)
 {
 #if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_WAIT_BRK))
+    && (defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED) \
+        || defined( \
+            MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_OPENDIR_BRK_ENABLED))
   architecture::brk ();
 #endif
 
@@ -933,8 +940,9 @@ int
 _link (const char* existing, const char* _new)
 {
 #if defined(MICRO_OS_PLUS_DEBUG) \
-    && (defined(MICRO_OS_PLUS_DEBUG_SYSCALLS_BRK) \
-        || defined(MICRO_OS_PLUS_DEBUG_SYSCALL_LINK_BRK))
+    && (defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED) \
+        || defined( \
+            MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_LINK_BRK_ENABLED))
   architecture::brk ();
 #endif
 
@@ -979,7 +987,8 @@ _openat(int dirfd, const char *name, int flags, int mode);
 
 // ----------------------------------------------------------------------------
 
-#endif // defined(MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_SYSCALLS)
+#endif // defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED) &&
+       // defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_ENABLED)
 
 // ----------------------------------------------------------------------------
 

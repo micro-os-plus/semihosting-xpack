@@ -36,6 +36,10 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED)
+
+// ----------------------------------------------------------------------------
+
 #if defined(__cplusplus)
 extern "C"
 {
@@ -148,6 +152,8 @@ namespace micro_os_plus::semihosting
 #include <micro-os-plus/semihosting-inlines.h>
 
 // ----------------------------------------------------------------------------
+
+#endif // defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED)
 
 #endif // MICRO_OS_PLUS_SEMIHOSTING_H_
 

@@ -22,14 +22,16 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_STARTUP)
+#if defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED) \
+    && defined(MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ENABLED)
 
-#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE)
-#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE 80
+#if !defined( \
+    MICRO_OS_PLUS_SEMIHOSTING_STARTUP_CMDLINE_BUFFER_ARRAY_SIZE_INTEGER)
+#define MICRO_OS_PLUS_SEMIHOSTING_STARTUP_CMDLINE_BUFFER_ARRAY_SIZE_INTEGER 80
 #endif
 
-#if !defined(MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE)
-#define MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE 10
+#if !defined(MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ARGV_BUFFER_ARRAY_SIZE_INTEGER)
+#define MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ARGV_BUFFER_ARRAY_SIZE_INTEGER 10
 #endif
 
 // ----------------------------------------------------------------------------
@@ -58,11 +60,13 @@ void
 micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
 {
   // Array of chars to receive the command line from the host.
-  static char cmdline[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_CMDLINE_ARRAY_SIZE];
+  static char cmdline
+      [MICRO_OS_PLUS_SEMIHOSTING_STARTUP_CMDLINE_BUFFER_ARRAY_SIZE_INTEGER];
 
   // Array of pointers to store the final argv pointers (pointing
   // in the cmdline array).
-  static char* argv[MICRO_OS_PLUS_INTEGER_SEMIHOSTING_ARGV_ARRAY_SIZE];
+  static char*
+      argv[MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ARGV_BUFFER_ARRAY_SIZE_INTEGER];
 
   int argc = 0;
   bool is_in_argument = false;
@@ -173,7 +177,8 @@ micro_os_plus_terminate (int code)
 
 // ----------------------------------------------------------------------------
 
-#endif // defined(MICRO_OS_PLUS_INCLUDE_SEMIHOSTING_STARTUP)
+#endif // defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED) &&
+       // defined(MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ENABLED)
 
 // ----------------------------------------------------------------------------
 

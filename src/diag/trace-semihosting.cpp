@@ -19,7 +19,8 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(MICRO_OS_PLUS_DIAG_TRACE_ENABLED)
+#if defined(MICRO_OS_PLUS_DIAG_TRACE_ENABLED) \
+    && defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_ENABLED)
 
 #if defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED) \
     || defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED)
@@ -45,12 +46,6 @@ namespace micro_os_plus::trace::detail
   implementation::initialise (void) noexcept
   {
     // For semihosting, no inits are required.
-  }
-
-  void
-  implementation::flush (void) noexcept
-  {
-    // For semihosting, no flush is required.
   }
 
   // --------------------------------------------------------------------------
@@ -203,11 +198,21 @@ namespace micro_os_plus::trace::detail
 
 #endif // defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED)
 
+  // --------------------------------------------------------------------------
+
+  void
+  implementation::flush (void) noexcept
+  {
+    // For semihosting, no flush is required.
+  }
+
 } // namespace micro_os_plus::trace::detail
 
-#endif /* defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED) || \
-          defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED) */
-#endif // defined(MICRO_OS_PLUS_TRACE)
+#endif // defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED) ||
+       //  defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED)
+
+#endif // defined(MICRO_OS_PLUS_DIAG_TRACE_ENABLED) &&
+       // defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_ENABLED)
 
 // ----------------------------------------------------------------------------
 
