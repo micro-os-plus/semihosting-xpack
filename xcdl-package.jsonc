@@ -19,10 +19,10 @@
         "micro-os-plus.architecture"
       ],
       "generatedFile": {
-        "type": "header",
+        "type": "c-header",
         "filePath": "{{buildFolderPath}}/generated/include/micro-os-plus/semihosting-defines.h"
       },
-      // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_ENABLED",
+      // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_ENABLED",
       "cdlComponents": [
         {
           "id": "startup",
@@ -33,21 +33,21 @@
             "src/semihosting-startup.cpp"
           ],
           "dependencies": [],
-          // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ENABLED",
+          // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ENABLED",
           "cdlOptions": [
             {
               "id": "cmdline-buffer-array-size",
               "description": "The maximum number of characters that can be received from the host; the buffer is modified in place, and space characters are replaced by nulls to mark the string terminators",
               "type": "integer",
               "defaultValue": 80,
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_CMDLINE_BUFFER_ARRAY_SIZE_INTEGER"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_CMDLINE_BUFFER_ARRAY_SIZE_INTEGER"
             },
             {
               "id": "argv-buffer-array-size",
               "description": "The maximum number of arguments (pointers to strings) that can be passed as argv[] to main()",
               "type": "integer",
               "defaultValue": 10,
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ARGV_BUFFER_ARRAY_SIZE_INTEGER"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ARGV_BUFFER_ARRAY_SIZE_INTEGER"
             }
           ]
         },
@@ -60,7 +60,7 @@
             "src/semihosting-syscalls.cpp"
           ],
           "dependencies": [],
-          // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_ENABLED",
+          // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_ENABLED",
           "cdlOptions": [
             {
               "id": "max-open-files",
@@ -71,13 +71,13 @@
               "legalValues": [
                 "4 to 100"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER"
             },
             {
               "id": "debug-brk",
               "display": "Debug syscalls BRK",
               "description": "Enable debugging for all syscalls BRK",
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED"
             },
             {
               "id": "debug-chdir-brk",
@@ -86,7 +86,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHDIR_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHDIR_BRK_ENABLED"
             },
             {
               "id": "debug-chmod-brk",
@@ -95,7 +95,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHMOD_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHMOD_BRK_ENABLED"
             },
             {
               "id": "debug-chown-brk",
@@ -104,7 +104,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHOWN_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHOWN_BRK_ENABLED"
             },
             {
               "id": "debug-closedir-brk",
@@ -113,7 +113,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CLOSEDIR_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CLOSEDIR_BRK_ENABLED"
             },
             {
               "id": "debug-execve-brk",
@@ -122,7 +122,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_EXECVE_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_EXECVE_BRK_ENABLED"
             },
             {
               "id": "debug-fcntl-brk",
@@ -131,7 +131,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FCNTL_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FCNTL_BRK_ENABLED"
             },
             {
               "id": "debug-fork-brk",
@@ -140,7 +140,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FORK_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FORK_BRK_ENABLED"
             },
             {
               "id": "debug-fsync-brk",
@@ -149,7 +149,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FSYNC_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FSYNC_BRK_ENABLED"
             },
             {
               "id": "debug-ftruncate-brk",
@@ -158,7 +158,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FTRUNCATE_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FTRUNCATE_BRK_ENABLED"
             },
             {
               "id": "debug-ioctl-brk",
@@ -167,7 +167,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_IOCTL_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_IOCTL_BRK_ENABLED"
             },
             {
               "id": "debug-kill-brk",
@@ -176,7 +176,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_KILL_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_KILL_BRK_ENABLED"
             },
             {
               "id": "debug-link-brk",
@@ -185,7 +185,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_LINK_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_LINK_BRK_ENABLED"
             },
             {
               "id": "debug-opendir-brk",
@@ -194,7 +194,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_OPENDIR_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_OPENDIR_BRK_ENABLED"
             },
             {
               "id": "debug-raise-brk",
@@ -203,7 +203,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_RAISE_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_RAISE_BRK_ENABLED"
             },
             {
               "id": "debug-readdir-brk",
@@ -212,7 +212,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_READDIR_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_READDIR_BRK_ENABLED"
             },
             {
               "id": "debug-readlink-brk",
@@ -221,7 +221,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_READLINK_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_READLINK_BRK_ENABLED"
             },
             {
               "id": "debug-rewinddir-brk",
@@ -230,7 +230,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_REWINDDIR_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_REWINDDIR_BRK_ENABLED"
             },
             {
               "id": "debug-rmdir-brk",
@@ -239,7 +239,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_RMDIR_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_RMDIR_BRK_ENABLED"
             },
             {
               "id": "debug-select-brk",
@@ -248,7 +248,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SELECT_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SELECT_BRK_ENABLED"
             },
             {
               "id": "debug-symlink-brk",
@@ -257,7 +257,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SYMLINK_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SYMLINK_BRK_ENABLED"
             },
             {
               "id": "debug-sync-brk",
@@ -266,7 +266,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SYNC_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SYNC_BRK_ENABLED"
             },
             {
               "id": "debug-truncate-brk",
@@ -275,7 +275,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_TRUNCATE_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_TRUNCATE_BRK_ENABLED"
             },
             {
               "id": "debug-utime-brk",
@@ -284,7 +284,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_UTIME_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_UTIME_BRK_ENABLED"
             },
             {
               "id": "debug-wait-brk",
@@ -293,7 +293,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_WAIT_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_WAIT_BRK_ENABLED"
             },
             {
               "id": "debug-writev-brk",
@@ -302,7 +302,7 @@
               "activeIf": [
                 "!debug-brk"
               ],
-              // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_WRITEV_BRK_ENABLED"
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_WRITEV_BRK_ENABLED"
             }
           ]
         },
@@ -312,7 +312,7 @@
           "id": "debug-faults",
           "display": "Debug faults",
           "description": "Enable debugging for the semihosting trace channel faults",
-          // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_DEBUG_FAULTS"
+          // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_DEBUG_FAULTS"
         }
       ]
     },
@@ -328,7 +328,7 @@
       "dependencies": [
         "micro-os-plus.diag.trace"
       ],
-      // "customDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_ENABLED",
+      // "defaultDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_ENABLED",
       "cdlComponents": [
         {
           "id": "debug",
@@ -337,7 +337,7 @@
           "implements": [
             "diag.trace.output-channel-interface"
           ],
-          // "customDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED",
+          // "defaultDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED",
           "cdlOptions": [
             {
               "name": "buffer-array-size",
@@ -345,7 +345,7 @@
               "description": "The size of a local buffer allocated on the stack, used to speed up the display",
               "type": "integer",
               "defaultValue": 16,
-              // "customDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_BUFFER_ARRAY_SIZE_INTEGER"
+              // "defaultDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_BUFFER_ARRAY_SIZE_INTEGER"
             }
           ]
         },
@@ -356,7 +356,7 @@
           "implements": [
             "micro-os-plus.diag.trace.interface"
           ],
-          // "customDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED"
+          // "defaultDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED"
         }
       ]
     }
