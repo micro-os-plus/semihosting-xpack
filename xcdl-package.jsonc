@@ -18,6 +18,10 @@
         "micro-os-plus.diag.trace.semihosting",
         "micro-os-plus.architecture"
       ],
+      "generatedFile": {
+        "type": "header",
+        "filePath": "{{buildFolderPath}}/generated/include/micro-os-plus/semihosting-defines.h"
+      },
       // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_ENABLED",
       "cdlComponents": [
         {
@@ -80,7 +84,7 @@
               "display": "Debug syscall chdir() BRK",
               "description": "Enable debugging for the chdir() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHDIR_BRK_ENABLED"
             },
@@ -89,7 +93,7 @@
               "display": "Debug syscall chmod() BRK",
               "description": "Enable debugging for the chmod() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHMOD_BRK_ENABLED"
             },
@@ -98,7 +102,7 @@
               "display": "Debug syscall chown() BRK",
               "description": "Enable debugging for the chown() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CHOWN_BRK_ENABLED"
             },
@@ -107,7 +111,7 @@
               "display": "Debug syscall closedir() BRK",
               "description": "Enable debugging for the closedir() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_CLOSEDIR_BRK_ENABLED"
             },
@@ -116,7 +120,7 @@
               "display": "Debug syscall execve() BRK",
               "description": "Enable debugging for the execve() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_EXECVE_BRK_ENABLED"
             },
@@ -125,7 +129,7 @@
               "display": "Debug syscall fcntl() BRK",
               "description": "Enable debugging for the fcntl() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FCNTL_BRK_ENABLED"
             },
@@ -134,7 +138,7 @@
               "display": "Debug syscall fork() BRK",
               "description": "Enable debugging for the fork() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FORK_BRK_ENABLED"
             },
@@ -143,7 +147,7 @@
               "display": "Debug syscall fsync() BRK",
               "description": "Enable debugging for the fsync() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FSYNC_BRK_ENABLED"
             },
@@ -152,7 +156,7 @@
               "display": "Debug syscall ftruncate() BRK",
               "description": "Enable debugging for the ftruncate() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FTRUNCATE_BRK_ENABLED"
             },
@@ -161,7 +165,7 @@
               "display": "Debug syscall ioctl() BRK",
               "description": "Enable debugging for the ioctl() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_IOCTL_BRK_ENABLED"
             },
@@ -170,7 +174,7 @@
               "display": "Debug syscall kill() BRK",
               "description": "Enable debugging for the kill() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_KILL_BRK_ENABLED"
             },
@@ -179,7 +183,7 @@
               "display": "Debug syscall link() BRK",
               "description": "Enable debugging for the link() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_LINK_BRK_ENABLED"
             },
@@ -188,7 +192,7 @@
               "display": "Debug syscall opendir() BRK",
               "description": "Enable debugging for the opendir() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_OPENDIR_BRK_ENABLED"
             },
@@ -197,7 +201,7 @@
               "display": "Debug syscall raise() BRK",
               "description": "Enable debugging for the raise() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_RAISE_BRK_ENABLED"
             },
@@ -206,7 +210,7 @@
               "display": "Debug syscall readdir() BRK",
               "description": "Enable debugging for the readdir() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_READDIR_BRK_ENABLED"
             },
@@ -215,7 +219,7 @@
               "display": "Debug syscall readlink() BRK",
               "description": "Enable debugging for the readlink() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_READLINK_BRK_ENABLED"
             },
@@ -224,7 +228,7 @@
               "display": "Debug syscall rewinddir() BRK",
               "description": "Enable debugging for the rewinddir() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_REWINDDIR_BRK_ENABLED"
             },
@@ -233,7 +237,7 @@
               "display": "Debug syscall rmdir() BRK",
               "description": "Enable debugging for the rmdir() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_RMDIR_BRK_ENABLED"
             },
@@ -242,7 +246,7 @@
               "display": "Debug syscall select() BRK",
               "description": "Enable debugging for the select() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SELECT_BRK_ENABLED"
             },
@@ -251,7 +255,7 @@
               "display": "Debug syscall symlink() BRK",
               "description": "Enable debugging for the symlink() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SYMLINK_BRK_ENABLED"
             },
@@ -260,7 +264,7 @@
               "display": "Debug syscall sync() BRK",
               "description": "Enable debugging for the sync() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_SYNC_BRK_ENABLED"
             },
@@ -269,7 +273,7 @@
               "display": "Debug syscall truncate() BRK",
               "description": "Enable debugging for the truncate() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_TRUNCATE_BRK_ENABLED"
             },
@@ -278,7 +282,7 @@
               "display": "Debug syscall utime() BRK",
               "description": "Enable debugging for the utime() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_UTIME_BRK_ENABLED"
             },
@@ -287,7 +291,7 @@
               "display": "Debug syscall wait() BRK",
               "description": "Enable debugging for the wait() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_WAIT_BRK_ENABLED"
             },
@@ -296,7 +300,7 @@
               "display": "Debug syscall writev() BRK",
               "description": "Enable debugging for the writev() syscall BRK",
               "activeIf": [
-                "!debugSyscallsBrk"
+                "!debug-brk"
               ],
               // "customDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_WRITEV_BRK_ENABLED"
             }
