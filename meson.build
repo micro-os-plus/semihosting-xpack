@@ -35,7 +35,7 @@
 message('Processing xPack @micro-os-plus/semihosting...')
 
 # -----------------------------------------------------------------------------
-#
+
 # Meson's DSL does not provide introspection methods on dependency objects
 # to retrieve their properties after creation. The `_local_*` variables
 # therefore serve a dual purpose: populating the dependency object and

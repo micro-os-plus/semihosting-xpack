@@ -86,7 +86,7 @@ endif ()
 {%- assign staticSuffix = staticArtefact.id %}
 {%- assign objectsArtefacts = component.cdlArtefacts | where: 'type', 'objectFiles' %}
 {%- assign objectsArtefact = objectsArtefacts | first %}
-{%- assign objectsSuffix = objectsArtefact.id -%}
+{%- assign objectsSuffix = objectsArtefact.id %}
 
 # https://cmake.org/cmake/help/v3.20/command/add_library.html?highlight=interface#interface-libraries
 # Visibility keywords: PRIVATE applies to the target itself; INTERFACE passes
@@ -149,9 +149,10 @@ message (
   "> {{nameDoubleColon}} -> {{nameDash}}-interface"
 )
 
-# -----------------------------------------------------------------------------
-{% if component.cdlArtefacts and component.cdlArtefacts.size > 0 %}
+{%- if component.cdlArtefacts and component.cdlArtefacts.size > 0 %}
 {%- if component.dependencies and component.dependencies.size > 0 %}
+
+# -----------------------------------------------------------------------------
 
 {%- for dependency in component.dependencies %}
 {%- assign dependencyDash = dependency | replace: '.', '-' %}
@@ -164,8 +165,9 @@ get_property (
 {%- endfor %}
 {%- endif %}
 
-# -----------------------------------------------------------------------------
 {%- if objectsArtefact %}
+
+# -----------------------------------------------------------------------------
 
 # https://cmake.org/cmake/help/v3.20/command/add_library.html?highlight=interface#object-libraries
 # Optional OBJECT library: compiles the library sources once and shares the
@@ -271,9 +273,10 @@ message (
   "> {{nameDoubleColon}}-{{objectsSuffix}} -> {{nameDash}}-{{objectsSuffix}}"
 )
 
-# -----------------------------------------------------------------------------
 {%- endif %}
 {%- if staticArtefact %}
+
+# -----------------------------------------------------------------------------
 
 # https://cmake.org/cmake/help/v3.20/command/add_library.html?highlight=interface#normal-libraries
 # Optional STATIC library: compiles the library sources into an archive that is
@@ -372,8 +375,8 @@ message (
   VERBOSE
   "> {{nameDoubleColon}}-{{staticSuffix}} -> {{nameDash}}-{{staticSuffix}}"
 )
+{%- endif %}
+{%- endif %}
 
 # -----------------------------------------------------------------------------
-{%- endif %}
-{%- endif %}
 {% endfor %}
