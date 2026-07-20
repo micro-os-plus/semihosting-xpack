@@ -78,9 +78,12 @@ namespace micro_os_plus::trace::detail
 
 #if defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED)
 
-#if !defined(MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE)
-#define MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE (16)
-#endif
+#if !defined( \
+    MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_BUFFER_ARRAY_SIZE_INTEGER)
+// Keep this in sync with xcdl-package.jsonc definition.
+#define MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_BUFFER_ARRAY_SIZE_INTEGER \
+  (16)
+#endif // !defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_BUFFER_ARRAY_SIZE_INTEGER)
 
   ssize_t
   implementation::write (const void* buf, std::size_t nbyte) noexcept
@@ -109,7 +112,8 @@ namespace micro_os_plus::trace::detail
         // If not, use a local buffer to speed things up.
         // For re-entrance, this bugger must be allocated on the stack,
         // so be cautious with the size.
-        char tmp[MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE];
+        char tmp
+            [MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_BUFFER_ARRAY_SIZE_INTEGER];
         size_t togo = nbyte;
         while (togo > 0)
           {

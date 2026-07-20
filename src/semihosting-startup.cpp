@@ -27,11 +27,14 @@
 
 #if !defined( \
     MICRO_OS_PLUS_SEMIHOSTING_STARTUP_CMDLINE_BUFFER_ARRAY_SIZE_INTEGER)
-#define MICRO_OS_PLUS_SEMIHOSTING_STARTUP_CMDLINE_BUFFER_ARRAY_SIZE_INTEGER 80
+// Keep this in sync with xcdl-package.jsonc definition.
+#define MICRO_OS_PLUS_SEMIHOSTING_STARTUP_CMDLINE_BUFFER_ARRAY_SIZE_INTEGER \
+  (80)
 #endif
 
 #if !defined(MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ARGV_BUFFER_ARRAY_SIZE_INTEGER)
-#define MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ARGV_BUFFER_ARRAY_SIZE_INTEGER 10
+// Keep this in sync with xcdl-package.jsonc definition.
+#define MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ARGV_BUFFER_ARRAY_SIZE_INTEGER (10)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -43,7 +46,7 @@ using namespace micro_os_plus;
 extern "C"
 {
   void
-  micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv);
+  micro_os_plus_startup_initialise_args (int* p_argc, char*** p_argv);
 
   void
   micro_os_plus_terminate (int code);
@@ -57,7 +60,7 @@ extern "C"
 // and parsed into strings.
 
 void
-micro_os_plus_startup_initialize_args (int* p_argc, char*** p_argv)
+micro_os_plus_startup_initialise_args (int* p_argc, char*** p_argv)
 {
   // Array of chars to receive the command line from the host.
   static char cmdline
