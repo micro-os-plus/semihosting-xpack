@@ -6,9 +6,87 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2026-07-19
+
+* 3eda256 xcdl-package.jsonc update
+* d37fec6 re-grnerate top commons
+* 56d34ac xcdl-package.jsonc update
+
+## 2026-07-18
+
+* 988cfdf README update
+* f4ac427 xcdl-package.jsonc rework & xcdl export
+* c4ade51 update for xcdl defines
+
+## 2026-07-17
+
+* bd3f06d re-generate top commons
+* adf3bff re-generate top commons & export xcdl
+* f323470 package*.json update
+* 569ea45 csrc: cleaups in includes, rely on semihosting.h
+* e58d6a9 semihosting.h: add semihosting-defines.h
+
+## 2026-07-16
+
+* 027473f re-generate top commons
+
+## 2026-06-11
+
+* 4f7b083 prefer project-config.h
+
+## 2026-06-06
+
+* e027777 use __has_include(<micro-os-plus/config.h>)
+* ce89d69 copyright update 2026
+
+## 2025-11-20
+
+* f28a25c rename npm-pack
+
+## 2025-10-07
+
+* d7c19a5 update copyright notices
+
+## 2023-11-28
+
+* b01e83f README updates
+* 52e2a3d package.json: cosmetise scripts
+
+## 2023-10-19
+
+* cd4d48a package.json: cosmetise description
+* 851fc04 README updates
+
+## 2023-07-14
+
+* 2110bfc README updates
+* 7dd61b1 package.json: cosmetise urls
+* 9039269 package.json: minXpm 0.16.2
+
+## 2023-06-04
+
+* 2cc2d5b update for @scope/name
+
+## 2023-06-03
+
+* 52c2e29 lower case ci.yml
+* 269f010 package.json min 0.16.0
+
+## 2023-05-08
+
+* 53878da .npmignore update
+* 5699fe8 README updates
+* 9ccabf6 README updates
+* 17c2d71 meson.build cosmetics
+
+## 2022-08-16
+
+* 5ce09b1 package.json min 0.14.0 & defaults
+
 ## 2022-08-04
 
-* v8.0.0
+* b7921ae 8.0.0
+* 339a29e prepare v8.0.0
 * 4425dc3 rename MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE
 * d11f17e .vscode/settings.json: cmake.ignoreCMakeListsMissing
 * 6942748 .vscode/settings.json: makefile.configureOnOpen
@@ -27,10 +105,12 @@ and close existing issues and pull requests.
 
 ## 2022-07-24
 
-2022-07-24 * bf2f2be xpack.json: add missing *-brk options
-2022-07-24 * 61de2db xpack.json: no more camelCase for option names
-2022-07-24 * 3b41c6f #6: rename startup cmdline & argv
-2022-07-24 * 6dd77bb #5: remove socket functions
+## 2022-07-24
+
+* bf2f2be xpack.json: add missing *-brk options
+* 61de2db xpack.json: no more camelCase for option names
+* 3b41c6f #6: rename startup cmdline & argv
+* 6dd77bb #5: remove socket functions
 
 ## 2022-07-23
 
