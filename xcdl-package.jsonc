@@ -345,6 +345,7 @@
               "description": "The size of a local buffer allocated on the stack, used to speed up the display",
               "type": "integer",
               "defaultValue": 16,
+              // Keep this in sync with xcdl-package.jsonc definition.
               // "defaultDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_BUFFER_ARRAY_SIZE_INTEGER"
             }
           ]
