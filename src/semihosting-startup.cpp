@@ -181,7 +181,7 @@ micro_os_plus_terminate (int code)
 // ----------------------------------------------------------------------------
 
 #endif // defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED) &&
-       // defined(MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ENABLED)
+// defined(MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ENABLED)
 
 // ----------------------------------------------------------------------------
 

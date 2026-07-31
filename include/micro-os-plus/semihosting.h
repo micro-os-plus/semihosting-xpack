@@ -115,8 +115,7 @@ extern "C"
 
   micro_os_plus_semihosting_response_t
   micro_os_plus_semihosting_call_host (
-     int reason,
-     micro_os_plus_semihosting_param_block_t* arg);
+      int reason, micro_os_plus_semihosting_param_block_t* arg);
 
 #if defined(__cplusplus)
 }
