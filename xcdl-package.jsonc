@@ -37,6 +37,7 @@
           "cdlOptions": [
             {
               "id": "cmdline-buffer-array-size",
+              "display": "Command line buffer array size",
               "description": "The maximum number of characters that can be received from the host; the buffer is modified in place, and space characters are replaced by nulls to mark the string terminators",
               "type": "integer",
               "defaultValue": 80,
@@ -44,6 +45,7 @@
             },
             {
               "id": "argv-buffer-array-size",
+              "display": "Argv buffer array size",
               "description": "The maximum number of arguments (pointers to strings) that can be passed as argv[] to main()",
               "type": "integer",
               "defaultValue": 10,
@@ -312,7 +314,7 @@
           "id": "debug-faults",
           "display": "Debug faults",
           "description": "Enable debugging for the semihosting trace channel faults",
-          // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_DEBUG_FAULTS"
+          // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_DEBUG_FAULTS_ENABLED"
         }
       ]
     },
@@ -335,12 +337,12 @@
           "display": "Trace via semihosting debug",
           "description": "A diag trace channel implemented over the semihosting SYS_WRITE0 call",
           "implements": [
-            "diag.trace.output-channel-interface"
+            "diag.trace.output-channel"
           ],
           // "defaultDefine": "MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED",
           "cdlOptions": [
             {
-              "name": "buffer-array-size",
+              "id": "buffer-array-size",
               "display": "Semihosting trace buffer array size",
               "description": "The size of a local buffer allocated on the stack, used to speed up the display",
               "type": "integer",
