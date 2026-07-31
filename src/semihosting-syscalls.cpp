@@ -14,9 +14,9 @@
 
 // ----------------------------------------------------------------------------
 
-#include <micro-os-plus/semihosting.h>
-#include <micro-os-plus/architecture.h>
-#include <micro-os-plus/diag/trace.h>
+#include "micro-os-plus/semihosting.h"
+#include "micro-os-plus/architecture.h"
+#include "micro-os-plus/diag/trace.h"
 
 #include <cstring>
 
@@ -875,7 +875,7 @@ _getpid (void)
 int
 _execve (const char* path, char* const argv[], char* const envp[])
 {
-#if defined(MICRO_OS_PLUS_DEBUG) \
+#if defined(MICRO_OS_PLUS_DEBUG_ENABLED) \
     && (defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED) \
         || defined( \
             MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_EXECVE_BRK_ENABLED))
@@ -891,7 +891,7 @@ _execve (const char* path, char* const argv[], char* const envp[])
 pid_t
 _fork (void)
 {
-#if defined(MICRO_OS_PLUS_DEBUG) \
+#if defined(MICRO_OS_PLUS_DEBUG_ENABLED) \
     && (defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED) \
         || defined( \
             MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_FORK_BRK_ENABLED))
@@ -907,7 +907,7 @@ _fork (void)
 int
 _kill (pid_t pid, int sig)
 {
-#if defined(MICRO_OS_PLUS_DEBUG) \
+#if defined(MICRO_OS_PLUS_DEBUG_ENABLED) \
     && (defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED) \
         || defined( \
             MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_KILL_BRK_ENABLED))
@@ -923,7 +923,7 @@ _kill (pid_t pid, int sig)
 pid_t
 _wait (int* stat_loc)
 {
-#if defined(MICRO_OS_PLUS_DEBUG) \
+#if defined(MICRO_OS_PLUS_DEBUG_ENABLED) \
     && (defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED) \
         || defined( \
             MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_OPENDIR_BRK_ENABLED))
@@ -939,7 +939,7 @@ _wait (int* stat_loc)
 int
 _link (const char* existing, const char* _new)
 {
-#if defined(MICRO_OS_PLUS_DEBUG) \
+#if defined(MICRO_OS_PLUS_DEBUG_ENABLED) \
     && (defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED) \
         || defined( \
             MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_LINK_BRK_ENABLED))

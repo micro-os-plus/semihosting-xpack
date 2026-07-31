@@ -9,18 +9,12 @@
  * obtained from https://opensource.org/licenses/mit.
  */
 
-#ifndef MICRO_OS_PLUS_SEMIHOSTING_INLINES_H_
-#define MICRO_OS_PLUS_SEMIHOSTING_INLINES_H_
+#ifndef MICRO_OS_PLUS_INLINES_SEMIHOSTING_INLINES_H_
+#define MICRO_OS_PLUS_INLINES_SEMIHOSTING_INLINES_H_
 
 // ----------------------------------------------------------------------------
 
 #if defined(__cplusplus)
-
-// ----------------------------------------------------------------------------
-
-// Include the architecture specific definitions, which
-// include `call_host()`.
-#include <micro-os-plus/architecture.h>
 
 // ----------------------------------------------------------------------------
 
@@ -44,6 +38,6 @@ namespace micro_os_plus::semihosting
 
 // ----------------------------------------------------------------------------
 
-#endif // MICRO_OS_PLUS_SEMIHOSTING_INLINES_H_
+#endif // MICRO_OS_PLUS_INLINES_SEMIHOSTING_INLINES_H_
 
 // ----------------------------------------------------------------------------

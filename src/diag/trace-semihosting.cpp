@@ -14,8 +14,8 @@
 
 // ----------------------------------------------------------------------------
 
-#include <micro-os-plus/diag/trace.h>
-#include <micro-os-plus/semihosting.h>
+#include "micro-os-plus/diag/trace.h"
+#include "micro-os-plus/semihosting.h"
 
 // ----------------------------------------------------------------------------
 
@@ -27,10 +27,10 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(MICRO_OS_PLUS_SEMIHOSTING_DEBUG_FAULTS)
+#if defined(MICRO_OS_PLUS_SEMIHOSTING_DEBUG_FAULTS_ENABLED)
 #error \
     "Cannot debug semihosting using semihosting trace; use MICRO_OS_PLUS_DIAG_TRACE_ITM_ENABLED"
-#endif
+#endif // defined(MICRO_OS_PLUS_SEMIHOSTING_DEBUG_FAULTS_ENABLED)
 
 // ----------------------------------------------------------------------------
 

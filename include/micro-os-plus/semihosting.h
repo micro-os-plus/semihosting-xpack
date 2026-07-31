@@ -20,19 +20,17 @@
 #endif
 #endif // defined(__cplusplus)
 
-#if __has_include(<micro-os-plus/project-config.h>)
-#include <micro-os-plus/project-config.h>
-#elif __has_include(<micro-os-plus/config.h>)
-#pragma message \
-    "micro-os-plus/config.h is deprecated, rename to micro-os-plus/project-config.h and include it instead of micro-os-plus/config.h"
-#include <micro-os-plus/config.h>
-#endif // __has_include(<micro-os-plus/project-config.h>)
+#if __has_include("micro-os-plus/project-config.h")
+#include "micro-os-plus/project-config.h"
+#endif // __has_include("micro-os-plus/project-config.h")
 
-#if __has_include(<micro-os-plus/semihosting-defines.h>)
-#include <micro-os-plus/semihosting-defines.h>
-#endif // __has_include(<micro-os-plus/semihosting-defines.h>)
+#if __has_include("micro-os-plus/semihosting-defines.h")
+#include "micro-os-plus/semihosting-defines.h"
+#endif // __has_include("micro-os-plus/semihosting-defines.h")
 
-#include <micro-os-plus/architecture.h>
+// ----------------------------------------------------------------------------
+
+#include "micro-os-plus/architecture.h"
 
 // ----------------------------------------------------------------------------
 
@@ -113,12 +111,12 @@ extern "C"
   // --------------------------------------------------------------------------
 
   // To allow for static inline optimizations, this definition is actually not
-  // in this package, but in the architecture semihosting-inlines.h file.
+  // in this package, but in the architecture semihosting.cpp file.
 
-  // static micro_os_plus_semihosting_response_t
-  // micro_os_plus_semihosting_call_host (
-  //    int reason,
-  //    micro_os_plus_semihosting_param_block_t* arg);
+  micro_os_plus_semihosting_response_t
+  micro_os_plus_semihosting_call_host (
+     int reason,
+     micro_os_plus_semihosting_param_block_t* arg);
 
 #if defined(__cplusplus)
 }
@@ -146,10 +144,10 @@ namespace micro_os_plus::semihosting
 
 #endif // defined(__cplusplus)
 
-// ----------------------------------------------------------------------------
+// ============================================================================
+// Templates, inlines & constexpr implementations.
 
-// Include the portable definitions.
-#include <micro-os-plus/semihosting-inlines.h>
+#include "inlines/semihosting-inlines.h"
 
 // ----------------------------------------------------------------------------
 

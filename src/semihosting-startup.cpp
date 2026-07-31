@@ -14,9 +14,9 @@
 
 // ----------------------------------------------------------------------------
 
-#include <micro-os-plus/semihosting.h>
-#include <micro-os-plus/architecture.h>
-#include <micro-os-plus/diag/trace.h>
+#include "micro-os-plus/semihosting.h"
+#include "micro-os-plus/architecture.h"
+#include "micro-os-plus/diag/trace.h"
 
 #include <ctype.h>
 
@@ -167,7 +167,7 @@ micro_os_plus_terminate (int code)
   semihosting::call_host (SEMIHOSTING_SYS_EXIT, fields);
 #endif
 
-#if defined(MICRO_OS_PLUS_DEBUG)
+#if defined(MICRO_OS_PLUS_DEBUG_ENABLED)
   architecture::brk ();
 #endif
 
