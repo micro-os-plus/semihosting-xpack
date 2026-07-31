@@ -129,7 +129,7 @@ The same functionality is available from a similar C function,
 defined in the architecture package:
 
 ```c
-static micro_os_plus_semihosting_response_t
+micro_os_plus_semihosting_response_t
 micro_os_plus_semihosting_call_host (
     int reason,
     micro_os_plus_semihosting_param_block_t* arg);
@@ -140,7 +140,7 @@ micro_os_plus_semihosting_call_host (
 The architecture should provide a definition of the following function:
 
 ```c
-  static inline __attribute__ ((always_inline)) int
+  __attribute__ ((always_inline)) int
   micro_os_plus_semihosting_call_host (int reason, void* arg);
 ```
 
@@ -166,7 +166,7 @@ The following folders should be passed to the compiler during the build:
 The header files to be included in user projects are:
 
 ```c++
-#include <micro-os-plus/semihosting.h>
+#include "micro-os-plus/semihosting.h"
 ```
 
 #### Source files
@@ -179,7 +179,6 @@ The source files to be added to the build are:
 
 #### Preprocessor definitions
 
-- `MICRO_OS_PLUS_INCLUDE_CONFIG_H` - to include `<micro-os-plus/config.h>`
 - `MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_ENABLED`
 - `MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_MAX_OPEN_FILES_INTEGER` (20)
 - `MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_BRK_ENABLED`
