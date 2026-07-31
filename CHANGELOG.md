@@ -6,6 +6,21 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2026-07-31
+
+* 1b59bb8 xcdl-package.jsonc update
+* d176686 re-generate top xcdl
+* 2c59b57 re-format clang
+* 090665b re-generate top commons
+* 27d7fde cosmetise guards & includes
+* 104da62 copyright notices update
+
+## 2026-07-20
+
+* 91a8d7c prepare 9.0.0
+* 546cb3b xcdl-package.jsonc cosmetics
+* 970c31b src cosmetics
+
 ## 2026-07-19
 
 * 3eda256 xcdl-package.jsonc update
