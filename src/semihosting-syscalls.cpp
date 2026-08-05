@@ -87,8 +87,11 @@ extern "C"
 namespace
 {
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
+
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif // defined(__GNUC__)
 
   // Struct used to keep track of the file position, just so we
   // can implement fseek(fh,x,SEEK_CUR).
@@ -98,7 +101,9 @@ namespace
     off_t pos;
   };
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
+#endif // defined(__GNUC__)
 
   /*
    *  User file descriptors (fd) are integer indexes into
@@ -154,9 +159,11 @@ initialise_monitor_handles (void)
 
   semihosting::param_block_t fields[3];
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
 
 #pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+#endif // defined(__GNUC__)
 
   fields[0] = reinterpret_cast<semihosting::param_block_t> (
       const_cast<char*> (":tt"));
@@ -174,7 +181,9 @@ initialise_monitor_handles (void)
       SEMIHOSTING_SYS_OPEN,
       static_cast<semihosting::param_block_t*> (fields)));
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
+#endif // defined(__GNUC__)
 
   fields[0] = reinterpret_cast<semihosting::param_block_t> (
       const_cast<char*> (":tt"));
@@ -869,8 +878,11 @@ _getpid (void)
   return 1;
 }
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic push
+
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif // defined(__GNUC__)
 
 int
 _execve (const char* path, char* const argv[], char* const envp[])
@@ -952,7 +964,9 @@ _link (const char* existing, const char* _new)
   return -1;
 }
 
+#if defined(__GNUC__)
 #pragma GCC diagnostic pop
+#endif // defined(__GNUC__)
 
 // ----------------------------------------------------------------------------
 
