@@ -32,7 +32,7 @@
 # -----------------------------------------------------------------------------
 
 # A source code library with the µOS++ portable semihosting definitions.
-message('Processing xPack @micro-os-plus/semihosting...')
+message('Processing xpm package @micro-os-plus/semihosting...')
 
 # -----------------------------------------------------------------------------
 
