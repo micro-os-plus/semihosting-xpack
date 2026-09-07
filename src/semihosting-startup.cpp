@@ -46,7 +46,7 @@ using namespace micro_os_plus;
 extern "C"
 {
   void
-  micro_os_plus_startup_initialise_args (int* p_argc, char*** p_argv);
+  micro_os_plus_startup_initialise_args_hook (int* p_argc, char*** p_argv);
 
   void
   micro_os_plus_terminate (int code);
@@ -60,7 +60,7 @@ extern "C"
 // and parsed into strings.
 
 void
-micro_os_plus_startup_initialise_args (int* p_argc, char*** p_argv)
+micro_os_plus_startup_initialise_args_hook (int* p_argc, char*** p_argv)
 {
   // Array of chars to receive the command line from the host.
   static char cmdline
