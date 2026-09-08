@@ -6,9 +6,25 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2026-09-08
+
+* v10.0.0
+* a710d51 add heapinfo_block
+
+## 2026-09-07
+
+* bbdc169 rename hooks
+* df3ab14 cosmetics xpm 
+
+## 2026-08-05
+
+* f0fbdf0 readme cosmetics
+* 557031b #if defined() cosmetics
+
 ## 2026-08-04
 
-* v9.0.0
+* 3c71a6a 9.0.0
+* 8c8e8af repare v9.0.0
 * 41bdbaa re-generate top commons
 
 ## 2026-07-31
