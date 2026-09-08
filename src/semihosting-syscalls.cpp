@@ -73,6 +73,61 @@ using namespace micro_os_plus;
 
 // ----------------------------------------------------------------------------
 
+#if defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_WRAP_ENABLED)
+
+// For libraries that provide non-semihosted syscall implementations, use the
+// magic of the linker wrap feature to redirect calls to the semihosted versions.
+
+// For this, rename all functions with the `__wrap_` prefix.
+
+#define initialise_monitor_handles __wrap_initialise_monitor_handles
+
+#define _open __wrap__open
+#define _close __wrap__close
+#define _read __wrap__read
+#define _write __wrap__write
+#define _lseek __wrap__lseek
+#define _isatty __wrap__isatty
+#define _fstat __wrap__fstat
+#define _stat __wrap__stat
+#define _rename __wrap__rename
+#define _unlink __wrap__unlink
+#define _system __wrap__system
+#define _gettimeofday __wrap__gettimeofday
+#define _ftime __wrap__ftime
+#define _times __wrap__times
+#define _clock __wrap__clock
+#define _getpid __wrap__getpid
+#define _execve __wrap__execve
+#define _fork __wrap__fork
+#define _kill __wrap__kill
+#define _wait __wrap__wait
+#define _link __wrap__link
+#define _exit __wrap__exit
+
+// `_exit` is defined in the startup package, wrap it manually here.
+extern "C"
+{
+  [[noreturn]]
+  void
+  __wrap__exit (int status);
+}
+
+[[noreturn]]
+void
+_Exit (int status);
+
+[[noreturn]]
+void
+__wrap__exit (int status)
+{
+  _Exit (status);
+}
+
+#endif // defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_WRAP_ENABLED)
+
+// ----------------------------------------------------------------------------
+
 extern "C"
 {
   // This name is used by newlib; for compatibility reasons, better preserve
