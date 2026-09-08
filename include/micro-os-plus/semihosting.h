@@ -110,6 +110,16 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
+  struct micro_os_plus_semihosting_heapinfo_block
+  {
+    micro_os_plus_semihosting_register_t heap_base;
+    micro_os_plus_semihosting_register_t heap_limit;
+    micro_os_plus_semihosting_register_t stack_base;
+    micro_os_plus_semihosting_register_t stack_limit;
+  };
+
+  // --------------------------------------------------------------------------
+
   // To allow for static inline optimizations, this definition is actually not
   // in this package, but in the architecture semihosting.cpp file.
 
@@ -132,8 +142,11 @@ namespace micro_os_plus::semihosting
   // --------------------------------------------------------------------------
   // Portable semihosting functions in C++.
 
+  typedef micro_os_plus::architecture::register_t register_t;
   typedef micro_os_plus::architecture::register_t param_block_t;
   typedef micro_os_plus::architecture::signed_register_t response_t;
+
+  typedef micro_os_plus_semihosting_heapinfo_block heapinfo_block_t;
 
   response_t
   call_host (int reason, param_block_t* arg);

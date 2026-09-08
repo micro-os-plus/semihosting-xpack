@@ -50,6 +50,12 @@
               "type": "integer",
               "defaultValue": 10,
               // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ARGV_BUFFER_ARRAY_SIZE_INTEGER"
+            },
+            {
+              "id": "heapinfo",
+              "display": "Heap info",
+              "description": "Show information about the semihosting heap and stack",
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_STARTUP_HEAPINFO_ENABLED"
             }
           ]
         },

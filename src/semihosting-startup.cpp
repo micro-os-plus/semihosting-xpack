@@ -19,6 +19,7 @@
 #include "micro-os-plus/diag/trace.h"
 
 #include <ctype.h>
+#include <cinttypes>
 
 // ----------------------------------------------------------------------------
 
@@ -62,6 +63,23 @@ extern "C"
 void
 micro_os_plus_startup_initialise_args_hook (int* p_argc, char*** p_argv)
 {
+  semihosting::param_block_t fields[2];
+
+#if defined(MICRO_OS_PLUS_SEMIHOSTING_STARTUP_HEAPINFO_ENABLED)
+
+  micro_os_plus::semihosting::heapinfo_block_t heap_info = {};
+  fields[0] = reinterpret_cast<micro_os_plus::semihosting::param_block_t> (
+      &heap_info);
+  semihosting::call_host (SEMIHOSTING_SYS_HEAPINFO, fields);
+
+  trace::printf ("Semihosting heap base: 0x%08" PRIxPTR
+                 ", limit: 0x%08" PRIxPTR ", stack base: 0x%08" PRIxPTR
+                 ", limit: 0x%08" PRIxPTR "\n",
+                 heap_info.heap_base, heap_info.heap_limit,
+                 heap_info.stack_base, heap_info.stack_limit);
+
+#endif // defined(MICRO_OS_PLUS_SEMIHOSTING_STARTUP_HEAPINFO_ENABLED)
+
   // Array of chars to receive the command line from the host.
   static char cmdline
       [MICRO_OS_PLUS_SEMIHOSTING_STARTUP_CMDLINE_BUFFER_ARRAY_SIZE_INTEGER];
@@ -74,7 +92,6 @@ micro_os_plus_startup_initialise_args_hook (int* p_argc, char*** p_argv)
   int argc = 0;
   bool is_in_argument = false;
 
-  semihosting::param_block_t fields[2];
   fields[0] = reinterpret_cast<semihosting::param_block_t> (cmdline);
   fields[1] = sizeof (cmdline) - 1;
   int ret = static_cast<int> (
