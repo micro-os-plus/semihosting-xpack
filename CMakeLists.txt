@@ -46,8 +46,9 @@ if (COMMAND xpack_get_package_name_and_version)
   xpack_get_package_name_and_version (
     "${CMAKE_CURRENT_SOURCE_DIR}/package.json"
   )
-  message (VERBOSE
-           "Processing xpm package ${PACKAGE_JSON_NAME}@${PACKAGE_JSON_VERSION}..."
+  message (
+    VERBOSE
+    "Processing xpm package ${PACKAGE_JSON_NAME}@${PACKAGE_JSON_VERSION}..."
   )
 endif ()
 
