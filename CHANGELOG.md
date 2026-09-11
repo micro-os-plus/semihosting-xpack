@@ -6,10 +6,18 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2026-09-11
+
+* v10.1.0
+* e3660a8 re-format cmake
+* 9bd670e xcdl-package.json add syscalls.wrap
+* c160598 10.0.0
+
 ## 2026-09-08
 
-* v10.0.0
-* a710d51 add heapinfo_block
+* 39f9236 10.0.0
+* 15723aa prepare v10.0.0
+* 57b59b1 add heapinfo_block
 
 ## 2026-09-07
 

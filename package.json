@@ -1,6 +1,6 @@
 {
   "name": "@micro-os-plus/semihosting",
-  "version": "10.0.0",
+  "version": "10.1.0-pre",
   "description": "A source code library with the µOS++ portable semihosting definitions",
   "repository": {
     "type": "git",
