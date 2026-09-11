@@ -311,6 +311,12 @@
                 "!debug-brk"
               ],
               // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_DEBUG_WRITEV_BRK_ENABLED"
+            },
+            {
+              "id": "wrap",
+              "display": "Wrap semihosting syscall functions",
+              "description": "Enable wrapping of semihosting syscall functions for redirection",
+              // "defaultDefine": "MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_WRAP_ENABLED"
             }
           ]
         },
