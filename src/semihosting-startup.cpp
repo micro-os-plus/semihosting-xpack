@@ -50,7 +50,7 @@ extern "C"
   micro_os_plus_startup_initialise_args_hook (int* p_argc, char*** p_argv);
 
   void
-  micro_os_plus_terminate (int code);
+  micro_os_plus_startup_exit_terminate_hook (int code);
 }
 
 // ----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ micro_os_plus_startup_initialise_args_hook (int* p_argc, char*** p_argv)
 // ----------------------------------------------------------------------------
 
 void __attribute__ ((noreturn, weak))
-micro_os_plus_terminate (int code)
+micro_os_plus_startup_exit_terminate_hook (int code)
 {
 #if (__SIZEOF_POINTER__ == 4)
   semihosting::call_host (SEMIHOSTING_SYS_EXIT,
