@@ -6,7 +6,7 @@
 
 # A source code library with the µOS++ semihosting support
 
-This project provides the **XXXX YYYY** source library as an xPack
+This project provides the **µOS++ semihosting** source library as an `xpm`
 dependency and includes support for semihosting.
 
 It complements the newlib
@@ -26,7 +26,7 @@ For maintainer info, please see the
 
 ## Install
 
-As a source library xPack, the easiest way to add it to a project is via
+As a source library xpm package, the easiest way to add it to a project is via
 **xpm**, but it can also be used as any Git project, for example as a submodule.
 
 ### Prerequisites
@@ -45,18 +45,7 @@ For details please follow the instructions in the
 
 ### xpm
 
-Note: the package will be available from npmjs.com at a later date.
-
-For now, it can be installed from GitHub:
-
-```sh
-cd my-project
-xpm init # Unless a package.json is already present
-
-xpm install github:micro-os-plus/semihosting-xpack
-```
-
-When ready, this package will be available as
+This package is available as
 [`@micro-os-plus/semihosting`](https://www.npmjs.com/package/@micro-os-plus/semihosting)
 from the `npmjs.com` registry:
 
@@ -293,6 +282,10 @@ According to [semver](https://semver.org) rules:
 
 The incompatible changes, in reverse chronological order, are:
 
+- v11.x: rename micro_os_plus_startup_exit_terminate_hook
+- v10.x: rename micro_os_plus_startup_initialise_args_hook
+- v9.x: update for xcdl macros
+- v8.x: rename MICRO_OS_PLUS_INTEGER_TRACE_SEMIHOSTING_BUFFER_ARRAY_SIZE
 - v7.x: get rid of the C++ `posix::` namespace
 - v6.x: rename source files
 - v5.x: rename SYS_GETCMDLINE; use param_block_t
