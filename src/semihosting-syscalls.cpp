@@ -1056,8 +1056,8 @@ _openat(int dirfd, const char *name, int flags, int mode);
 
 // ----------------------------------------------------------------------------
 
-#endif // defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED) &&
-// defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_ENABLED)
+#endif /* defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED) &&
+          defined(MICRO_OS_PLUS_SEMIHOSTING_SYSCALLS_ENABLED) */
 
 // ----------------------------------------------------------------------------
 

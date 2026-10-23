@@ -212,11 +212,11 @@ namespace micro_os_plus::trace::detail
 
 } // namespace micro_os_plus::trace::detail
 
-#endif // defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED) ||
-//  defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED)
+#endif /* defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_DEBUG_ENABLED) ||
+         defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_STDOUT_ENABLED) */
 
-#endif // defined(MICRO_OS_PLUS_DIAG_TRACE_ENABLED) &&
-// defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_ENABLED)
+#endif /* defined(MICRO_OS_PLUS_DIAG_TRACE_ENABLED) &&
+          defined(MICRO_OS_PLUS_DIAG_TRACE_SEMIHOSTING_ENABLED) */
 
 // ----------------------------------------------------------------------------
 

@@ -197,8 +197,8 @@ micro_os_plus_startup_exit_terminate_hook (int code)
 
 // ----------------------------------------------------------------------------
 
-#endif // defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED) &&
-// defined(MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ENABLED)
+#endif /* defined(MICRO_OS_PLUS_SEMIHOSTING_ENABLED) &&
+          defined(MICRO_OS_PLUS_SEMIHOSTING_STARTUP_ENABLED) */
 
 // ----------------------------------------------------------------------------
 
