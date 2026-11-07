@@ -28,7 +28,7 @@
   "devDependencies": {
     "@xpack/npm-packages-helper": "github:xpack/npm-packages-helper",
     "del-cli": "^7.0.0",
-    "glob": "^13.0.6",
+    "glob": "^14.0.4",
     "json": "^11.0.0",
     "json5": "^2.2.3",
     "jsonc-parser": "^3.3.1",
