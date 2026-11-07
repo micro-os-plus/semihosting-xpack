@@ -146,7 +146,7 @@ The version is visible at:
 When the package is considered stable:
 
 - with a Git client (VS Code is fine)
-- merge `xpack-development` into `xpack`
+- rebase `xpack` on top of `xpack-development` 
 - push to GitHub
 - select `xpack-development`
 
