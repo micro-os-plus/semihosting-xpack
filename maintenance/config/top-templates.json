@@ -1,5 +1,7 @@
 {
   "descriptiveName": "Arm Semihosting",
+  "permalinkName": "semihosting",
+  "preferredName": "Arm Semihosting",
   "githubActionsNodeVersions": [
     "24"
   ],
@@ -13,5 +15,6 @@
   "githubActionsXpmVersions": [
     "0.23.2"
   ],
+  "skipCiTests": true,
   "useSelfHostedRunners": false
 }

@@ -73,7 +73,7 @@ micro_os_plus_semihosting_startup_dependency_compile_cpp_args = _local_compile_c
 foreach name : _local_include_directories
   message('+ -I ' + name)
 endforeach
-foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args
+foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args + _local_link_args
   message('+ ' + name)
 endforeach
 message('> micro_os_plus_semihosting_startup_dependency')
@@ -112,7 +112,7 @@ micro_os_plus_semihosting_syscalls_dependency_compile_cpp_args = _local_compile_
 foreach name : _local_include_directories
   message('+ -I ' + name)
 endforeach
-foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args
+foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args + _local_link_args
   message('+ ' + name)
 endforeach
 message('> micro_os_plus_semihosting_syscalls_dependency')
@@ -147,7 +147,7 @@ micro_os_plus_diag_trace_semihosting_debug_dependency_compile_cpp_args = _local_
 foreach name : _local_include_directories
   message('+ -I ' + name)
 endforeach
-foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args
+foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args + _local_link_args
   message('+ ' + name)
 endforeach
 message('> micro_os_plus_diag_trace_semihosting_debug_dependency')
@@ -182,7 +182,7 @@ micro_os_plus_diag_trace_semihosting_stdout_dependency_compile_cpp_args = _local
 foreach name : _local_include_directories
   message('+ -I ' + name)
 endforeach
-foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args
+foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args + _local_link_args
   message('+ ' + name)
 endforeach
 message('> micro_os_plus_diag_trace_semihosting_stdout_dependency')
@@ -203,11 +203,22 @@ _local_sources += [
   'src/diag/trace-semihosting.cpp',
 ]
 
+# The dependencies are single objects; enclose them in brackets,
+# to append them as elements of the list.
 _local_dependencies += [
   micro_os_plus_diag_trace_dependency,
   micro_os_plus_diag_trace_semihosting_debug_dependency,
   micro_os_plus_diag_trace_semihosting_stdout_dependency,
 ]
+
+# The dependencies' C/C++ args are lists; add them without brackets,
+# to concatenate their elements rather than nest the lists.
+_local_compile_c_args += micro_os_plus_diag_trace_dependency_compile_c_args
+_local_compile_cpp_args += micro_os_plus_diag_trace_dependency_compile_cpp_args
+_local_compile_c_args += micro_os_plus_diag_trace_semihosting_debug_dependency_compile_c_args
+_local_compile_cpp_args += micro_os_plus_diag_trace_semihosting_debug_dependency_compile_cpp_args
+_local_compile_c_args += micro_os_plus_diag_trace_semihosting_stdout_dependency_compile_c_args
+_local_compile_cpp_args += micro_os_plus_diag_trace_semihosting_stdout_dependency_compile_cpp_args
 
 # https://mesonbuild.com/Reference-manual_functions.html#declare_dependency
 micro_os_plus_diag_trace_semihosting_dependency = declare_dependency(
@@ -227,7 +238,7 @@ micro_os_plus_diag_trace_semihosting_dependency_compile_cpp_args = _local_compil
 foreach name : _local_include_directories
   message('+ -I ' + name)
 endforeach
-foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args
+foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args + _local_link_args
   message('+ ' + name)
 endforeach
 message('> micro_os_plus_diag_trace_semihosting_dependency')
@@ -248,6 +259,8 @@ _local_include_directories += [
   'include',
 ]
 
+# The dependencies are single objects; enclose them in brackets,
+# to append them as elements of the list.
 _local_dependencies += [
   micro_os_plus_diag_trace_dependency,
   micro_os_plus_diag_trace_semihosting_dependency,
@@ -255,6 +268,19 @@ _local_dependencies += [
   micro_os_plus_semihosting_startup_dependency,
   micro_os_plus_semihosting_syscalls_dependency,
 ]
+
+# The dependencies' C/C++ args are lists; add them without brackets,
+# to concatenate their elements rather than nest the lists.
+_local_compile_c_args += micro_os_plus_diag_trace_dependency_compile_c_args
+_local_compile_cpp_args += micro_os_plus_diag_trace_dependency_compile_cpp_args
+_local_compile_c_args += micro_os_plus_diag_trace_semihosting_dependency_compile_c_args
+_local_compile_cpp_args += micro_os_plus_diag_trace_semihosting_dependency_compile_cpp_args
+_local_compile_c_args += micro_os_plus_architecture_dependency_compile_c_args
+_local_compile_cpp_args += micro_os_plus_architecture_dependency_compile_cpp_args
+_local_compile_c_args += micro_os_plus_semihosting_startup_dependency_compile_c_args
+_local_compile_cpp_args += micro_os_plus_semihosting_startup_dependency_compile_cpp_args
+_local_compile_c_args += micro_os_plus_semihosting_syscalls_dependency_compile_c_args
+_local_compile_cpp_args += micro_os_plus_semihosting_syscalls_dependency_compile_cpp_args
 
 # https://mesonbuild.com/Reference-manual_functions.html#declare_dependency
 micro_os_plus_semihosting_dependency = declare_dependency(
@@ -274,7 +300,7 @@ micro_os_plus_semihosting_dependency_compile_cpp_args = _local_compile_cpp_args
 foreach name : _local_include_directories
   message('+ -I ' + name)
 endforeach
-foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args
+foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args + _local_link_args
   message('+ ' + name)
 endforeach
 message('> micro_os_plus_semihosting_dependency')
