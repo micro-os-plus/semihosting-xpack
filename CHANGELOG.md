@@ -6,9 +6,23 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2026-11-07
+
+* v11.0.1
+* 5fa0077 re-generate top commons
+
+## 2026-10-23
+
+* bdd7d86 #endif cosmetics
+
+
 ## 2026-09-19
 
-* v11.0.0
+* 73112c0 README update
+* 2154d29 11.0.0
+* 2c722a6 package.json update version
+* 5fb719f README update
+* 5956b49 prepare v11.0.0
 * ffc092c rename micro_os_plus_startup_exit_terminate_hook
 
 ## 2026-09-11
