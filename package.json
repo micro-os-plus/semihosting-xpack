@@ -27,12 +27,13 @@
   "dependencies": {},
   "devDependencies": {
     "@xpack/npm-packages-helper": "github:xpack/npm-packages-helper",
-    "del-cli": "^7.0.0",
-    "glob": "^13.0.6",
+    "del-cli": "^8.0.1",
+    "glob": "^14.0.4",
     "json": "^11.0.0",
     "json5": "^2.2.3",
     "jsonc-parser": "^3.3.1",
-    "liquidjs": "^10.25.0"
+    "liquidjs": "^10.30.1",
+    "prettier": "^3.9.10"
   },
   "scripts": {
     "generate-top-commons": "node node_modules/@xpack/npm-packages-helper/maintenance/scripts/generate-top-commons.mjs --micro-os-plus",
@@ -45,7 +46,8 @@
     "git-log": "git log --pretty='%cd * %h %s' --date=short",
     "git-pull-helper": "git -C ${HOME}/Work/micro-os-plus/build-helper-xpack.git pull",
     "deep-clean": "del-cli node_modules package-lock.json *.tgz",
-    "postversion": "git push origin --all && git push origin --tags"
+    "postversion": "git push origin --all && git push origin --tags",
+    "update-changelog": "node maintenance/scripts/update-changelog.mjs CHANGELOG.md"
   },
   "xpack": {
     "minimumXpmRequired": "0.20.8",
@@ -61,6 +63,6 @@
     }
   },
   "engines": {
-    "node": ">=20.0"
+    "node": ">=22.12"
   }
 }
