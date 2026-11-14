@@ -20,6 +20,7 @@
 
 #include <ctype.h>
 #include <cinttypes>
+#include <cassert>
 
 // ----------------------------------------------------------------------------
 
@@ -96,6 +97,7 @@ micro_os_plus_startup_initialise_args_hook (int* p_argc, char*** p_argv)
   fields[1] = sizeof (cmdline) - 1;
   int ret = static_cast<int> (
       semihosting::call_host (SEMIHOSTING_SYS_GETCMDLINE, fields));
+  assert (ret == 0);
   if (ret == 0)
     {
       // In case the host send more than we can chew, limit the
