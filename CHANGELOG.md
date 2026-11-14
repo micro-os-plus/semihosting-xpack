@@ -6,15 +6,25 @@ Please check
 [GitHub](https://github.com/micro-os-plus/semihosting-xpack/issues/)
 and close existing issues and pull requests.
 
+## 2026-11-14
+
+* v11.0.2
+* 0e3b4fa #11: Assert the SYS_GETCMDLINE result
+* d4f8ec0 update skills
+* b96b9ec re-generate top commons
+
 ## 2026-11-07
 
-* v11.0.1
+* a91ee67 empty website
+* 4922117 README update
+* 4d0944d README update
+* 41fb8f4 11.0.1
+* 95c7364 prepare v11.0.1
 * 5fa0077 re-generate top commons
 
 ## 2026-10-23
 
 * bdd7d86 #endif cosmetics
-
 
 ## 2026-09-19
 
